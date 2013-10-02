@@ -1,0 +1,812 @@
+body, form, img {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#bodywrap3, #bodywrapmain3 {
+    padding: 8px;
+}
+a {
+    font-family: sans-serif;
+    font-weight: normal;
+    text-decoration: none;
+}
+a, a:visited, a:active {
+    color: #0000d0;
+}
+a:hover {
+    text-decoration: none;
+    color: #0000ff;
+}
+hr {
+    margin: 0.5em 0;
+    border: 0;
+    border-bottom: 1px solid #c0c0c0;
+}
+
+#verytopbar {
+    z-index: 100;
+    width: 100%;
+    margin: 0 0 0.2em;
+    padding: 0;
+    font-size: 0.9em;
+}
+.darkbar, #themedropdown, #homedropdown {
+    background: #000;
+    color: #fff;
+}
+#verytopbar, #themedropdown, #watchedthreads, #homedropdown {
+    -moz-box-shadow: 3px 3px 8px #666;
+    -webkit-box-shadow: 3px 3px 8px #666;
+    -o-box-shadow: 3px 3px 8px #666;
+    box-shadow: 3px 3px 8px #666;
+}
+.darkbar a {
+    display: inline-block;
+    color: #fff;
+}
+#themedropdown, #homedropdown {
+    position: absolute;
+    z-index: 110;
+    width: 30em;
+}
+.frontpage #themedropdown {
+    width: 20em;
+}
+#themedropdown h2 {
+    padding-top: 0.2em;
+    border-top: 1px solid #ccc;
+    text-align: center;
+}
+#themedropdown .themelink {
+    float: left;
+    margin: 0;
+    padding: 0;
+    width: 10em;
+}
+#themedropdown .themelink a {
+    padding: 0.5em 0.8em;
+    width: 10em;
+    font-size: 0.9em;
+}
+.themeauthor {
+    margin-left: 1.2em;
+    font-size: 0.85em;
+    font-style: italic;
+}
+.navbar, .adminbar {
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.navbarsection {
+    margin-right: 1em;
+}
+.navbarboard, .adminbaritem {
+    margin: 0 1px;
+    border-top: 4px solid white;
+}
+.navbarboard {
+    padding: 4px 0.2em 8px;
+}
+.adminbaritem {
+    padding: 4px 0.5em 8px;
+}
+.adminbar {
+    position: absolute;
+    right: 0;
+}
+.adminbar a {
+    font-weight: bold;
+}
+
+h1, h2, h3, .logo {
+    margin: 0;
+    font-family: sans-serif;
+}
+h1, .logo {
+    font-size: 4em;
+    text-align: center;
+}
+#verytopbar h1 {
+    font-size: 5em;
+    -moz-text-shadow: 1px 1px 1px #444, 0 0 18px #ddd;
+    -webkit-text-shadow: 1px 1px 1px #444, 0 0 18px #ddd;
+    -o-text-shadow: 1px 1px 1px #444, 0 0 18px #ddd;
+    text-shadow: 1px 1px 1px #444, 0 0 18px #ddd;
+}
+h2 {
+    font-size: 1.5em;
+}
+h3 {
+    margin: 0 auto;
+    font-size: 1.8em;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.frontpage {
+    min-width: 980px;
+}
+#siteleftsidebar {
+    float: left;
+    width: 150px;
+    /*margin-top: 1.6em;*/
+    margin-left: 0.4em;
+    font-size: 0.8em;
+}
+#siteallbutsidebar {
+    margin-left: 160px;
+}
+.sitesidebar h2, #sitemiddle h2 {
+    margin-bottom: 2px;
+    padding: 1px 0 1px 0.3em;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+}
+.sitesidebar .menuexpander {
+    float: right;
+    margin: 0 1px;
+    padding: 0 6px;
+    font-weight: bold;
+    color: #000;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+.sitesidebar .menuexpander:hover {
+    text-decoration: none;
+}
+.sitesidebar ul {
+    margin: 0 0 0.75em;
+    padding: 0;
+    list-style-type: none;
+}
+.sitesidebar li {
+    margin: 0;
+    width: 100%;
+}
+.sitesidebar li .boardlink {
+    display: block;
+    padding-left: 0.5em;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+#siterightsidebar {
+    float: right;
+    margin: 0 1.5em 3em;
+    width: 240px;
+}
+#siterightsidebar h2 {
+    margin-bottom: 0.75em;
+    font-size: 1.3em;
+}
+.sitesidebar .recentpostitem {
+    overflow: hidden;
+}
+.sitesidebar .recentnewsheaderline {
+    font-weight: bold;
+    font-size: 1.35em;
+}
+.sitesidebar .recentpostheaderline {
+    margin-bottom: 0.5em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sitesidebar .recentpostmessage {
+    padding-left: 0.5em;
+}
+.sitesidebar hr {
+    margin: 1em 0 2em;
+}
+
+#sitemiddle, #topmenu {
+    margin-left: 184px;
+    margin-right: 288px;
+}
+#topmenu {
+    margin-bottom: -1px;
+    font-size: 0.95em;
+}
+#topmenu ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    overflow: hidden;
+}
+#topmenu .tab {
+    float: left;
+    margin-top: 0.6em;
+    margin-right: -1px;
+    line-height: 1.8em;
+    border: 1px solid;
+    -moz-border-radius-topleft: 8px;
+    -webkit-border-top-left-radius: 8px;
+    border-top-left-radius: 8px;
+    -moz-border-radius-topright: 8px;
+    -webkit-border-top-right-radius: 8px;
+    border-top-right-radius: 8px;
+}
+#topmenu .current {
+    position: relative;
+    top: 1px;
+    margin-top: 0;
+    line-height: 2.4em;
+    border-bottom: 0;
+    -moz-border-radius-topleft: 12px;
+    -webkit-border-top-left-radius: 12px;
+    border-top-left-radius: 12px;
+    -moz-border-radius-topright: 12px;
+    -webkit-border-top-right-radius: 12px;
+    border-top-right-radius: 12px;
+}
+#topmenu .tab a {
+    display: block;
+    padding: 0 1em;
+    font-weight: normal;
+}
+#topmenu .current a {
+    font-size: 1.3em;
+}
+#topmenu .donate {
+    float: right;
+    margin-top: 0.5em;
+}
+#topmenu .tab form {
+    display: inline-block;
+}
+#topmenu .tab form input[type=image] {
+    vertical-align: middle;
+    margin: 0 0.2em;
+}
+
+#sitemiddle .newsentry {
+    margin-bottom: 2em;
+}
+#sitemiddle .newsentry:first-child h2 {
+    -moz-border-radius-topleft: 0;
+    -webkit-border-top-left-radius: 0;
+    border-top-left-radius: 0;
+}
+#sitemiddle .frontwidesection:first-child h2 {
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+}
+#sitemiddle h2 {
+    font-size: 1em;
+    font-weight: normal;
+}
+#sitemiddle .newssubtitle {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+#sitemiddle .newssubtitlebar {
+    float: right;
+    margin-right: 0.5em;
+    line-height: 1.9em;
+    opacity: 0.7;
+}
+#sitemiddle .newstimestamp {
+    font-style: italic;
+    font-size: 0.8em;
+}
+#sitemiddle .permalink {
+    float: right;
+    margin-right: 0.5em;
+    line-height: 1.9em;
+}
+#sitemiddle .newspermalink {
+    margin-left: 0.5em;
+}
+#sitemiddle .newscontent {
+    margin-left: 1em;
+}
+#sitemiddle td {
+    padding: 0;
+    vertical-align: top;
+}
+#sitemiddle .board-dir {
+    padding-left: 1em;
+    width: 1px;
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1.3em;
+}
+#sitemiddle .board-namearea {
+    font-size: 1.2em;
+    vertical-align: bottom;
+}
+#sitemiddle .board-name {
+    font-weight: bold;
+}
+#sitemiddle .board-connbar {
+    width: 1px;
+    padding: 0 0.5em 0 2em;
+}
+#sitemiddle .board-desc {
+    padding: 0 0 0.7em 0;
+}
+
+#watchedthreads {
+    position: absolute;
+    font-size: 0.8em;
+    z-index: 110;
+    width: 48%;
+    min-width: 20em;
+    max-width: 35em;
+}
+#watchedthreadlist {
+    padding: 0.2em 0 0.2em 0.2em;
+    max-height: 36em;
+    overflow: auto;
+}
+.watchedthread {
+    margin-bottom: 0.7em;
+}
+.watchedthreadbuttons {
+    float: right;
+    margin-top: 0.1em;
+    margin-bottom: -5px;
+}
+.watchedthreadbuttons a {
+    float: right;
+    margin: 0 2px 0;
+    line-height: 0.8em;
+    text-decoration: none;
+}
+.watchedthread .removelink {
+    padding: 2px 3px 2px 3px;
+    background: #edd;
+    border: 1px outset #c88;
+    color: red;
+    font-weight: bold;
+}
+.watchedthread .removelink:active {
+    padding: 3px 2px 1px 4px;
+    border: 1px inset #c88;
+}
+.watchedthread .golink {
+    padding: 0 4px 4px 3px;
+    background: #ded;
+    border: 1px outset #8c8;
+    color: green;
+    font-weight: bold;
+}
+.watchedthread .golink:active {
+    padding: 1px 3px 3px 4px;
+    border: 1px inset #8c8;
+}
+.watchedthread .topline, .watchedthread .preview {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.watchedthread .filetitle {
+    margin: 0;
+    font-size: 1em;
+}
+.watchedthreadnewreplies {
+    font-weight: bold;
+    color: #f22;
+    text-decoration: none;
+}
+a:hover .watchedthreadnewreplies {
+    color: #faa;
+}
+.watchedthread .preview {
+    margin-left: 1.2em;
+}
+
+.replymodelinkbar {
+    position: relative; /* For GitHub bar on /meta/ */
+    float: left;
+    width: 0;
+    white-space: nowrap;
+    z-index: 10;
+}
+.postarea {
+    text-align: center;
+}
+.postarea table {
+    margin: 0 auto;
+    text-align: left;
+}
+.postarea td {
+    padding-top: 0;
+}
+.postarea .postblock {
+    padding: 0 0.25em;
+    font-weight: bold;
+}
+.postarea input[type=text], .postarea input[type=password], .postarea textarea {
+    margin: 0;
+    border: 1px solid #000;
+    font-family: sans-serif;
+}
+.postarea input[type=submit] {
+    vertical-align: bottom;
+    margin: -10px 0.3em 0 0.1em;
+    font-size: 1.2em;
+}
+.postarea input[type=text]:focus, .postarea input[type=password]:focus, .postarea textarea:focus {
+    margin: -1px;
+    border-width: 2px;
+}
+.dangling-options {
+    position: absolute;
+    margin-top: -4px;
+}
+.helpbutton {
+    margin-top: -2px;
+    vertical-align: middle;
+}
+.helphover {
+    position: relative;
+}
+.helphover div {
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    z-index: 50;
+    width: 30em;
+    padding: 1em;
+    font-size: 0.9em;
+    border: 1px dotted #000;
+}
+.helphover ul {
+    margin-bottom: 0;
+}
+.blotter {
+    overflow: hidden;
+    text-align: center;
+}
+.blotter .date {
+    font-style: italic;
+}
+.blotter .subject {
+    font-weight: bold;
+}
+
+#rp-tags-input-table {
+    margin: 0;
+    width: 100%;
+}
+#rp-tags-input-table th {
+    text-align: center;
+}
+#rp-tags-input-table td {
+    vertical-align: top;
+    padding-bottom: 0.5em;
+}
+.rp-tags {
+    margin: 0 0 0.8em !important;
+}
+.rp-tags .reply {
+    display: inline-block;
+    margin-right: 0.5em !important;
+    padding: 0.2em 0.4em !important;
+    border: 1px inset #888;
+}
+.rp-tags .rp-tag-extra {
+    font-style: italic;
+}
+.roll {
+    font-weight: bold;
+    outline: 2px dashed #22e;
+}
+.collapsing-spoiler {
+    margin: 0.8em 0;
+}
+.collapsing-spoiler > div {
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 6px 0 0 -7px;
+    padding: 4px 6px;
+    border: 1px inset #888;
+}
+
+#delform hr {
+    margin: 2em 0 1em;
+}
+.doubledash {
+    display: none;
+    vertical-align: top;
+    clear: both;
+    float: left;
+}
+.stickyregion {
+    margin: -0.5em -8px -1em;  /* must be same as hr padding, body padding, and #delform hr padding, respectively */
+    padding: 0.5em  8px  1em;
+}
+.highlight {
+    padding-left: 0.5em;
+    border: none;
+    border-left: 9px double;
+}
+
+.thread {
+    display: table;
+}
+.threadsource {
+    float: right;
+    margin: -0.5em 0 -0.5em;
+    font-size: 1.5em;
+}
+.unhidethreadplaceholder {
+    margin: -0.85em 0 -3.1em;
+    opacity: 0.75;
+}
+.unhidethreadplaceholder:nth-child(2) {  /* HACK! */
+    position: relative;
+    top: 0.5em;
+}
+.postfooter {
+    margin-right: 0.2em;
+    text-align: right;
+    font-size: 0.75em;
+    white-space: nowrap;
+}
+.reply {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 0.7em;
+}
+.reply .postfooter {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.filesize {
+    font-size: 0.8em;
+    color: #303030;
+}
+.filetitle {
+    margin-right: 0.4em;
+    font-size: 1.2em;
+    line-height: 0.9em;
+    font-weight: bold;
+}
+.postername, .postername a {
+    font-family: inherit;
+    font-weight: bold;
+}
+.postername a {
+    border-bottom: 1px dashed;
+}
+.admin, .mod {
+    border: 0 dotted #000;
+    border-width: 2px 0;
+    padding: -3px;
+}
+.admin {
+    color: #c000c0;
+    border-color: #c000c0;
+}
+.mod {
+    color: #e02020;
+    border-color: #e02020;
+}
+i.rd {  /* RainbowDash mod, only using <i> because it's 1 char long */
+    font-style: normal;
+}
+i.sm {  /* Scootaloo mod */
+    font-style: normal;
+    color: #f80;
+}
+.gp {  /* Trixie mod */
+    background-image: url(images/sparkles.gif);
+    background-position: -8px -6px;
+}
+i.sn { /* Soarin mod */
+    font-style: normal;
+    background-image: url(images/sn.gif);
+    background-position: center;
+}
+i.sd {  /* Spike mod */
+    position: relative;
+    top: -3px;
+    background-image: url(images/spikefire2.gif);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+i.sd i {
+    position: relative;
+    top: 3px;
+    font-style: normal;
+    color: #6000c0;
+}
+i.ov {
+    font-style: normal;
+}
+
+#bm {	/* BigMac mod */
+    font-weight: 900;
+    color: #ce3254;
+    text-shadow: 0px 0px 1px;
+}
+#bm i {
+    font-style: normal;
+    color: #8dde5d;
+}
+.sf {	/* Spitfire mod */
+    font-style: normal;
+    text-shadow: 0 0 7px #ff4422;
+    color: #ff4422 !important;
+}
+.flutter {	/* Fluttershy mod */
+    color: #f8b9cd;
+    font-weight: bold;
+    text-shadow: 1px -1px 2px #000000;
+}
+.posttime {
+    margin-right: 0.3em;
+    font-size: 0.9em;
+    font-style: italic;
+}
+.reflink a {
+    color: inherit;
+}
+.extrabtns {
+    vertical-align: middle;
+}
+.hidethread, .unhidethread, .watchthread, .expandthread, .quickreply, .hidewatchedthreads, .refreshwatchedthreads, .restorewatchedthreads {
+    background-image: url('./icons/blue/icons.gif');
+    background-repeat: no-repeat;
+}
+.hidethread {
+    background-position: -32px -16px;
+}
+.unhidethread {
+    background-position: -48px 0;
+}
+.watchthread {
+    background-position: -32px 0;
+}
+.expandthread {
+    background-position: 0 -16px;
+}
+.hidewatchedthreads {
+    background-position: -48px -16px;
+}
+.refreshwatchedthreads {
+    background-position: -16px -16px;
+}
+.restorewatchedthreads {
+    background-position: -16px 0;
+}
+
+.thumb, .nothumb {
+    float: left;
+    margin: 2px 20px;
+}
+.nothumb {
+    padding: 0.5em;
+    border: 2px dashed #aaa;
+    text-align: center;
+}
+blockquote {
+    margin: 0.8em 1em 0.4em 2.5em;
+}
+abbr {
+    border-bottom: 1px dashed #000;
+}
+.spoiler {
+    background: #000;
+    color: #000;
+}
+.spoiler:hover, .spoiler-hover {
+    color: #fff;
+}
+.royalluna, .rcv {
+    text-shadow: 2px 2px 0 rgba(64,64,64,0.4),-2px -2px 0px rgba(64,64,64,0.2);
+    font-size: 1.1em;
+}
+.shy {
+    font-size: 0.6rem;
+}
+.sar {
+    display: inline-block;
+    -webkit-transform: skew(15deg);
+    -moz-transform: skew(15deg);
+    -ms-transform: skew(15deg);
+    -o-transform: skew(15deg);
+    transform: skew(15deg);
+    margin-left: -.03em;
+    margin-right: .06em;
+}
+.abbrev {
+    margin: 1em 0 0 -1em;
+}
+.omittedposts {
+    display: block;
+    margin-top: 0.5em;
+    color: #808080;
+}
+.oldpost {
+    font-weight: bold;
+    font-style: italic;
+    color: #e02020;
+}
+.reflinkpreview {
+    position: absolute;
+    z-index: 50;
+    min-width: 32em;
+    padding: 0.25em 0.75em;
+    -moz-box-shadow: 3px 3px 8px #666;
+    -webkit-box-shadow: 3px 3px 8px #666;
+    -o-box-shadow: 3px 3px 8px #666;
+    box-shadow: 3px 3px 8px #666;
+}
+.userdelete {
+    float: right;
+}
+.footer {
+    text-align: center;
+    font-size: 0.75em;
+}
+.boardheaderdesc {
+    text-align: center;
+}
+.last-edit-time {
+    font-size: 0.75em;
+    font-style: italic;
+}
+/*
+#delform{
+    position: relative;
+}
+#firsthalf{
+    width: 49%;
+    float: left;
+}
+#duoviewother{
+    float: right;
+    width: 49%;
+}
+.userdelete{
+    position: absolute;
+    bottom: -102px;
+    right: 0;
+    width: 300px;
+    padding-bottom: 11px;
+}
+*/
+/*#menuwrap {
+    width: 600px;
+    margin: 15px auto;
+    position: relative;
+}*/
+
+
+#modmenu{
+    position: fixed;
+    bottom: 2px;
+    right: 2px;
+    padding: 4px 5px;
+
+    font-family: sans-serif;
+    font-size: 80%;
+    background: #ffe;
+    color: #000;
+    z-index: 2;
+    border: 1px solid rgb(148, 157, 166);
+    -webkit-box-shadow: -3px -3px 11px rgba(50, 50, 50, 0.55);
+    -moz-box-shadow:    -3px -3px 11px rgba(50, 50, 50, 0.55);
+    box-shadow:         -3px -3px 11px rgba(50, 50, 50, 0.55);
+}
+#modmenu h2{
+    padding: 0;
+    margin: 2px 0;
+    background: #fca;
+}
+#modmenu a{
+    text-decoration: none;
+    color: #550;
+}
+

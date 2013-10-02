@@ -1,0 +1,75 @@
+body {
+    background: #e8e8ff;
+}
+.logo {
+    color: #000080;
+}
+a, a:visited, a:active {
+    color: #0010B0;
+}
+a:hover, .reflink a:hover {
+    color: #35E;
+}
+
+.darkbar, #themedropdown, #homedropdown {
+    background: #016;
+}
+.darkbar a {
+    color: #c0c0ff;
+    border-top-color: #45a;
+}
+#verytopbar a:hover {
+    background: #004;
+}
+.darkbar a:hover {
+    color: #e8f0ff;
+}
+.darkbar a:hover, .darkbar .navbarcurboard {
+    border-top-color: #8ae;
+}
+
+#siteleftsidebar a:hover, #topmenu .tab {
+    background: #d8d8f0;
+}
+.sitesidebar h2, .newsentry h2, #topmenu .current {
+    background: #c0c0f0;
+}
+.sitesidebar h2, #topmenu .tab, #sitemiddle h2 {
+    border: 1px solid #8080b0;
+}
+.sitesidebar h2, #sitemiddle h2 {
+    -moz-box-shadow: 2px 2px 2px #bbc;
+    -webkit-box-shadow: 2px 2px 2px #bbc;
+    box-shadow: 2px 2px 2px #bbc;
+}
+
+.postblock {
+    background: #a8b8f0;
+}
+.postarea input[type=text], .postarea input[type=password], .postarea textarea {
+    border-color: #90a0d0;
+}
+.postarea input[type=text]:focus, .postarea input[type=password]:focus, .postarea textarea:focus {
+    border-color: #0020c0;
+}
+
+.helphover div, .reply, .highlight, .reflinkpreview {
+    background: #d4dcf0;
+}
+.highlight, .reflinkpreview {
+    border-left-color: #4060b0;
+}
+
+.filetitle {
+    color: #1010e0;
+}
+.postername, .postername a {
+    color: #203090;
+    border-bottom-color: #6080e0;
+}
+.postertrip {
+    color: #4060b0;
+}
+.unkfunc {
+    color: #4070c0;
+}

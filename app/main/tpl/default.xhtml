@@ -1,0 +1,79 @@
+<!-- root @vars -->
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="/imgbb/app/img_global.css"/>
+        <link rel="stylesheet" href="/imgbb/app/colgate.css" id="userstylelink"/>
+        <title>Testing Services</title>
+    </head>
+    <body class="frontpage">
+        <div id="bodywrapmain1">
+            <div id="bodywrapmain2">
+                <div id="bodywrapmain3">
+                    <span metal:use-macro="board_list"/>
+                    <span metal:use-macro="recent_posts"/>
+                    <span metal:use-macro="topmenu"/>
+                </div>
+            </div>
+        </div>
+    </body>
+
+<!-- macro: board_list @var boardsections-->
+    <div id="siteleftsidebar" class="sitesidebar" metal:define-macro="board_list">
+        <span tal:repeat="section boardsections" tal:omit-tag="">
+            <h2>
+                <a class="menuexpander" href="#" onclick="togglemenuarea(this, '${section}');return false" title="Click to show/hide">−</a>
+                ${section}
+            </h2>
+            <span tal:repeat="board boards" tal:omit-tag="">
+                <div id="${board/name}" tal:condition="php: board['category'] eq section">
+                    <ul>
+                        <li>
+                            <a tal:attributes="href string:index.php?app=boards&area=${board/name}" tal:content="board/title"/>
+                        </li>
+                    </ul>
+                </div>
+            </span>
+            <div style="height:0.5em"></div>
+        </span>
+    </div>
+
+<!-- macro: recent_posts -->
+    <div id="siterightsidebar" class="sitesidebar" xmlns="http://www.w3.org/199/html" metal:define-macro="recent_posts">
+        <h2>
+           Recent Posts
+        </h2>
+        <span tal:repeat="post posts" tal:omit-tag="">
+            <div class="recentpostitem">
+                <div class="recentpostheaderline">
+                    <a href="index.php?/${post/boardname}/res/${post/parentid}.html#${post/id}">
+                        /${post/boardname}/
+                    </a>
+                    –
+                    <b tal:content="post/name | default">
+                        <span tal:condition="not: post/tripcode" tal:omit-tag="">
+                            Anonyomus
+                        </span>
+                    </b>
+                    ${post/tripcode}
+                </div>
+                <div style="text-align:center">
+                    <a href="files/src/137907500801.jpg" target="_blank"/><img src="files/thumb/137907500801s.jpg" style="float:left;margin-right:1em" height="84" width="125"/>
+                </div>
+                <div class="recentpostmessage">
+                    ${post/message_source}
+                </div>
+            </div>
+            <hr />
+        </span>
+    </div>
+
+<!-- macro: topmenu -->
+    <div id="topmenu" class="menu" metal:define-macro="topmenu">
+        <ul>
+            <li class="tab" tal:repeat="item php: range(1,4)">
+                <a tal:attributes="href item">
+                    ${item}
+                </a>
+            </li>
+        </ul>
+    </div>
