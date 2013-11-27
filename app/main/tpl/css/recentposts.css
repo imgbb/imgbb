@@ -1,0 +1,60 @@
+/************************************
+***          Recent posts         ***
+*************************************/
+.recentpostwrap{
+    margin-bottom: 30px;
+    background: #f2f2f7;
+    color: #29292d;
+
+    clear: left;
+
+    -webkit-box-shadow: 2px 2px 10px rgba(50, 50, 50, 0.65);
+    -moz-box-shadow:    2px 2px 10px rgba(50, 50, 50, 0.65);
+    box-shadow:         2px 2px 10px rgba(50, 50, 50, 0.65);
+}
+.sidecolhead{
+    padding: 10px 15px;
+    background: #25253d;
+    float: left;
+    overflow: hidden;
+}
+.recentpostheader{
+    background: #25253d;
+    color: #ececec;
+    padding: 10px 15px;
+    /*overflow: hidden;*/
+    /*white-space: nowrap;*/
+    /*text-overflow: ellipsis;*/
+}
+.recentpostcontent{
+}
+.recentpostbody p{
+    margin: 0;
+    padding: 5px 5px 5px 5px;
+    min-height: 137px;
+}
+.recentpostboard{
+}
+.recentpostboard a{
+    color: #c4c4c4;
+    text-decoration: none;
+}
+.recentpostboard a:hover{
+    color: #ececec;
+    text-decoration: underline;
+}
+.recentpostername{
+    font-weight: bold;
+}
+.recentpostertrip{
+}
+.recentposttime{
+    visibility: hidden;
+    float: right;
+}
+.recentpostimg{
+    max-width: 110px;
+    max-height: 130px;
+    float: left;
+    margin: 5px;
+}

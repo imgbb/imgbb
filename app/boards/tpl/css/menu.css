@@ -1,0 +1,97 @@
+
+html, body{
+    margin: 0;
+    padding: 0;
+}
+
+/************************************
+***         Dropdown setup        ***
+*************************************/
+nav {
+    background: #27408B;
+    min-width: 900px;
+    height: 40px;
+    margin: 0 auto;
+}
+ul{
+    margin: 0;
+}
+nav>ul{
+    width: 100%;
+}
+nav ul ul { /* Dropdown boxes no display / display */
+    display: none;
+}
+nav ul li:hover > ul {
+    display: block;
+}
+nav ul {
+    padding: 0 0;
+    list-style: none;
+    position: relative;
+    display: inline-table;
+}
+nav ul li { /*All menu items*/
+    padding: 0;
+    float: left;
+}
+
+nav ul li .this_area {
+    border-top: 4px solid #6495ED;
+}
+nav ul li:hover {
+    background-color: #3A5FCD;
+}
+nav ul li a { /*Links in menu*/
+    height: 36px;
+    line-height: 40px;
+    border-top: 4px solid #3A5FCD;
+    display: block;
+    padding: 0 15px;
+    color: #ececec;
+    text-decoration: none;
+    text-align: center;
+}
+nav ul li:hover a {
+    color: #ececec;
+    border-top: 4px solid #3A5FCD;
+}
+nav ul ul {/* Dropdown boxes */
+    background: #27408B;
+    padding: 0;
+    position: absolute;
+    top: 100%;
+}
+nav ul ul li {/* Dropdown Items */
+    float: none;
+    position: relative;
+}
+nav ul ul li a { /* Dropdown links */
+    padding: 0 15px;
+    min-width: 100px;
+    color: #ececec;
+}
+nav ul ul li a:hover {
+    background: #333348;
+}
+nav ul ul ul { /*Second level dropdown*/
+    background: #25253d;
+    position: absolute;
+    left: 100%;
+    top:0;
+}
+.topmenuimage img{
+    display: block;
+    height: 40px;
+    width: auto;
+}
+
+
+
+
+
+
+
+
+
+

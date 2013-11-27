@@ -1,0 +1,65 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <!--<link rel="stylesheet" href="/imgbb/app/img_global.css"/>-->
+    <!--<link rel="stylesheet" href="/imgbb/app/colgate.css" id="userstylelink"/>-->
+        <span tal:omit-tag="" tal:condition="exists: imgbb/css" tal:repeat="each_css imgbb/css">
+            <link rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
+        </span>
+    <title tal:content="imgbb/title">imgBB</title>
+</head>
+<body>
+    <div class="frontwrap">
+        <div id="topmenu">
+            <!-- Navigation p -->
+            <nav>
+                <ul><!-- Top level of the menu-->
+                    <!--<li class="topmenuimage"><img src="https://trello-avatars.s3.amazonaws.com/cb7167c41df87150cec5dcd98aa0f6e4/170.png"></li>-->
+                    <li tal:condition="exists: user"><a href="#">User</a><!--first menu item-->
+                        <ul><!-- Dropdown for the first item-->
+                            <li><a href="#">foo</a></li><!-- items in the dropdown-->
+                            <li><a href="#">bar</a></li>
+                            <li><a href="#">moo</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="${imgbb/base_url}" tal:attributes="class php: (isset(boardinfo)) ? 'this_area' : ''">Boards</a><!-- second menu item-->
+                        <ul><!-- dropdown for the second item-->
+                        <span tal:repeat="section boardsections" tal:omit-tag="">
+                            <li>
+                                <a href="#" tal:attributes="class php: (section['name'] == boardinfo['category_name']) ? 'this_area' : ''">${section/name}</a><!-- top item in the dropdown-->
+                                <ul><!-- next level of dropdown for the second menu item-->
+                                    <span tal:repeat="board boards" tal:omit-tag="">
+                                        <li>
+                                            <a href="index.php?/${board/board_name}/" tal:condition="php: board['board_category'] eq section['id']" tal:attributes="class php: (board['board_name'] == imgbb['highlight']['action']) ? 'this_area' : ''">
+                                                /${board/board_name}/
+                                            </a>
+                                        </li><!-- first item in the next level dropdown-->
+                                    </span>
+                                </ul>
+                            </li>
+                        </span>
+                        </ul>
+                    </li>
+                    <li tal:condition="exists: user">
+                        <a href="index.php?app=manage">Mod</a>
+                    </li>
+
+                    <li style="float:right;"><a href="#">Home</a><!-- The inline style should be switched for an ID.. In fact.. All the top-level items should get an ID.. That'd be nice-->
+                        <ul style="right:0;"><!-- Disregard inline styling.. Will be moved to CSS if ID's are implemented for the top-level items.-->
+                            <li><a href="${imgbb/base_url}">Front Page</a></li>
+                            <li tal:condition="not: exists: user"><a href="/imgbb/index.php?app=user&amp;mod=login">Login</a></li>
+                            <li tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings">Account&nbsp;Settings</a></li>
+                            <li tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings&amp;sect=pref">User&nbsp;Preferences</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <tal:block metal:use-macro="${imgbb/macro/src}/${imgbb/macro/name}" />
+    </div>
+    <div class="footer" tal:condition="true: imgbb/footer">
+        footer content
+    </div>
+</body>
+</html>

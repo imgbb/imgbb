@@ -1,0 +1,55 @@
+<tal:block metal:define-macro="page">
+    <tal:block tal:repeat="parent parents">
+        <div class="thread">
+            <div class="op">
+                <img src="${parent/file}.${parent/file_type}" height="150" width="125" />
+                ID: ${parent/id} <br />
+                Boardid: ${parent/boardid} <br />
+                Name: ${parent/name} <br />
+                Tripcode: ${parent/tripcode} <br />
+                File: ${parent/file}<br />
+                Message: <p tal:content="structure parent/message" />
+                <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}" style="color:royalblue">View Thread</a>
+            </div>
+            <div class="replies" style="margin-left:15px;">
+                <tal:block tal:repeat="reply replies">
+                    <div tal:condition="php: reply['parentid'] == parent['id']" class="reply">
+                        <img src="" height="150" width="125" />
+                        ID: <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${reply/parentid}#${reply/id}">${reply/id}</a>
+                        Parentid: ${reply/parentid}
+                        Name: ${reply/name}<br />
+                        Tripcode: ${reply/tripcode} <br />
+                        File: ${reply/file} <br />
+                        Message: <p tal:content="structure reply/message" />
+                    </div>
+                </tal:block>
+            </div>
+        </div>
+        <hr />
+    </tal:block>
+</tal:block>
+
+<tal:block metal:define-macro="thread">
+    <div class="thread" tal:repeat="post posts">
+        <div class="op" tal:condition="true: repeat/post/start" style="padding-bottom:30px;margin-left:1px;">
+            test
+            ID: ${post/id} <br />
+            Boardid: ${post/boardid}<br />
+            Name: ${post/name}<br />
+            Tripcode: ${post/tripcode}<br />
+            File: ${post/file}<br />
+            Message: <p tal:content="structure post/message"/>
+        </div>
+        <div class="replies" style="margin-left:16px;" tal:condition="not: repeat/post/start">
+            <div class="post" id="${post/id}">
+                ID: <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${post/parentid}#${post/id}">${post/id}</a>
+                Parentid: ${post/parentid}
+                Name: ${post/name}<br />
+                Tripcode: ${post/tripcode} <br />
+                File: ${post/file} <br />
+                Message: <p tal:content="structure post/message" />
+            </div>
+            <hr />
+        </div>
+    </div>
+</tal:block>

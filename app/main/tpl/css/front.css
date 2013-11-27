@@ -1,0 +1,140 @@
+html, body{/*Will be removed when css is cleaned up*/
+    margin: 0;
+    padding: 0;
+    background: #e6e6ed;
+    color: #ececec;
+    font-family: sans-serif;
+}
+
+/*Header*/
+.header{
+    text-align: center;
+    margin: 30px auto;
+    min-width: 900px;
+}
+
+.header img{
+
+    width: 550px;
+    height: auto;
+}
+
+/*Front page content*/
+.frontwrap{
+    min-width: 840px;
+    padding: 0 30px;
+}
+
+/*Main Column*/
+.frontmaincolwrap{
+    display: table-cell;
+    vertical-align: top;
+    width: 100%;
+    padding-right: 19px;
+}
+
+.frontcontentmenu{
+    padding: 0;
+}
+
+.frontcontentmenu li{
+    display: inline;
+    text-align: center;
+    float: left;
+    background: #25253d;
+
+}
+
+.frontcontentmenu a{
+    display: inline-block;
+    text-decoration: none;
+    color: #ececec;
+    padding: 10px 15px;
+    min-width: 50px;
+}
+.frontcontentmenu a:hover{
+    background: #333348;
+}
+
+.frontcontentwrap{
+    clear: left;
+}
+
+.newsitem{
+    background: #f2f2f7;
+    margin-bottom: 20px;
+
+    overflow: hidden;
+
+    -webkit-box-shadow: 2px 2px 10px rgba(50, 50, 50, 0.65);
+    -moz-box-shadow:    2px 2px 10px rgba(50, 50, 50, 0.65);
+    box-shadow:         2px 2px 10px rgba(50, 50, 50, 0.65);
+}
+
+.newsheader{
+    background: #25253d;
+    padding: 10px 15px;
+}
+
+.newsheadline{
+    display: inline-block;
+    font-size: 40px;
+    padding-bottom: 20px;
+}
+
+.newspostername{
+    font-weight: bold;
+}
+
+.newspostertrip{
+}
+
+.newsmod{
+
+}
+
+.newsposttime{
+    float: right;
+}
+
+.newscontent{
+    padding: 10px 15px;
+}
+.newscontent a, .newsfooter a{
+    color: #3e3e42;
+    text-decoration: none;
+}
+.newscontent a:hover, .newsfooter a:hover{
+    color: #29292d;
+    text-decoration: underline;
+}
+.newsimg{
+    max-width: 300px;
+    max-height: 300px;
+    float: left;
+    margin-right: 15px;
+    margin-bottom: 10px;
+}
+
+.newsbody{
+    color: #29292d;
+}
+.newsbody p{
+    margin: 0;
+}
+
+.newsfooter{
+    clear: left;
+    float: right;
+    padding: 10px;
+    color: #29292d;
+}
+/*Secondary Column*/
+.frontsidecolwrap{
+    display: table-cell;
+    vertical-align: top;
+    min-width: 250px;
+    clear: left;
+    padding-left: 19px;
+    /*width: 10%;*/
+}
