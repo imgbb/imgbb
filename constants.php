@@ -9,4 +9,5 @@
 
     define('IBB_ROOT_PATH', dirname(__FILE__));
     define('IBB_LIB_PATH', IBB_ROOT_PATH . '/lib');
-    define('IBB_TEMPLATES_PATH', IBB_ROOT_PATH . '/TAL');
+    define('IBB_TEMPLATES_PATH', IBB_ROOT_PATH . '/app/main/tpl');
+	define('abc', 'def');
