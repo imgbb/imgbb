@@ -50,8 +50,6 @@ class boards_boardpage_view {
 			ON				ibb_board_categories.id = ibb_boards.category
 			WHERE			ibb_boards.name 					= "'.$this->core->request('action').'"
 		');
-		print_r($this->db->results['boardinfo']);
-		print_r($this->core->request('action'));
 		$this->db->query('boards', '
 			SELECT 		 ibb_boards.id 	AS board_id
 						,ibb_boards.name AS board_name
@@ -70,9 +68,6 @@ class boards_boardpage_view {
 		/* Set page title */
 		$this->core->output->setTitle($this->db->results['boardinfo']['title']);
 
-		/* Set CSS */
-		$this->core->output->addCSS('menu');
-
 		/* Use the API and stuff. */
 		$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->db->results['boards']);
 
@@ -88,27 +83,38 @@ class boards_boardpage_view {
 						,parentid
 						,name
 						,tripcode
+						,subject
 						,message
 						,file
 						,`timestamp`
 						,file_type
 						,file_server
+						,file_size
+						,image_h
+						,image_w
+						,file_original
 			FROM		pcposts
-			WHERE 		boardid 	=	(SELECT id FROM pcboards WHERE name = "' . $this->core->request('action') . '")
+			WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
 			AND 		parentid	=	0
 			AND			is_deleted	=	0
 			ORDER BY	`timestamp` DESC
 			LIMIT 		10');
-			$this->db->query('replies', "
-			SELECT		*
-			FROM		pcposts
-			WHERE 		boardid 	=	(SELECT id FROM pcboards WHERE name = '" . $this->core->request('action') . "')
-			AND			is_deleted	=	0
-			ORDER BY	`timestamp` DESC
-			LIMIT 		30");
+			foreach ($this->db->results['parents'] as $parent)
+			{
+				$this->db->queryInLoop('replies', $parent['id'], '
+					SELECT		*
+					FROM		pcposts
+					WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
+					AND			parentid	=	' . $parent['id'] . '
+					AND			is_deleted	=	0
+					ORDER BY	`timestamp` DESC
+					LIMIT 		3');
+			}
+
 
 			/* Add the macro  */
-			$this->core->output->addMacro('page', 'boards.xhtml');
+			$this->core->output->addMacro('board', 'boards.xhtml');
+//			print_r($this->db->results['replies']);
 
 			//temp for grandil, he wanted pics, quick write
 			foreach ($this->db->results['parents'] as &$parent)

@@ -1,68 +1,15 @@
 <!-- root @vars -->
     <head>
         <meta charset="utf-8" />
-        <!--<link rel="stylesheet" href="/imgbb/app/img_global.css"/>-->
-        <!--<link rel="stylesheet" href="/imgbb/app/colgate.css" id="userstylelink"/>-->
         <span tal:omit-tag="" tal:repeat="each_css imgbb/css">
-            <link rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
+            <link tal:condition="php: !is_array(each_css) AND strlen(each_css) > 1" rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
+            <link tal:condition="php: is_array(each_css)" rel="stylesheet" href="${imgbb/base_url}/app/${each_css/app}/tpl/css/${each_css/filename}" />
         </span>
+        <!--<link rel="stylesheet" tal:attributes="href string: ${imgbb/base_url}/app/main/tpl/css/menu.css" tal:condition="true: imgbb/menubar"/>-->
         <title tal:content="imgbb/title">imgBB</title>
     </head>
     <body>
-    <div id="topmenu">
-        <!-- Navigation p -->
-        <nav>
-            <ul><!-- Top level of the menu-->
-                <!--<li class="topmenuimage"><img src="https://trello-avatars.s3.amazonaws.com/cb7167c41df87150cec5dcd98aa0f6e4/170.png"></li>-->
-                <li tal:condition="exists: user"><a href="#">User</a><!--first menu item-->
-                    <ul><!-- Dropdown for the first item-->
-                        <li><a href="#">foo</a></li><!-- items in the dropdown-->
-                        <li><a href="#">bar</a></li>
-                        <li><a href="#">moo</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="${imgbb/base_url}">Boards</a><!-- second menu item-->
-                    <ul><!-- dropdown for the second item-->
-                        <span tal:repeat="section boardsections" tal:omit-tag="">
-                            <li>
-                                <a href="#">${section/name}</a><!-- top item in the dropdown-->
-                                <ul><!-- next level of dropdown for the second menu item-->
-                                    <span tal:repeat="board boards" tal:omit-tag="">
-                                        <li>
-                                            <!--<a href="index.php?/${board/board_name}/"-->
-                                               <!--tal:condition="php: board['board_category'] eq section['id']"-->
-                                               <!--tal:attributes="class php: (board['board_name'] == imgbb['highlight']['action']) ? 'this_area' : '';-->
-                                                               <!--style php: (board['board_type'] == 2) ? 'color:green' : '';-->
-                                                               <!--style php: (board['board_type'] == 3) ? 'color:blue' : ''">-->
-                                                <!--/${board/board_name}/-->
-                                            <!--</a>-->
-                                            <a href="index.php?/${board/board_name}/"
-                                                    tal:condition="php: board['board_category'] eq section['id']">
-                                                ${board/board_name}
-                                            </a>
-                                        </li><!-- first item in the next level dropdown-->
-                                    </span>
-                                </ul>
-                            </li>
-                        </span>
-                    </ul>
-                </li>
-                <li tal:condition="exists: user">
-                    <a href="index.php?app=manage">Mod</a>
-                </li>
-
-                <li class="this_area" style="float:right;"><a href="#">Home</a><!-- The inline style should be switched for an ID.. In fact.. All the top-level items should get an ID.. That'd be nice-->
-                    <ul style="right:0;"><!-- Disregard inline styling.. Will be moved to CSS if ID's are implemented for the top-level items.-->
-                        <li><a tal:attributes="class php: (imgbb['highlight']['mod'] eq 'front') ? 'this_area' : ''" href="${imgbb/base_url}">${imgbb/highlight/mod}</a></li>
-                        <li tal:attributes="class php: (imgbb['highlight']['area'] eq 'login') ? 'this_area' : ''" tal:condition="not: exists: user"><a href="/imgbb/index.php?app=user&amp;mod=login">Login</a></li>
-                        <li tal:attributes="class php: (imgbb['highlight']['mod'] eq 'settings' && imgbb['highlight']['area'] eq 'view') ? 'this_area' : ''" tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings">Account&nbsp;Settings</a></li>
-                        <li tal:attributes="class php: (imgbb['highlight']['mod'] eq 'settings' && imgbb['highlight']['area'] eq 'pref') ? 'this_area' : ''" tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings&amp;sect=pref">User&nbsp;Preferences</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <tal:block tal:condition="true: imgbb/menubar" metal:use-macro="${imgbb/IBB_TEMPLATES_PATH}/menubar.xhtml/menubar" />
 
     <span metal:use-macro="${imgbb/tplpath}home.xhtml/header" />
     <div class="frontwrap">

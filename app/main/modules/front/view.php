@@ -62,8 +62,7 @@ class main_front_view {
 		ClassHandler::loadAPI('boards');
 
 		// todo this too, put it all somewhere easily accessible... maybe through the intface?
-		/* Set menu CSS */
-		$this->core->output->addCSS( 'menu' );
+
 		/* Set page title */
 		$this->core->output->setTitle( 'imgBB' );
 

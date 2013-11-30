@@ -428,11 +428,18 @@ class output {
 	private $macro;
 
 	/**
-	 * Use the menu?
+	 * Use default meta attributes?
 	 *
 	 * @var bool
 	 */
 	public $head = TRUE;
+
+	/**
+	 * Use the menu?
+	 *
+	 * @var bool
+	 */
+	public $menu = TRUE;
 
 	/**
 	 * Use the footer?
@@ -542,10 +549,24 @@ class output {
 	 *
 	 * @param $val string add CSS file
 	 */
-	public function addCSS($val)
+	public function addCSS($filename)
 	{
-		$this->vars['imgbb']['css'][] = $val;
+		$this->vars['imgbb']['css'][] = $filename;
 		$this->css = TRUE;
+	}
+
+	/**
+	 * Mostly used to take stuff from app Main
+	 *
+	 * @param $filename
+	 * @param $app
+	 */
+	public function addXAppCSS($filename, $app)
+	{
+		$this->vars['imgbb']['css'][] = array(
+											'filename' 	=> $filename,
+											'app'		=> $app
+		);
 	}
 
 	/**
@@ -558,19 +579,26 @@ class output {
 		/* Initialize PHPTAL */
 		$this->tpl = new PHPTAL( $this->workingpath );
 
+		/* Set up head	*/
+		if ($this->menu)
+		{
+			$this->addXAppCSS('menu.css', 'main');
+		}
 
 		/* Set up static variables. */
-		$this->vars['imgbb']['base_url'] 	= $this->core->settings('base_url');
-		$this->vars['imgbb']['this_app']	= $this->core->request('app');
-		$this->vars['imgbb']['macro']		= $this->macro;
-		$this->vars['imgbb']['slots']		= $this->slots;
-		$this->vars['imgbb']['tplpath']		= $this->path;
-		$this->vars['imgbb']['title']		= $this->title;
-		$this->vars['imgbb']['highlight']	= array ( 'app' => $this->core->request('app'),
-													  'mod' => $this->core->request('mod'),
-													  'area' => $this->core->request('area'),
-													  'action' => $this->core->request('action')
-											  );
+		$this->vars['imgbb']['base_url'] 		= $this->core->settings('base_url');
+		$this->vars['imgbb']['this_app']		= $this->core->request('app');
+		$this->vars['imgbb']['macro']			= $this->macro;
+		$this->vars['imgbb']['slots']			= $this->slots;
+		$this->vars['imgbb']['tplpath']			= $this->path;
+		$this->vars['imgbb']['title']			= $this->title;
+		$this->vars['imgbb']['highlight']		= array ( 	'app' 		=> $this->core->request('app'),
+													  		'mod' 		=> $this->core->request('mod'),
+													  		'area' 		=> $this->core->request('area'),
+													  		'action' 	=> $this->core->request('action')
+											  	);
+		$this->vars['imgbb']['IBB_TEMPLATES_PATH']	= IBB_TEMPLATES_PATH;
+		$this->vars['imgbb']['menubar']		= $this->menu;
 
 
 		/* Give PHPTAL our variables */
@@ -726,6 +754,22 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	}
 
 	/**
+	 * temp
+	 *
+	 * @param $qname
+	 * @param $query
+	 */
+	public function queryInLoop( $qname, $parent, $query )
+	{
+		$this->execute($query);
+		$this->results[$qname][$parent][] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+	}
+
+	/**
+	 * This is used for queries against the database that fetch only one row. This function does not include
+	 * an array filled with each row, so you can access the row's columns directly without needing to add
+	 * annoying [0]s every time.
+	 *
 	 * @param $qname
 	 * @param $query
 	 */
