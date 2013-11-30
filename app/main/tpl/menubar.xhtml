@@ -1,0 +1,54 @@
+<div id="topmenu" metal:define-macro="menubar">
+    <!-- Navigation p -->
+    <nav>
+        <ul><!-- Top level of the menu-->
+            <!--<li class="topmenuimage"><img src="https://trello-avatars.s3.amazonaws.com/cb7167c41df87150cec5dcd98aa0f6e4/170.png"></li>-->
+            <li tal:condition="exists: user"><a href="#">User</a><!--first menu item-->
+                <ul><!-- Dropdown for the first item-->
+                    <li><a href="#">foo</a></li><!-- items in the dropdown-->
+                    <li><a href="#">bar</a></li>
+                    <li><a href="#">moo</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="${imgbb/base_url}">Boards</a><!-- second menu item-->
+                <ul><!-- dropdown for the second item-->
+                        <span tal:repeat="section boardsections" tal:omit-tag="">
+                            <li>
+                                <a href="#">${section/name}</a><!-- top item in the dropdown-->
+                                <ul><!-- next level of dropdown for the second menu item-->
+                                    <span tal:repeat="board boards" tal:omit-tag="">
+                                        <li>
+                                            <!--<a href="index.php?/${board/board_name}/"-->
+                                            <!--tal:condition="php: board['board_category'] eq section['id']"-->
+                                            <!--tal:attributes="class php: (board['board_name'] == imgbb['highlight']['action']) ? 'this_area' : '';-->
+                                            <!--style php: (board['board_type'] == 2) ? 'color:green' : '';-->
+                                            <!--style php: (board['board_type'] == 3) ? 'color:blue' : ''">-->
+                                            <!--/${board/board_name}/-->
+                                            <!--</a>-->
+                                            <a href="index.php?/${board/board_name}/"
+                                               tal:condition="php: board['board_category'] eq section['id']">
+                                                ${board/board_name}
+                                            </a>
+                                        </li><!-- first item in the next level dropdown-->
+                                    </span>
+                                </ul>
+                            </li>
+                        </span>
+                </ul>
+            </li>
+            <li tal:condition="exists: user">
+                <a href="index.php?app=manage">Mod</a>
+            </li>
+
+            <li class="this_area" style="float:right;"><a href="#">Home</a><!-- The inline style should be switched for an ID.. In fact.. All the top-level items should get an ID.. That'd be nice-->
+                <ul style="right:0;"><!-- Disregard inline styling.. Will be moved to CSS if ID's are implemented for the top-level items.-->
+                    <li><a tal:attributes="class php: (imgbb['highlight']['mod'] eq 'front') ? 'this_area' : ''" href="${imgbb/base_url}">${imgbb/highlight/mod}</a></li>
+                    <li tal:attributes="class php: (imgbb['highlight']['area'] eq 'login') ? 'this_area' : ''" tal:condition="not: exists: user"><a href="/imgbb/index.php?app=user&amp;mod=login">Login</a></li>
+                    <li tal:attributes="class php: (imgbb['highlight']['mod'] eq 'settings' && imgbb['highlight']['area'] eq 'view') ? 'this_area' : ''" tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings">Account&nbsp;Settings</a></li>
+                    <li tal:attributes="class php: (imgbb['highlight']['mod'] eq 'settings' && imgbb['highlight']['area'] eq 'pref') ? 'this_area' : ''" tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings&amp;sect=pref">User&nbsp;Preferences</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</div>
