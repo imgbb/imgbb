@@ -73,32 +73,56 @@ class boards_boardpage_view {
 
 		if (!$this->core->request('subaction'))
 		{
-			/* Using the database handler I developed, I can easily store the results quickly and efficiently... */
-			/* (and thanks a lot for the tip about putting the comma behind, and nested SELECTs!)*/
-			/* I'm also not entirely sure where to put the nested SELECT statements. Right after the equal sign,
-			   right below it, right below it but two spaces after.....*/
-			$this->db->query('parents', '
-			SELECT		 id
+			/* Kusaba X level of efficiency. Consulting. */
+			$this->db->query('stickies', '
+			SELECT		id
 						,boardid
 						,parentid
 						,name
 						,tripcode
+						,email
 						,subject
 						,message
 						,file
-						,`timestamp`
-						,file_type
 						,file_server
-						,file_size
-						,image_h
-						,image_w
+						,file_type
 						,file_original
+						,file_size
+						,image_w
+						,image_h
+						,timestamp
+						,stickied
+						,locked
+						,is_deleted
+			FROM		pcposts
+			WHERE		boardid		=	' . $this->db->results['boardinfo']['board_id'] . '
+			AND			parentid	=	0
+			AND			is_deleted	=	0
+			AND			stickied	=	1
+			ORDER BY	`bumped` DESC');
+
+			foreach ($this->db->results['stickies'] as $sticky)
+			{
+				$this->db->queryInLoop('replies', $sticky['id'], '
+					SELECT		*
+					FROM		pcposts
+					WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
+					AND			parentid	=	' . $sticky['id'] . '
+					AND			is_deleted	=	0
+					ORDER BY	`bumped` DESC
+					LIMIT 		1');
+			}
+
+
+			$this->db->query('parents', '
+			SELECT		*
 			FROM		pcposts
 			WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
 			AND 		parentid	=	0
 			AND			is_deleted	=	0
-			ORDER BY	`timestamp` DESC
-			LIMIT 		10');
+			AND			stickied	=	0
+			ORDER BY	`bumped` DESC
+			LIMIT 		' . (10 - count($this->db->results['stickies'])));
 			foreach ($this->db->results['parents'] as $parent)
 			{
 				$this->db->queryInLoop('replies', $parent['id'], '
@@ -107,31 +131,26 @@ class boards_boardpage_view {
 					WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
 					AND			parentid	=	' . $parent['id'] . '
 					AND			is_deleted	=	0
-					ORDER BY	`timestamp` DESC
+					ORDER BY	`bumped` DESC
 					LIMIT 		3');
 			}
+
+			$this->db->results['parents'] = array_merge($this->db->results['stickies'], $this->db->results['parents']);
+			foreach ( $this->db->results['parents'] as $parent )
+			{
+				$this->db->queryInLoop('repliescount', $parent['id'], '
+				SELECT		COUNT(*)
+				FROM 		pcposts
+				WHERE		boardid		=	' . $this->db->results['boardinfo']['board_id'] . '
+				AND			parentid			=	' . $parent['id']);
+			}
+
+
 
 
 			/* Add the macro  */
 			$this->core->output->addMacro('board', 'boards.xhtml');
 //			print_r($this->db->results['replies']);
-
-			//temp for grandil, he wanted pics, quick write
-			foreach ($this->db->results['parents'] as &$parent)
-			{
-				$fs = 'dash';
-				if ($parent['file_server'] == 1)
-					$fs = 'dash';
-				if ($parent['file_server'] == 2)
-					$fs = 'pinkie';
-				if ($parent['file_server'] == 3)
-					$fs = 'twilight';
-				if ($parent['file_server'] == 4)
-					$fs = 'derpy';
-				if ($parent['file_server'] == 5)
-					$fs = 'applejack';
-				$parent['file'] = $fs . '.ponychan.net/chan/files/src/' . $parent['file'];
-			}
 
 			/////////////////////////////////
 			//// Prepare dynamic variables

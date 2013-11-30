@@ -102,6 +102,11 @@
                         </div>
                         <blockquote class="postmessage" tal:content="structure parent/message" />
                     </div>
+                    <tal:block tal:repeat="replycount repliescount/${parent/id}">
+                        <tal:block tal:repeat="reply replycount">
+                            ${reply}
+                        </tal:block>
+                    </tal:block>
                 </div>
                 <tal:block tal:repeat="parentreplies replies/${parent/id}">
                     <div class="postcontainer" tal:repeat="reply parentreplies">

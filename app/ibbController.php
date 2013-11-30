@@ -217,7 +217,7 @@ class ibbCore {
 	 */
 	public function verifyfURL()
 	{
-		/* Only one key since there aren't any ampersands in the URL, so let's just autofetch it with key() */
+		/* Only one key since there aren't any ampersands in a fURL, so let's just autofetch it with key() */
 		if (preg_match('#/(.*)?/(\d*)?#', key( $_REQUEST )))
 		{
 			/* Here we make sure to tell the rest of the code that the user used fURL */
