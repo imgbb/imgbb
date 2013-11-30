@@ -1,4 +1,4 @@
 basic
 =====
 
-This is where the very first lines of code will be drawn. It couldn't be further from the final product, and is designed just to give me a feel for what I'm looking to make.
+No information available. Installation instructions and scripts will be made available in 0.7 (IMGBB).
