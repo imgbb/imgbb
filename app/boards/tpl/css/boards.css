@@ -1,0 +1,85 @@
+html{
+    background: #e6e6ed;
+    color: #29292d;
+    font-family: sans-serif;
+}
+hr {
+    margin: 20px 5px;
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+.board{
+
+}
+.thread{
+
+}
+.postcontainer{
+
+}
+.post{
+    overflow: hidden;
+    margin: 5px 5px;
+}
+.reply{
+    display: table;
+    background: #f2f2f7;
+    min-width: 400px;
+
+    padding: 5px 10px;
+
+    -webkit-box-shadow: 2px 2px 10px rgba(50, 50, 50, 0.65);
+    -moz-box-shadow:    2px 2px 10px rgba(50, 50, 50, 0.65);
+    box-shadow:         2px 2px 10px rgba(50, 50, 50, 0.65);
+}
+.op{
+    display: inline;
+}
+.postinfo{
+    display: inline;
+    width: auto;
+}
+.subject{
+    font-size: 1em;
+}
+.namespan{
+    font-size: 0.9em;
+}
+.name{
+    font-weight: bold;
+}
+.postertrip{
+
+}
+.datetime{
+    font-size: 0.75em;
+}
+.postnumber{
+    font-size: 0.75em;
+}
+.postnumber a {
+    text-decoration: none;
+    color: inherit;
+}
+.file{
+
+}
+.fileinfo{
+    font-size: 0.75em;
+}
+.filetext{
+
+}
+.filetext a {
+    color: #3e3e42;
+    text-decoration: none;
+}
+.filethumb{
+    float: left;
+    margin: 5px 10px 5px 0;
+}
+.postmessage{
+
+}
