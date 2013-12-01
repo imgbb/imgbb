@@ -157,7 +157,7 @@ class boards_boardpage_view {
 			////////////////////////////j/////
 			//// Prepare dynamic variables
 			/////////////////////////////////
-
+//test
 			/* Temporary parsing, all parsing will be moved to a parsing object */
 			foreach ($this->db->results['parents'] as &$post)
 			{
