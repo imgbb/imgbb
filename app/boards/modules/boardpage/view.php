@@ -68,6 +68,8 @@ class boards_boardpage_view {
 		/* Set page title */
 		$this->core->output->setTitle($this->db->results['boardinfo']['title']);
 
+		$this->core->output->addCSS( 'boards' );
+
 		/* Use the API and stuff. */
 		$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->db->results['boards']);
 
@@ -152,9 +154,19 @@ class boards_boardpage_view {
 			$this->core->output->addMacro('board', 'boards.xhtml');
 //			print_r($this->db->results['replies']);
 
-			/////////////////////////////////
+			////////////////////////////j/////
 			//// Prepare dynamic variables
 			/////////////////////////////////
+
+			/* Temporary parsing, all parsing will be moved to a parsing object */
+			foreach ($this->db->results['parents'] as &$post)
+			{
+				$post['timestamp'] 	=	date('jS \of F, Y', $post['timestamp']);
+//				$post['message']	=	stripslashes($post['message']);
+				$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
+				$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
+//				$post['message']	=	strlen($post['message']) > 500 ? substr($post['message'], 0, 500) . ' <b>&hellip;</b>' : $post['message'];
+			}
 
 			/* Load SQLs into the vars */
 			foreach ( $this->db->results as $queryk => $query )
@@ -163,10 +175,60 @@ class boards_boardpage_view {
 			}
 
 
+
+
 		} else
 		{
 			$this->viewSingleThread( $this->core->request('action'), $this->core->request('subaction'));
 		}
+
+		// b temp
+		require_once IBB_ROOT_PATH . '/classes/boards/post.php';
+
+		$this->core->output->vars['parents'] 	= new post($this->core->output->vars['parents']);
+		foreach ($this->core->output->vars['parents'] as $parent)
+		{
+			$this->core->output->vars['replies'][$parent['id']] = new post($this->core->output->vars['replies'][$parent['id']]);
+		}
+
+//		echo '<textarea rows=600 cols=180>';
+//		print_r($this->core->output->vars['replies']);
+//		echo '</textarea>';
+//		foreach ($this->core->output->vars[')
+//		$this->core->output->vars['replies']	= new post($this->core->output->vars['replies']);
+		// e temp
+//		foreach ($this->core->output->vars['replies'] as $key => &$reply)
+//		{
+//			$reply = new post($this->core->output->vars['replies'][$key]);
+//		}
+//		foreach ($this->core->output->vars['parents'] as $k1 => $parent)
+		{
+//			echo 'i am the parent (key: ' . $k1 . ')';
+//			print_r($this->core->output->vars['replies'][$parent['id']]);
+//			echo '<hr />';
+
+//			foreach ($this->core->output->vars['replies'][$parent['id']] as $k2 => $parentreplies)
+//			{
+//				echo 'i am the object(key ' . $k2 . ' parentkey: '. $parent['id'] .')';
+//				$this->core->output->vars['replies'][$parent['id']] = new post($this->core->output->vars['replies'][$parent['id']]);
+//			}
+		}
+//		print_r($this->core->output->vars['replies']['36460004']);
+//		$exthread 	= new post($this->core->output->vars['replies']['36460004']);
+//		$ex2		= new post($this->core->output->vars['parents']);
+//		foreach ($exthread as $post)
+//		{
+//			print_r($post->posts);
+//		}
+//		$this->core->output->vars['replies'] = new post
+//		print_r($this->core->output->vars['parents']);
+//		echo '<hr /><hr /><hr /><hr />';
+//		echo '<textarea>';
+//		print_r($this->core->output->vars['replies']);
+//		echo '</textarea>';
+//		echo $this->core->output->vars['parents']->current()[0][0]['name'];
+
+//		var_dump($this->db->results['parents'][0]['message']);
 	}
 
 	/**
