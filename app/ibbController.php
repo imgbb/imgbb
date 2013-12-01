@@ -762,7 +762,7 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	public function queryInLoop( $qname, $parent, $query )
 	{
 		$this->execute($query);
-		$this->results[$qname][$parent][] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+		$this->results[$qname][$parent] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
 	}
 
 	/**
