@@ -1,69 +1,4 @@
 <tal:block metal:define-macro="board">
-    <style type="text/css">
-
-        html{
-            background: #ccc;
-        }
-        .board{
-
-        }
-        .thread{
-
-        }
-        .postcontainer{
-
-        }
-        .post{
-            overflow: hidden;
-            margin: 5px;
-        }
-        .reply{
-            display: table;
-            background: #f1efee;
-        }
-        .op{
-            display: inline;
-        }
-        .postinfo{
-            display: inline;
-            width: auto;
-        }
-        .subject{
-
-        }
-        .namespan{
-
-        }
-        .name{
-
-        }
-        .postertrip{
-
-        }
-        .datetime{
-
-        }
-        .postnumber{
-
-        }
-        .file{
-
-        }
-        .fileinfo{
-
-        }
-        .filetext{
-
-        }
-        .filethumb{
-            float: left;
-            margin: 3px 15px;
-        }
-        .postmessage{
-
-        }
-
-    </style>
     <div class="board">
         <tal:block tal:repeat="parent parents">
             <div id="two_${parent/id}" class="thread">
@@ -85,12 +20,11 @@
                         </div>
                         <div class="postinfo">
                             <span class="subject" tal:content="structure parent/subject"/>
-                                <span class="namespan">
-                                    <span class="name" tal:content="parent/name | default">
-                                        <tal:block tal:condition="not: exists: parent/tripcode">Anonymous</tal:block>
-                                    </span>
-                                    <span class="postertrip" tal:content="string: !${parent/tripcode}" />
-                                </span>
+                            <span class="namespan">
+                                <span class="name" tal:content="parents/name | default">
+                                    Anonymous
+                                </span><span class="postertrip" tal:condition="parents/tripcode">!${parent/tripcode}</span>
+                            </span>
                             <span class="datetime" tal:content="parent/timestamp"/>
                             <span class="postnumber">
                                 <a href="${parent/id}#helpmeobizekenobi, yoou're my only hope">
@@ -108,18 +42,18 @@
                         </tal:block>
                     </tal:block>
                 </div>
-                <tal:block tal:repeat="parentreplies replies/${parent/id}">
-                    <div class="postcontainer" tal:repeat="reply parentreplies">
+                <!--<tal:block tal:repeat="parentreplies replies/${parent/id}">-->
+                    <div class="postcontainer" tal:repeat="reply replies/${parent/id}">
                         <div id="${reply/id}" class="post reply">
                             <!--helloWorld${parent/id}-->
                             <!--${repeat/reply/key}-->
                             <div class="postinfo">
                                 <span class="subject" tal:content="structure reply/subject"/>
                                 <span class="namespan">
-                                    <span class="name" tal:content="reply/name | default">
-                                        <tal:block tal:condition="not: exists: reply/tripcode">Anonymous</tal:block>
+                                    <span class="name" tal:content="replies/${parent/id}/name | default">
+                                        Anonymous
+                                    </span><span class="postertrip" tal:condition="replies/${parent/id}/tripcode">!${reply/tripcode}
                                     </span>
-                                    <span class="postertrip" tal:content="string: !${reply/tripcode}" />
                                 </span>
                                 <span class="datetime" tal:content="reply/timestamp" />
                                 <span class="postnumber">
@@ -146,7 +80,7 @@
                             <blockquote class="postmessage" tal:content="structure reply/message"/>
                         </div>
                     </div>
-                </tal:block>
+                <!--</tal:block>-->
             </div>
             <hr />
         </tal:block>
