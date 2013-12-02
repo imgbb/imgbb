@@ -73,6 +73,9 @@ class boards_boardpage_view {
 		/* Use the API and stuff. */
 		$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->db->results['boards']);
 
+		// a temp
+		require_once IBB_ROOT_PATH . '/classes/boards/post.php';
+
 		if (!$this->core->request('subaction'))
 		{
 			/* Kusaba X level of efficiency. Consulting. */
@@ -158,15 +161,29 @@ class boards_boardpage_view {
 			//// Prepare dynamic variables
 			/////////////////////////////////
 //test
-			/* Temporary parsing, all parsing will be moved to a parsing object */
+			/***** Temporary parsing, all parsing will be moved to a parsing object */
 			foreach ($this->db->results['parents'] as &$post)
 			{
 				$post['timestamp'] 	=	date('jS \of F, Y', $post['timestamp']);
+				$post['name']		=	($post['tripcode'] == '' && $post['name'] == '') ? 'Anonymous' : $post['name'];
 //				$post['message']	=	stripslashes($post['message']);
 				$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
 				$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
 //				$post['message']	=	strlen($post['message']) > 500 ? substr($post['message'], 0, 500) . ' <b>&hellip;</b>' : $post['message'];
 			}
+
+			foreach ($this->db->results['replies'] as &$thread)
+			{
+				$thread = array_reverse($thread);
+				foreach ($thread as &$post)
+				{
+					$post['name']		=	($post['tripcode'] == '' && $post['name'] == '') ? 'Anonymous' : $post['name'];
+					$post['timestamp'] 	=	date('jS \of F, Y g:i a', $post['timestamp']);
+					$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
+					$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
+				}
+			}
+			/**** */
 
 			/* Load SQLs into the vars */
 			foreach ( $this->db->results as $queryk => $query )
@@ -174,22 +191,19 @@ class boards_boardpage_view {
 				$this->core->output->vars[$queryk] = $query;
 			}
 
-
-
+			// b temp
+			$this->core->output->vars['parents'] 	= new post($this->core->output->vars['parents']);
+			foreach ($this->core->output->vars['parents'] as $parent)
+			{
+				$this->core->output->vars['replies'][$parent['id']] = new post($this->core->output->vars['replies'][$parent['id']]);
+			}
 
 		} else
 		{
-			$this->viewSingleThread( $this->core->request('action'), $this->core->request('subaction'));
+			$this->viewSingleThread( $this->db->results['boardinfo']['board_id'], $this->core->request('subaction'));
 		}
 
-		// b temp
-		require_once IBB_ROOT_PATH . '/classes/boards/post.php';
-
-		$this->core->output->vars['parents'] 	= new post($this->core->output->vars['parents']);
-		foreach ($this->core->output->vars['parents'] as $parent)
-		{
-			$this->core->output->vars['replies'][$parent['id']] = new post($this->core->output->vars['replies'][$parent['id']]);
-		}
+//		print_r($this->core->output->vars['replies']['36460509']);
 
 //		echo '<textarea rows=600 cols=180>';
 //		print_r($this->core->output->vars['replies']);
@@ -241,13 +255,13 @@ class boards_boardpage_view {
 		$this->db->query('posts', '
 			SELECT 	*
 			FROM	pcposts
-			WHERE	boardid		= 	(SELECT id FROM pcboards WHERE name = "'.$board.'")
+			WHERE	boardid		= 	'.$board.'
 			AND 	id			= 	'.$thread.'
 			AND		is_deleted	=	0
 			UNION
 			SELECT	*
 			FROM	pcposts
-			WHERE	boardid		=	(SELECT id FROM pcboards WHERE name = "'.$board.'")
+			WHERE	boardid		=	'.$board.'
 			AND 	parentid	=	'.$thread.'
 			AND		is_deleted	=	0
 		');
@@ -257,6 +271,19 @@ class boards_boardpage_view {
 		{
 			$this->core->output->vars[$queryk] = $query;
 		}
+
+		// TODO IMGBB deal with this
+		$this->core->output->vars['parent'] = $this->core->output->vars['posts'][0];
+		foreach ($this->core->output->vars['posts'] as &$post)
+		{
+			$post['timestamp'] 	=	date('jS \of F, Y', $post['timestamp']);
+			$post['name']		=	($post['tripcode'] == '' && $post['name'] == '') ? 'Anonymous' : $post['name'];
+			$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
+			$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
+		}
+
+		// c temp
+		$this->core->output->vars['posts']	= new post($this->core->output->vars['posts']);
 
 		$this->core->output->addMacro('thread', 'boards.xhtml');
 	}
