@@ -32,7 +32,7 @@ class BasicFriendlyURL {
 			if (preg_match($regex, $request, $matches))
 			{
 				$array['action'] = $matches[1];
-				if ($matches[2])
+				if (isset($matches[2]))
 				{
 					$array['subaction'] = $matches[2];
 				}
