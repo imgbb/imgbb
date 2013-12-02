@@ -1,3 +1,53 @@
+<tal:block metal:define-macro="thread">
+    <div class="board">
+        <div id="${parent/id}" class="thread" >
+            <div class="postcontainer" tal:repeat="post posts">
+                <div id="${post/id}" class="post op" tal:attributes="class php: posts.key() == 1 ? 'post op' : 'post reply'">
+                    <div class="file" tal:condition="post/file">
+                        <div class="fileinfo">
+                                <span class="filetext">
+                                    File:
+                                    <a href="${imgbb/base_url}/files/src/${post/file}.${post/file_type}">
+                                        ${post/file}.${post/file_type}
+                                    </a>
+                                    ${structure string: &ndash;} (${post/file_size}, ${post/image_h}x${post/image_w}, ${post/file_original}.${post/file_type})
+                                </span>
+                        </div>
+                        <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${post/file}.${post/file_type}">
+                            <img src="http://applejack.ponychan.net/chan/files/thumb/138522502933s.png" />
+                        </a>
+                    </div>
+                    <div class="postinfo">
+                        <label>
+                            <input type="checkbox" />
+                            <span class="subject" tal:content="structure post/subject"/>
+                                <span class="namespan">
+                                    <span class="name" tal:content="post/name" /><span class="postertrip" tal:condition="post/tripcode">!${post/tripcode}</span>
+                                </span>
+                                <span class="mod">
+                                    ## NeedUserAppFirst ##
+                                </span>
+                            <span class="datetime" tal:content="post/timestamp"/>
+                                <span class="postnumber">
+                                    <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}-#${post/id}">
+                                        No.
+                                    </a>
+                                    <a href="${imgbb/base_url}/pls" tal:content="post/id"/>
+                                </span>
+                        </label>
+                    </div>
+                    <blockquote class="postmessage" tal:content="structure post/message" />
+                </div>
+                <!--<tal:block tal:repeat="replycount repliescount/${parent/id}">-->
+                    <!--<tal:block tal:repeat="reply replycount">-->
+                        <!--${reply}-->
+                    <!--</tal:block>-->
+                <!--</tal:block>-->
+            </div>
+        </div>
+    </div>
+</tal:block>
+
 <tal:block metal:define-macro="board">
     <div class="board">
         <tal:block tal:repeat="parent parents">
@@ -19,20 +69,26 @@
                             </a>
                         </div>
                         <div class="postinfo">
-                            <span class="subject" tal:content="structure parent/subject"/>
-                            <span class="namespan">
-                                <span class="name" tal:content="parents/name | default">
-                                    Anonymous
-                                </span><span class="postertrip" tal:condition="parents/tripcode">!${parent/tripcode}</span>
-                            </span>
-                            <span class="datetime" tal:content="parent/timestamp"/>
-                            <span class="postnumber">
-                                <a href="${parent/id}#helpmeobizekenobi, yoou're my only hope">
-                                    No.
+                            <label>
+                                <input type="checkbox" />
+                                <span class="subject" tal:content="structure parent/subject"/>
+                                <span class="namespan">
+                                    <span class="name" tal:content="parent/name" /><span class="postertrip" tal:condition="parent/tripcode">!${parent/tripcode}</span>
+                                </span>
+                                <span class="mod">
+                                    ## NeedUserAppFirst ##
+                                </span>
+                                <span class="datetime" tal:content="parent/timestamp"/>
+                                <span class="postnumber">
+                                    <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}-#${parent/id}">
+                                        No.
+                                    </a>
+                                    <a href="${imgbb/base_url}/pls" tal:content="parent/id"/>
+                                </span>
+                                <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}">
+                                    View
                                 </a>
-                                
-                                <a href="${imgbb/base_url}/pls" tal:content="parent/id"/>
-                            </span>
+                            </label>
                         </div>
                         <blockquote class="postmessage" tal:content="structure parent/message" />
                     </div>
@@ -48,20 +104,25 @@
                             <!--helloWorld${parent/id}-->
                             <!--${repeat/reply/key}-->
                             <div class="postinfo">
-                                <span class="subject" tal:content="structure reply/subject"/>
-                                <span class="namespan">
-                                    <span class="name" tal:content="replies/${parent/id}/name | default">
-                                        Anonymous
-                                    </span><span class="postertrip" tal:condition="replies/${parent/id}/tripcode">!${reply/tripcode}
+                                <label>
+                                    <input type="checkbox" />
+                                    <span class="subject" tal:content="structure reply/subject"/>
+                                    <span class="namespan">
+                                        <span class="name">
+                                            ${reply/name}</span><span class="postertrip" tal:condition="reply/tripcode">!${reply/tripcode}
+                                        </span>
                                     </span>
-                                </span>
-                                <span class="datetime" tal:content="reply/timestamp" />
-                                <span class="postnumber">
-                                    <a href="${parent/id}#helpmeobizekenobi, yoou're my only hope">
-                                        No.
-                                    </a>
-                                    <a href="${imgbb/base_url}/pls" tal:content="parent/id"/>
-                                </span>
+                                    <span class="mod">
+                                        ## NeedUserAppFirst ##
+                                    </span>
+                                    <span class="datetime" tal:content="reply/timestamp" />
+                                    <span class="postnumber">
+                                        <a href="${reply/id}#helpmeobizekenobi, yoou're my only hope">
+                                            No.
+                                        </a>
+                                        <a href="${imgbb/base_url}/pls" tal:content="reply/id"/>
+                                    </span>
+                                </label>
                             </div>
                             <div class="file" tal:condition="reply/file">
                                 <div class="fileinfo">
