@@ -177,20 +177,6 @@ class ibbCore {
 	// TODO IMGBB request handler
 	public function determinePath()
 	{
-		try
-		{
-			// Does the application physically exist?
-			if ( !$handle = is_dir( "app/" . $_GET['app'] ) )
-			{
-				throw new Exception( "Could not find application " . $_GET['app'] );
-			}
-
-		} catch (Exception $e)
-		{
-			// Throw default output
-			throw new Exception ($e);
-		}
-
 		//TODO IMGBB rework
 		if ( self::$fURL )
 		{
@@ -209,6 +195,20 @@ class ibbCore {
 		else
 		{
 			self::$request['app'] = 'main';
+		}
+
+		try
+		{
+			// Does the application physically exist?
+			if ( !$handle = is_dir( "app/" . self::$request['app'] . '/' ) )
+			{
+				throw new Exception( "Could not find application " . $_GET['app'] );
+			}
+
+		} catch (Exception $e)
+		{
+			// Throw default output
+			throw new Exception ($e);
 		}
 	}
 
@@ -775,9 +775,17 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	 */
 	public function singleResultQuery ( $qname, $query )
 	{
-		$this->execute( $query );
-		// dat [0]... there must be some function or constant that can be passed as an option to stop double array...
-		$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC)[0];
+		try {
+			$this->execute( $query );
+			$results = $this->instance()->store_result();
+			if ($results->num_rows == 0)
+				throw new Exception('Query returned no results, boards needs to catch this');
+			// dat [0]... there must be some function or constant that can be passed as an option to stop double array...
+			$this->results[$qname] = $results->fetch_all(MYSQL_ASSOC)[0];
+		}
+		catch (exception $e) {
+			throw new Exception($e->getMessage());
+		}
 	}
 
 	/**
