@@ -249,7 +249,7 @@ class ibbCore {
 	{
 		if (!$key)
 			return self::$request;
-		elseif (self::$request[$key])
+		elseif (isset(self::$request[$key]))
 			return self::$request[$key];
 		else
 			return false;
