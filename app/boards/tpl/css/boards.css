@@ -37,6 +37,12 @@ hr {
 .op{
     display: inline;
 }
+.op:after { /*Clearfix*/
+    content: "";
+    display: block;
+    height: 0;
+    clear: both;
+}
 .postinfo{
     display: inline;
     width: auto;
