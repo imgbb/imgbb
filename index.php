@@ -2,13 +2,11 @@
 /* temp */
 $time_start = microtime(true);
 require_once 'constants.php';
-require_once 'app/ibbController.php';
+require_once IBB_ROOT_PATH . '/app/ibbController.php';
 require_once IBB_LIB_PATH . '/PHPTAL-1.2.2/PHPTAL.php';
 require_once IBB_ROOT_PATH . '/classes/furl_class.php';
 require_once IBB_ROOT_PATH . '/classes/loader_class.php';
-//require_once IBB_ROOT_PATH . 'app/ibbCore.php';
 // TODO BASIC Exception handler
-//echo 'god index req_once<br />';
 session_start();
 /* temp */
 
