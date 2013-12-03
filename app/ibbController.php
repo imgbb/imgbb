@@ -595,7 +595,8 @@ class output {
 		$this->vars['imgbb']['highlight']		= array ( 	'app' 		=> $this->core->request('app'),
 													  		'mod' 		=> $this->core->request('mod'),
 													  		'area' 		=> $this->core->request('area'),
-													  		'action' 	=> $this->core->request('action')
+													  		'action' 	=> $this->core->request('action'),
+															'subaction'	=> $this->core->request('subaction')
 											  	);
 		$this->vars['imgbb']['IBB_TEMPLATES_PATH']	= IBB_TEMPLATES_PATH;
 		$this->vars['imgbb']['menubar']		= $this->menu;
@@ -613,6 +614,10 @@ class output {
 //		{
 //			$this-
 //		}
+
+		// temp
+		// Set configuration
+		$this->tpl->setPhpCodeDestination(IBB_LIB_PATH . '/PHPTAL-' . preg_replace('#\_#', '.', PHPTAL_VERSION) . '/cache');
 
 		/* All fired up, baby, OUR IMAGEBOARD IS WORKING */
 		$this->tpl->echoExecute();
