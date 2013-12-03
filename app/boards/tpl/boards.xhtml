@@ -1,4 +1,60 @@
 <tal:block metal:define-macro="thread">
+<div class="postform">
+    <form method="post" id="postform">
+        <ul>
+            <li>
+                <input name="" id="" type="text" value="Name"><input name="" id="" type="button" value="Go Anon!"><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                <div id="" class="helphover" style="display: none;">
+                    <div>Help text</div>
+                </div>
+            </li>
+            <li>
+                <select name="">
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <option value="option3">Option 3</option>
+                </select>
+            </li>
+            <li>
+                <input name="" id="" type="text" value="Email"><label for=""></label><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                <div id="" class="helphover" style="display: none;">
+                    <div>Help text</div>
+                </div>
+            </li>
+            <li>
+                <input name="" id="" type="text" value="Subject"><label for=""></label><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                <div id="" class="helphover" style="display: none;">
+                    <div>Help text</div>
+                </div>
+            </li>
+            <li>
+                <textarea name="" id="" value="Post">Post here</textarea><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                <div id="" class="helphover" style="display: none;">
+                    <div>Help text</div>
+                </div>
+            </li>
+            <li>
+                <input name="" id="" type="file" value="File upload"><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                <div id="" class="helphover" style="display: none;">
+                    <div>Help text</div>
+                </div>
+            </li>
+            <li>
+                <input name="" id="" type="text" value="Embed"><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                <div id="" class="helphover" style="display: none;">
+                    <div>Help text</div>
+                </div>
+            </li>
+            <li>
+                <input name="" id="" type="password" value="password"><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                <div id="" class="helphover" style="display: none;">
+                    <div>Help text</div>
+                </div>
+            </li>
+        </ul>
+    <input type="submit" name="submit" id="submit" value="Post" onclick="function">
+    </form>
+</div>
     <div class="board">
         <div id="${parent/id}" class="thread" >
             <div class="postcontainer" tal:repeat="post posts">
