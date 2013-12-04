@@ -1,6 +1,6 @@
 <tal:block metal:define-macro="postbox">
     <div class="postform">
-        <form method="post" id="postform">
+        <form method="post" id="postform" action="${imgbb/base_url}/index.php?app=boards&mod=posting&action=process">
             <ul>
                 <li>
                     <input name="postername" id="postername" type="text" value="Poster Name" /><input name="goAnon" id="goanon" type="button" value="Go Anon!" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
@@ -98,7 +98,7 @@ dumping array imgbb info<br /><hr />
                             <input type="checkbox" />
                             <span class="subject" tal:content="structure post/subject"/>
                                 <span class="namespan">
-                                    <span class="name" tal:content="post/name" /><span class="postertrip" tal:condition="post/tripcode">!${post/tripcode}</span>
+                                    <span class="name" tal:content="post/display_name" /><span class="postertrip" tal:condition="post/display_tripcode">!${post/display_tripcode}</span>
                                 </span>
                                 <span class="mod">
                                     ## NeedUserAppFirst ##
@@ -149,7 +149,7 @@ dumping array imgbb info<br /><hr />
                                 <input type="checkbox" />
                                 <span class="subject" tal:content="structure parent/subject"/>
                                 <span class="namespan">
-                                    <span class="name" tal:content="parent/name" /><span class="postertrip" tal:condition="parent/tripcode">!${parent/tripcode}</span>
+                                    <span class="name" tal:content="parent/display_name" /><span class="postertrip" tal:condition="parent/display_tripcode">!${parent/display_display_tripcode}</span>
                                 </span>
                                 <span class="mod">
                                     ## NeedUserAppFirst ##
@@ -184,8 +184,8 @@ dumping array imgbb info<br /><hr />
                                     <input type="checkbox" />
                                     <span class="subject" tal:content="structure reply/subject"/>
                                     <span class="namespan">
-                                        <span class="name">
-                                            ${reply/name}</span><span class="postertrip" tal:condition="reply/tripcode">!${reply/tripcode}
+                                        <span class="display_name">
+                                            ${reply/display_name}</span><span class="postertrip" tal:condition="reply/display_display_tripcode">!${reply/display_tripcode}
                                         </span>
                                     </span>
                                     <span class="mod">
