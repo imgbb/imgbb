@@ -1,6 +1,7 @@
 <tal:block metal:define-macro="postbox">
     <div class="postform">
-        <form method="post" id="postform" action="${imgbb/base_url}/index.php?app=boards&mod=posting&action=process">
+        <form method="post" id="postform" action="${imgbb/base_url}/index.php?app=boards&mod=posting&area=post&action=process">
+            <input type="hidden" name="board" value="${imgbb/highlight/action}" />
             <ul>
                 <li>
                     <input name="postername" id="postername" type="text" value="Poster Name" /><input name="goAnon" id="goanon" type="button" value="Go Anon!" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
