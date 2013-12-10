@@ -30,3 +30,12 @@ $time_end = microtime(true);
 $execution_time = $time_end - $time_start;
 
 echo '<b style="color:black;">Total Execution Time:</b> <span style="color:black;">'.$execution_time.'</span>';
+echo '<br /><b style="color:black;">Peak Memory Usage</b>: <span style="color:black;">'. turnMemoryToKB(memory_get_peak_usage()) . ' KB</span>';
+echo '<br /><b style="color:black;">Memory Usage at End of Script</b>: <span style="color:black;">' . turnMemoryToKB(memory_get_usage()) . ' KB</span>';
+echo '<br /><b style="color:black;">Query Execution Count</b>: <span style="color:black;">' . ibbCore::$queryc . '</span>';
+
+
+function turnMemoryToKB( $memory_get_usage )
+{
+	return substr($memory_get_usage, 0, strlen($memory_get_usage) - 3);
+}
