@@ -26,18 +26,17 @@ class ibbController {
 	 * @var $handles 	ibbDBCore
 	 * @var $settings	array
 	 * @var $request	array
-	 * @var $tpl		idkyet
 	 */
 	public static	$handles;
 	public			$settings;
-	public static 	$request;
-	public			$tpl;
 
 	/**
 	 * @var $core	ibbCore
 	 */
 	public			$core;
 	public static	$fURL;
+
+	public $user_data;
 
 	/**
 	 * Singleton
@@ -71,6 +70,7 @@ class ibbController {
 	{
 		$this->core = ibbCore::getInstance();
 		$this->core->run();
+		$this->core->output = output::getInstance();
 	}
 
 	/**
@@ -80,6 +80,22 @@ class ibbController {
 	 */
 	public function handleRequest()
 	{
+		$this->user_data = $this->core->user()->init();
+
+		// temporarily putting this here while I figure out where to actually put this
+		if ($this->core->request('action') == 'process' || $this->core->request('subaction') == 'process')
+		{
+			define('REQUEST_TYPE', 'process');
+			foreach ($_POST as $fieldname => $fieldval)
+			{
+				$this->core->hotfixAddRequest($fieldname, $fieldval);
+			}
+		}
+		// same for this
+		if (isset($_SESSION['user_name']))
+		{
+			$this->core->output->user = TRUE;
+		}
 
 		try {
 			ClassHandler::Execute( $this->core->request('app'));
@@ -106,6 +122,12 @@ class ibbCore {
 	public static	$request;
 
 	public static 	$fURLArray;
+
+	public static	$User;
+
+	public 			$data;
+
+	public static	$queryc = 0;
 
 	// temporarily static until settings configuration are made @ IMGBB state
 	public static	$settings = array(
@@ -147,9 +169,6 @@ class ibbCore {
 			// init DB
 			self::$handles['db'] = ibbDBCore::getInstance();
 
-			//init output
-			self::getInstance()->output = output::getInstance();
-
 		/* First check if it's a fURL */
 		self::verifyfURL();
 
@@ -163,8 +182,9 @@ class ibbCore {
 
 		//TODO IMGBB create global app controller && revise class into singleton
 		/* Build for us the member */
-		//TODO BASIC create user object
-//		$memberData = Member::init(self::$instance);
+		/* Do we want this here, or in the Controller? */
+		/* Not sure how or where to construct it */
+		self::$User = new User;
 
 		/* Does the user have access? */
 		//TODO BASIC create user permissions
@@ -279,6 +299,15 @@ class ibbCore {
 	{
 		self::$request[$key] = $val;
 	}
+
+
+	/**
+	 * @return User
+	 */
+	public function user()
+	{
+		return self::$User;
+	}
 }
 
 /**
@@ -306,24 +335,31 @@ class ClassHandler {
 	 */
 	public static function Execute( $app )
 	{
-		$MODULE = '';
-		$AREA = '';
+		self::$core = ibbCore::getInstance();
 
-		self::$core 	= 	ibbCore::getInstance();
+		$MODULE = self::$core->request('mod');
+		$AREA = self::$core->request('area');
 
-		if ( $app == 'user' )
+		/* ugh need to rewrite this class so badly, more edits to make it compatible */
+//		if ( $app == 'user' )
+//		{
+//			throw new Exception( "The application '$app' has been disabled on this installation." );
+//		}
+
+		if ( !$MODULE )
 		{
-			throw new Exception( "The application '$app' has been disabled on this installation." );
+			if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/defaultMod.php" )
+			{
+				throw new Exception( 'Could not find default module!' );
+			}
 		}
 
-		if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/defaultMod.php" )
+		if ( !$AREA )
 		{
-			throw new Exception( 'Could not find default module!' );
-		}
-
-		if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/$MODULE/defaultArea.php" )
-		{
-			throw new exception( 'Could not find default area!' );
+			if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/$MODULE/defaultArea.php" )
+			{
+				throw new exception( 'Could not find default area!' );
+			}
 		}
 
 		if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/$MODULE/$AREA.php" )
@@ -346,8 +382,11 @@ class ClassHandler {
 		self::$core->output->setWorkingTemplate( IBB_ROOT_PATH . '/app/'.$app.'/tpl/', 'default.xhtml');
 
 		/* Initialize */
-		// it's complaining that init wasn't found, I guess that's why I need an abstract class...
-		$handle->init();
+		// it's complaining that init/process wasn't found, I guess that's why I need an abstract class...
+		if (REQUEST_TYPE == 'process')
+			$handle->process();
+		else
+			$handle->init();
 
 		/* Go go, power ranger */
 		// temp name ofc...
@@ -461,6 +500,11 @@ class output {
 	 * @var array
 	 */
 	private	$slots;
+
+	/**
+	 * @var bool
+	 */
+	public $user = FALSE;
 
 	/**
 	 * Singleton
@@ -601,6 +645,14 @@ class output {
 		$this->vars['imgbb']['IBB_TEMPLATES_PATH']	= IBB_TEMPLATES_PATH;
 		$this->vars['imgbb']['menubar']		= $this->menu;
 
+		if ($this->user)
+		{
+			$this->vars['imgbb']['user'] = $this->core->user()->getData();
+		}
+		print_r($this->vars['imgbb']['user']);
+		if ($this->user)
+			print_r($this->core->user()->getData());
+
 
 		/* Give PHPTAL our variables */
 		foreach ( $this->vars as $key => $value )
@@ -617,7 +669,7 @@ class output {
 
 		// temp
 		// Set configuration
-		$this->tpl->setPhpCodeDestination(IBB_LIB_PATH . '/PHPTAL-' . preg_replace('#\_#', '.', PHPTAL_VERSION) . '/cache');
+		$this->tpl->setPhpCodeDestination(IBB_LIB_PATH . '/PHPTAL-' . preg_replace('#_#', '.', PHPTAL_VERSION) . '/cache');
 
 		/* All fired up, baby, OUR IMAGEBOARD IS WORKING */
 		$this->tpl->echoExecute();
@@ -627,33 +679,97 @@ class output {
 }
 
 /**
- * Class Member
+ * Class User
  *
  * dead class, needs a lot of rethinking
  */
-class Member {
+class User {
 
-	private 		$core;
-	private 		$db;
-	private static 	$instance;
-	private			$data;
-	private 		$permissions;
+	protected 			$core;
+	protected 			$db;
+	protected static 	$instance;
+	protected			$user_data;
+	protected 			$permissions;
 
 	/**
-	 * @return Member
+	 * documentation later, still not sure about this
+	 *
+	 * todo completely rewrite the BASIC algorithm
+	 *
+	 * @param bool $id
+	 *
+	 * @return array
 	 */
-	public function init()
+	public function init( $id = FALSE )
 	{
-//		$this->db->query('permissions', '')
+		if ( !$id )
+		{
+
+			if ( isset($_SESSION['user_id']) )
+			{
+
+				$this->user_data = $this->db->queryDirect('account_data', '
+					SELECT	*
+					FROM	ibb_users
+					WHERE	id = ' . $_SESSION['user_id']);
+
+				if ( $this->user_data )
+				{
+					return $this->user_data;
+				}
+				else
+				{
+					error_log('CLASS USER->init() DEBUG: $_SESSION[\'user_id\') ('.$_SESSION['user_id'].') found but no result in user data(?)');
+					return false;
+				}
+			}
+			else
+			{
+				echo 'not logged in';
+				return false;
+			}
+		}
+		else
+		{
+			$this->user_data = $this->db->queryDirect('account_data', '
+				SELECT	*
+				FROM	ibb_users
+				WHERE	id = ' . $id);
+
+			if ( isset( $this->user_data ) )
+			{
+				return $this->user_data;
+			}
+			else
+			{
+				error_log('CLASS USER->init() DEBUG: Passed variable $id ' . $id . ' did not go through.');
+				return false;
+			}
+		}
+	}
+
+	public function getData()
+	{
+		return $this->user_data;
+	}
+
+	/**
+	 * @param $key
+	 *
+	 * @return mixed
+	 */
+	public function getPermissions($key)
+	{
+		return explode(',', $this->user_data[$key]);
 	}
 
 	/**
 	 * Constructor
 	 */
-	public function __construct(ibbCore $ibbc)
+	public function __construct()
 	{
-		$this->core = $ibbc;
-		$this->db	= $this->core->DB();
+		$this->core = ibbCore::getInstance();
+		$this->db	= $this->core->db();
 	}
 
 	/**
@@ -740,10 +856,11 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	 */
 	public function execute( $query )
 	{
+		ibbCore::$queryc++;
 //		if (!is_array($query)) {
 //			throw new Exception('DB Query doesn\'t follow format');
 //		}
-		$this->instance()->real_query( $query );
+		return $this->instance()->real_query( $query );
 	}
 
 	/**
@@ -754,8 +871,23 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	 */
 	public function query( $qname, $query )
 	{
+		$success = $this->execute($query);
+
+		if ( $success )
+			$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+		else
+			throw new Exception(' Query failed! ' . $query);
+	}
+
+	/**
+	 * @param $query
+	 *
+	 * @return array
+	 */
+	public function queryDirect( $query )
+	{
 		$this->execute($query);
-		$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+		return $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
 	}
 
 	/**
@@ -766,8 +898,12 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	 */
 	public function queryInLoop( $qname, $parent, $query )
 	{
-		$this->execute($query);
-		$this->results[$qname][$parent] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+		$success = $this->execute($query);
+
+		if ( $success )
+			$this->results[$qname][$parent] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+		else
+			throw new Exception(' Query failed! ' . $query);
 	}
 
 	/**
@@ -784,13 +920,43 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 			$this->execute( $query );
 			$results = $this->instance()->store_result();
 			if ($results->num_rows == 0)
-				throw new Exception('Query returned no results, boards needs to catch this');
+				throw new Exception('Query returned no results, boards needs to catch this ' . $query);
 			// dat [0]... there must be some function or constant that can be passed as an option to stop double array...
 			$this->results[$qname] = $results->fetch_all(MYSQL_ASSOC)[0];
 		}
 		catch (exception $e) {
 			throw new Exception($e->getMessage());
 		}
+	}
+
+	/**
+	 * @param $query
+	 *
+	 * @return bool
+	 */
+	public function queryBoolean ( $query )
+	{
+		$this->execute ( $query );
+		$results = $this->instance()->store_result();
+		if ($results->num_rows == 0)
+		{
+			return false;
+		}
+		else
+		{
+			return $this->instance()->use_result()->fetch_all(MYSQL_ASSOC)[0];
+		}
+
+	}
+
+	public function buildSafeQuery()
+	{
+		return func_get_args();
+	}
+
+	public function commit()
+	{
+
 	}
 
 	/**
@@ -808,4 +974,22 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 		$this->instance()->close();
 	}
 
+}
+
+/**
+ * Dunno where to put this stuff
+ *
+ * Class TempStuff
+ */
+class TempStuff
+{
+	/**
+	 * @param string $app
+	 * @param string $module
+	 * @param string $area
+	 */
+	public function sendMeAway( $app = '', $module = '', $area = '')
+	{
+
+	}
 }
