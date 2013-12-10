@@ -6,7 +6,7 @@
             <link tal:condition="php: is_array(each_css)" rel="stylesheet" href="${imgbb/base_url}/app/${each_css/app}/tpl/css/${each_css/filename}" />
         </span>
         <!--<link rel="stylesheet" tal:attributes="href string: ${imgbb/base_url}/app/main/tpl/css/menu.css" tal:condition="true: imgbb/menubar"/>-->
-        <title tal:content="imgbb/title">imgBB</title>
+        <title tal:content="imgbb/title | default">imgBB</title>
     </head>
     <body>
     <tal:block tal:condition="true: imgbb/menubar" metal:use-macro="${imgbb/IBB_TEMPLATES_PATH}/menubar.xhtml/menubar" />
