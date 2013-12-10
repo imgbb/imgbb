@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+        <span tal:omit-tag="" tal:repeat="each_css imgbb/css">
+            <link tal:condition="php: !is_array(each_css) AND strlen(each_css) > 1" rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
+            <link tal:condition="php: is_array(each_css)" rel="stylesheet" href="${imgbb/base_url}/app/${each_css/app}/tpl/css/${each_css/filename}" />
+        </span>
+        <!--<link rel="stylesheet" tal:attributes="href string: ${imgbb/base_url}/app/main/tpl/css/menu.css" tal:condition="true: imgbb/menubar"/>-->
+        <title tal:content="imgbb/title | default">imgBB</title>
+    </head>
+<body>
+<div id="main">
+
+    <div id="contents">
+
+        <div id="loginform">
+
+            <div id="pinkie" class="loginpony">
+                <img src="/imgbb/assets/pinkie.png" />
+            </div>
+
+            <form action="?action=login" method="post" name="managelogin">
+
+                <input name="username" onfocus="if (this.value=='Username') this.value = ''" type="text" />
+                <input name="password" onfocus="if (this.value=='Password') this.value = ''" type="password" />
+                <input value="Sign in" type="submit" />
+            </form>
+
+
+
+        </div>
+    </div>
+
+    <div class="footer">
+        <p align="center"><a href="http://www.ponychan.net/chan/">Home</a> | <a href="http://www.ponychan.net/chan/?p=news">News</a> | <a href="http://www.ponychan.net/chan/?p=faq">FAQ</a> | <a href="http://www.ponychan.net/chan/?p=rules">Rules</a> |&nbsp;<a href="http://www.ponychan.net/chan/?p=contact">Contact Us</a> | Powered by <a href="http://www.ponychan.net/chan/">Ponychan</a></p>
+    </div>
+</div></body></html>
