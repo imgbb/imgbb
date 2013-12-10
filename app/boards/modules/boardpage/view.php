@@ -21,6 +21,16 @@ class boards_boardpage_view {
 	 */
 	public $core;
 
+	/**
+	 * @var User
+	 */
+	public $user;
+
+	/**
+	 * @var array
+	 */
+	public $board_info;
+
 
 	/**
 	 *
@@ -30,14 +40,6 @@ class boards_boardpage_view {
 		$this->core 	= 	ibbCore::getInstance();
 		$this->db		=	$this->core->DB();
 		$this->request 	=	$this->core->request();
-	}
-
-	/**
-	 * @return PHPTAL
-	 * @throws Exception
-	 */
-	public function init()
-	{
 		$this->db->singleResultQuery('boardinfo', '
 			SELECT			ibb_boards.id 					AS board_id,
 							ibb_boards.name 			AS `board_name`,
@@ -50,6 +52,15 @@ class boards_boardpage_view {
 			ON				ibb_board_categories.id = ibb_boards.category
 			WHERE			ibb_boards.name 					= "'.$this->core->request('action').'"
 		');
+		$this->user_data =	$this->core->data;
+	}
+
+	/**
+	 * @return PHPTAL
+	 * @throws Exception
+	 */
+	public function init()
+	{
 		$this->db->query('boards', '
 			SELECT 		 ibb_boards.id 	AS board_id
 						,ibb_boards.name AS board_name
@@ -83,11 +94,13 @@ class boards_boardpage_view {
 			SELECT		id
 						,boardid
 						,parentid
-						,name
-						,tripcode
-						,email
+						,userid
+						,display_name
+						,display_tripcode
 						,subject
+						,email
 						,message
+						,password
 						,file
 						,file_server
 						,file_type
@@ -98,11 +111,11 @@ class boards_boardpage_view {
 						,timestamp
 						,stickied
 						,locked
-						,is_deleted
-			FROM		pcposts
+						,deleted
+			FROM		ibb_posts
 			WHERE		boardid		=	' . $this->db->results['boardinfo']['board_id'] . '
 			AND			parentid	=	0
-			AND			is_deleted	=	0
+			AND			deleted		=	0
 			AND			stickied	=	1
 			ORDER BY	`bumped` DESC');
 
@@ -110,10 +123,10 @@ class boards_boardpage_view {
 			{
 				$this->db->queryInLoop('replies', $sticky['id'], '
 					SELECT		*
-					FROM		pcposts
+					FROM		ibb_posts
 					WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
 					AND			parentid	=	' . $sticky['id'] . '
-					AND			is_deleted	=	0
+					AND			deleted		=	0
 					ORDER BY	`bumped` DESC
 					LIMIT 		1');
 			}
@@ -121,10 +134,10 @@ class boards_boardpage_view {
 
 			$this->db->query('parents', '
 			SELECT		*
-			FROM		pcposts
+			FROM		ibb_posts
 			WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
 			AND 		parentid	=	0
-			AND			is_deleted	=	0
+			AND			deleted		=	0
 			AND			stickied	=	0
 			ORDER BY	`bumped` DESC
 			LIMIT 		' . (10 - count($this->db->results['stickies'])));
@@ -132,10 +145,10 @@ class boards_boardpage_view {
 			{
 				$this->db->queryInLoop('replies', $parent['id'], '
 					SELECT		*
-					FROM		pcposts
+					FROM		ibb_posts
 					WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
 					AND			parentid	=	' . $parent['id'] . '
-					AND			is_deleted	=	0
+					AND			deleted		=	0
 					ORDER BY	`bumped` DESC
 					LIMIT 		3');
 			}
@@ -145,9 +158,9 @@ class boards_boardpage_view {
 			{
 				$this->db->queryInLoop('repliescount', $parent['id'], '
 				SELECT		COUNT(*)
-				FROM 		pcposts
-				WHERE		boardid		=	' . $this->db->results['boardinfo']['board_id'] . '
-				AND			parentid			=	' . $parent['id']);
+				FROM 		ibb_posts
+				WHERE		boardid			=	' . $this->db->results['boardinfo']['board_id'] . '
+				AND			parentid		=	' . $parent['id']);
 			}
 
 
@@ -165,7 +178,7 @@ class boards_boardpage_view {
 			foreach ($this->db->results['parents'] as &$post)
 			{
 				$post['timestamp'] 	=	date('jS \of F, Y', $post['timestamp']);
-				$post['name']		=	($post['tripcode'] == '' && $post['name'] == '') ? 'Anonymous' : $post['name'];
+				$post['display_name']		=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
 //				$post['message']	=	stripslashes($post['message']);
 				$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
 				$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
@@ -174,10 +187,11 @@ class boards_boardpage_view {
 
 			foreach ($this->db->results['replies'] as &$thread)
 			{
+				// Not sure why this is needed
 				$thread = array_reverse($thread);
 				foreach ($thread as &$post)
 				{
-					$post['name']		=	($post['tripcode'] == '' && $post['name'] == '') ? 'Anonymous' : $post['name'];
+					$post['display_name']		=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
 					$post['timestamp'] 	=	date('jS \of F, Y g:i a', $post['timestamp']);
 					$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
 					$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
@@ -245,7 +259,49 @@ class boards_boardpage_view {
 //		var_dump($this->db->results['parents'][0]['message']);
 	}
 
+	public function process()
+	{
+		if (!in_array($this->db->results['boardinfo']['board_id'], $this->user->getPermissions('boards')))
+		{
+			throw new Exception('permission denied exception');
+		}
+
+		if ($this->user->getPermissions('is_staff'))
+		{
+
+		}
+
+		if (isset($_FILES))
+		{
+
+		}
+		$this->db->buildSafeQuery(array(
+				'type'		=> array('INSERT INTO' => 'ibb_posts'),
+				'columns'	=> array('boardid'
+									,'parentid'
+									,'userid'
+									,'message'
+									,'display_name'
+									,'display_tripcode'
+									,'subject'
+									,'timestamp'),
+				'values'	=> array($this->db->results['boardinfo']['board_id']
+									,$_POST['parentid']
+									,$_SESSION['userid']
+									,$_POST['message'])
+									,$_POST['display_name']
+									,$_POST['display_tripcode']
+									,$_POST['subject']
+									,time()
+			)
+		);
+
+		$this->db->commit();
+	}
+
 	/**
+	 * should probably put this back in init()
+	 *
 	 * @param      $board
 	 * @param      $thread
 	 * @param null $user
@@ -254,16 +310,16 @@ class boards_boardpage_view {
 	{
 		$this->db->query('posts', '
 			SELECT 	*
-			FROM	pcposts
+			FROM	ibb_posts
 			WHERE	boardid		= 	'.$board.'
 			AND 	id			= 	'.$thread.'
-			AND		is_deleted	=	0
+			AND		deleted	=	0
 			UNION
 			SELECT	*
-			FROM	pcposts
+			FROM	ibb_posts
 			WHERE	boardid		=	'.$board.'
 			AND 	parentid	=	'.$thread.'
-			AND		is_deleted	=	0
+			AND		deleted		=	0
 		');
 
 		/* Load SQLs into the vars */
@@ -277,7 +333,7 @@ class boards_boardpage_view {
 		foreach ($this->core->output->vars['posts'] as &$post)
 		{
 			$post['timestamp'] 	=	date('jS \of F, Y', $post['timestamp']);
-			$post['name']		=	($post['tripcode'] == '' && $post['name'] == '') ? 'Anonymous' : $post['name'];
+			$post['display_name']		=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
 			$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
 			$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
 		}
@@ -287,4 +343,5 @@ class boards_boardpage_view {
 
 		$this->core->output->addMacro('thread', 'boards.xhtml');
 	}
+
 }
