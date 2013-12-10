@@ -4,7 +4,7 @@
             <input type="hidden" name="board" value="${imgbb/highlight/action}" />
             <ul>
                 <li>
-                    <input name="postername" id="postername" type="text" value="Poster Name" /><input name="goAnon" id="goanon" type="button" value="Go Anon!" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                    <input name="postername" id="postername" type="text" /><input name="goAnon" id="goanon" type="button" value="Go Anon!" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
                     <div id="" class="helphover" style="display: none;">
                         <div>Help text</div>
                     </div>
@@ -15,37 +15,37 @@
                     </select>
                 </li>
                 <li>
-                    <input name="email" id="email" type="text" value="Poster Email" /><label for="email">this_was_empty_body_xml_complained</label><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                    <input name="email" id="email" type="text" /><label for="email">this_was_empty_body_xml_complained</label><a href="#" onclick="Display help"><span class="helpme">?</span></a>
                     <div id="" class="helphover" style="display: none;">
                         <div>Help text</div>
                     </div>
                 </li>
                 <li>
-                    <input name="subject" id="subject" type="text" value="Poster Subject" /><label for="subject">this_was_empty_body_xml_complained</label><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                    <input name="subject" id="subject" type="text" /><label for="subject">this_was_empty_body_xml_complained</label><a href="#" onclick="Display help"><span class="helpme">?</span></a>
                     <div id="" class="helphover" style="display: none;">
                         <div>Help text</div>
                     </div>
                 </li>
                 <li>
-                    <textarea name="body" id="body">Post here</textarea><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                    <textarea name="body" id="body" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
                     <div id="" class="helphover" style="display: none;">
                         <div>Help text</div>
                     </div>
                 </li>
                 <li>
-                    <input name="file" id="file" type="file" value="Poster File upload" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                    <input name="file" id="file" type="file" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
                     <div id="" class="helphover" style="display: none;">
                         <div>Help text</div>
                     </div>
                 </li>
                 <li>
-                    <input name="embed" id="embed" type="text" value="Embed" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                    <input name="embed" id="embed" type="text" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
                     <div id="" class="helphover" style="display: none;">
                         <div>Help text</div>
                     </div>
                 </li>
                 <li>
-                    <input name="password" id="password" type="password" value="Poster Password" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
+                    <input name="password" id="password" type="password" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
                     <div id="" class="helphover" style="display: none;">
                         <div>Help text</div>
                     </div>
@@ -102,7 +102,6 @@ dumping array imgbb info<br /><hr />
                                     <span class="name" tal:content="post/display_name" /><span class="postertrip" tal:condition="post/display_tripcode">!${post/display_tripcode}</span>
                                 </span>
                                 <span class="mod">
-                                    ## NeedUserAppFirst ##
                                 </span>
                             <span class="datetime" tal:content="post/timestamp"/>
                                 <span class="postnumber">
@@ -150,10 +149,9 @@ dumping array imgbb info<br /><hr />
                                 <input type="checkbox" />
                                 <span class="subject" tal:content="structure parent/subject"/>
                                 <span class="namespan">
-                                    <span class="name" tal:content="parent/display_name" /><span class="postertrip" tal:condition="parent/display_tripcode">!${parent/display_display_tripcode}</span>
+                                    <span class="name" tal:content="parent/display_name" /><span class="postertrip" tal:condition="parent/display_tripcode">!${parent/display_tripcode}</span>
                                 </span>
                                 <span class="mod">
-                                    ## NeedUserAppFirst ##
                                 </span>
                                 <span class="datetime" tal:content="parent/timestamp"/>
                                 <span class="postnumber">
@@ -186,7 +184,7 @@ dumping array imgbb info<br /><hr />
                                     <span class="subject" tal:content="structure reply/subject"/>
                                     <span class="namespan">
                                         <span class="display_name">
-                                            ${reply/display_name}</span><span class="postertrip" tal:condition="reply/display_display_tripcode">!${reply/display_tripcode}
+                                            ${reply/display_name}</span><span class="postertrip" tal:condition="reply/display_tripcode">!${reply/display_tripcode}
                                         </span>
                                     </span>
                                     <span class="mod">
