@@ -43,8 +43,6 @@ receive various private on-the-house conversions of their themes.
 
 
 
-Project leader - D.B Truthlight
-
-Designer - Grandil
-
+Project leader - D.B Truthlight\n
+Designer - Grandil\n
 JavaScript - "Josh"
