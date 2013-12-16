@@ -1,79 +1,157 @@
 <tal:block metal:define-macro="postbox">
-    <div class="postform">
-        <form method="post" id="postform" action="${imgbb/base_url}/index.php?app=boards&mod=posting&area=post&action=process">
+    <div style="text-align:center;font-size:6em;">${boardinfo/title}</div>
+    <hr />
+    <div class="postarea">
+        <form id="postform" action="index.php?app=boards&amp;mod=boards&amp;area=view&amp;action=process" method="post">
             <input type="hidden" name="board" value="${imgbb/highlight/action}" />
-            <ul>
-                <li>
-                    <input name="postername" id="postername" type="text" /><input name="goAnon" id="goanon" type="button" value="Go Anon!" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
-                    <div id="" class="helphover" style="display: none;">
-                        <div>Help text</div>
-                    </div>
-                </li>
-                <li>
-                    <select name="names">
-                        <option value="option1">Option 1</option>
-                    </select>
-                </li>
-                <li>
-                    <input name="email" id="email" type="text" /><label for="email">this_was_empty_body_xml_complained</label><a href="#" onclick="Display help"><span class="helpme">?</span></a>
-                    <div id="" class="helphover" style="display: none;">
-                        <div>Help text</div>
-                    </div>
-                </li>
-                <li>
-                    <input name="subject" id="subject" type="text" /><label for="subject">this_was_empty_body_xml_complained</label><a href="#" onclick="Display help"><span class="helpme">?</span></a>
-                    <div id="" class="helphover" style="display: none;">
-                        <div>Help text</div>
-                    </div>
-                </li>
-                <li>
-                    <textarea name="body" id="body" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
-                    <div id="" class="helphover" style="display: none;">
-                        <div>Help text</div>
-                    </div>
-                </li>
-                <li>
-                    <input name="file" id="file" type="file" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
-                    <div id="" class="helphover" style="display: none;">
-                        <div>Help text</div>
-                    </div>
-                </li>
-                <li>
-                    <input name="embed" id="embed" type="text" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
-                    <div id="" class="helphover" style="display: none;">
-                        <div>Help text</div>
-                    </div>
-                </li>
-                <li>
-                    <input name="password" id="password" type="password" /><a href="#" onclick="Display help"><span class="helpme">?</span></a>
-                    <div id="" class="helphover" style="display: none;">
-                        <div>Help text</div>
-                    </div>
-                </li>
-            </ul>
-            <input type="submit" name="submit" id="submit" value="Post" onclick="function" />
+            <table>
+                <tbody>
+                <tr tal:condition="not: imgbb/user/registered">
+                    <td class="tdlabel">
+                        Name
+                    </td>
+                    <td class="tdinput">
+                        <input id="postername" type="text" name="postername" />
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr tal:condition="imgbb/user/registered">
+                    <td class="tdlabel">
+                        Name
+                    </td>
+                    <td class="tdinput">
+                        <select name="names">
+                            <option value="main">
+                                ${imgbb/user/display_name}!${imgbb/user/display_trip}
+                            </option>
+                            <option value="${name/id}" tal:repeat="name imgbb/user/names">
+                                ${name/display_name}!${name/display_trip}
+                            </option>
+                        </select>
+                        <input id="goanon" type="button" name="goanon" value="Go Anon!" />
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="tdlabel">
+                        Email
+                    </td>
+                    <td class="tdinput">
+                        <input id="email" type="text" name="email"/>
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="tdlabel">
+                        Subject
+                    </td>
+                    <td class="tdinput">
+                        <input id="subject" type="text" name="subject"/>
+                        <input id="submit" type="submit" onclick="" value="New Post" name="Submit" />
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="tdlabel">
+                        Message
+                    </td>
+                    <td class="tdinput">
+                        <textarea id="message" name="body" />
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="tdlabel">
+                        File
+                    </td>
+                    <td class="tdinput">
+                        <input id="file" type="file" name="file"/>
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="tdlabel">
+                        Embed
+                    </td>
+                    <td class="tdinput">
+                        <input id="embed" type="text" name="embed"/>
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="tdlabel">
+                        Password
+                    </td>
+                    <td class="tdinput">
+                        <input id="password" type="password" name="password"/>
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
         </form>
     </div>
+    <hr />
 </tal:block>
 
-<tal:block metal:define-macro="boards_debug">
-dumping array imgbb info<br /><hr />
-<tal:block tal:repeat="var imgbb">
-    <tal:block tal:condition="php: is_array(var)">
-        <div style="border:2px solid; max-width:600px;">
-            <b>imgbb['${repeat/var/key}']</b><br />
-            <tal:block tal:repeat="v var">
-                ${repeat/v/key} => ${v}<br />
-            </tal:block>
-        </div>
-
-    </tal:block>
-    <tal:block tal:condition="php: !is_array(var)">
-        ${repeat/var/key}=> ${var}<br />
-    </tal:block>
-</tal:block>
-<hr />
-</tal:block>
+<!--<tal:block metal:define-macro="boards_debug">-->
+<!--dumping array imgbb info<br /><hr />-->
+<!--<tal:block tal:repeat="var imgbb">-->
+    <!--<tal:block tal:condition="php: is_array(var)">-->
+        <!--<div style="border:2px solid; max-width:600px;">-->
+            <!--<b>imgbb['${repeat/var/key}']</b><br />-->
+            <!--<tal:block tal:repeat="v var">-->
+                <!--${repeat/v/key} => ${v}<br />-->
+            <!--</tal:block>-->
+        <!--</div>-->
+<!---->
+    <!--</tal:block>-->
+    <!--<tal:block tal:condition="php: !is_array(var)">-->
+        <!--${repeat/var/key}=> ${var}<br />-->
+    <!--</tal:block>-->
+<!--</tal:block>-->
+<!--<hr />-->
+<!--</tal:block>-->
 
 <tal:block metal:define-macro="thread">
     <div class="board">
