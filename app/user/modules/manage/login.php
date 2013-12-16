@@ -42,20 +42,20 @@ class user_manage_login
 
 	public function process()
 	{
-		$results = $this->db->queryBoolean('
+		$this->db->query('user', '
 			SELECT	id
 			FROM	ibb_users
 			WHERE	`username` = "'.$this->core->request('username').'"
 			AND		`password` = "'.$this->core->request('password').'"
-		');
+		', SINGLE_RESULT_QUERY );
 
-		if (!$results)
+		if (!$this->db->results['user'])
 			throw new Exception('standard exception, login incorrect.');
 
 		setcookie('username', $this->core->request('username'), time()+60*60*24*30);
 		$_SESSION['user_name'] 		= $this->core->request('username');
 		$_SESSION['user_password'] 	= $this->core->request('password');
-		$_SESSION['user_id']		= $results['id'];
+		$_SESSION['user_id']		= $this->db->results['user']['id'];
 
 	}
 }
