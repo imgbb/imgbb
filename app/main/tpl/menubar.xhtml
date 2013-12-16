@@ -46,14 +46,19 @@
                     <li>
                         <a tal:attributes="class php: (imgbb['highlight']['mod'] eq 'front') ? 'this_area' : ''" href="${imgbb/base_url}">${imgbb/highlight/mod}</a>
                     </li>
-                    <li tal:attributes="class php: (imgbb['highlight']['area'] eq 'login') ? 'this_area' : ''" tal:condition="not: exists: imgbb['user']">
-                        <a href="/imgbb/index.php?app=user&amp;mod=manage">
+                    <li tal:condition="not: imgbb/user/registered">
+                        <a href="index.php?app=user&amp;mod=manage&area=login">
                             Login
                         </a>
                     </li>
-                    <li tal:condition="true: imgbb/user">
+                    <li tal:condition="imgbb/user/registered">
+                        <a href="index.php?app=user&amp;mod=manage&area=logout">
+                            Logout
+                        </a>
+                    </li>
+                    <li tal:condition="imgbb/user/registered">
                         <a href="index.php?app=user&amp;&mod=profile">
-                            ${imgbb/username}
+                            ${imgbb/user/display_name}
                         </a>
                     </li>
                     <li tal:attributes="class php: (imgbb['highlight']['mod'] eq 'settings' && imgbb['highlight']['area'] eq 'view') ? 'this_area' : ''" tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings">Account&nbsp;Settings</a></li>
