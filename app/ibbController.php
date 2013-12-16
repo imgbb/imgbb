@@ -506,6 +506,7 @@ class output {
 	 */
 	public $user = FALSE;
 
+
 	/**
 	 * Singleton
 	 *
@@ -644,14 +645,13 @@ class output {
 											  	);
 		$this->vars['imgbb']['IBB_TEMPLATES_PATH']	= IBB_TEMPLATES_PATH;
 		$this->vars['imgbb']['menubar']		= $this->menu;
+		$this->vars['imgbb']['user']		= $this->core->user();
 
-		if ($this->user)
-		{
-			$this->vars['imgbb']['user'] = $this->core->user()->getData();
-		}
-		print_r($this->vars['imgbb']['user']);
+//		print_r($this->vars['imgbb']['user']);
 		if ($this->user)
 			print_r($this->core->user()->getData());
+//		var_dump($this->vars['imgbb']['user']->display_name);
+//		var_dump($this->core->user()->display_name);
 
 
 		/* Give PHPTAL our variables */
@@ -690,6 +690,10 @@ class User {
 	protected static 	$instance;
 	protected			$user_data;
 	protected 			$permissions;
+	public				$registered = FALSE;
+	public				$display_name;
+	public				$display_trip;
+	public				$names;
 
 	/**
 	 * documentation later, still not sure about this
@@ -707,14 +711,16 @@ class User {
 
 			if ( isset($_SESSION['user_id']) )
 			{
+				$this->registered = TRUE;
 
-				$this->user_data = $this->db->queryDirect('account_data', '
+				$this->user_data = $this->db->queryDirect('
 					SELECT	*
 					FROM	ibb_users
 					WHERE	id = ' . $_SESSION['user_id']);
 
 				if ( $this->user_data )
 				{
+					$this->bootUser();
 					return $this->user_data;
 				}
 				else
@@ -725,19 +731,21 @@ class User {
 			}
 			else
 			{
+//				$this->bootAnon();
 				echo 'not logged in';
 				return false;
 			}
 		}
 		else
 		{
-			$this->user_data = $this->db->queryDirect('account_data', '
+			$this->user_data = $this->db->queryDirect('
 				SELECT	*
 				FROM	ibb_users
 				WHERE	id = ' . $id);
 
 			if ( isset( $this->user_data ) )
 			{
+				$this->registered = TRUE;
 				return $this->user_data;
 			}
 			else
@@ -748,9 +756,24 @@ class User {
 		}
 	}
 
+	public function bootUser()
+	{
+		$this->display_name = $this->getData()['display_name'];
+		$this->display_trip = $this->getData()['display_trip'];
+		$this->names 		= $this->db->queryDirect('
+								SELECT	*
+								FROM	ibb_names
+								WHERE	userid = ' . $_SESSION['user_id']
+								);
+
+	}
+
+	/**
+	 * @return mixed
+	 */
 	public function getData()
 	{
-		return $this->user_data;
+		return $this->user_data[0];
 	}
 
 	/**
@@ -854,29 +877,74 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	 *
 	 * @throws	Exception
 	 */
-	public function execute( $query )
+	public function execute( $query, $type = NULL, $qname = NULL )
 	{
 		ibbCore::$queryc++;
-//		if (!is_array($query)) {
-//			throw new Exception('DB Query doesn\'t follow format');
-//		}
 		return $this->instance()->real_query( $query );
 	}
 
+
 	/**
-	 * @param 	$qname 	string 	retrieval key
-	 * @param 	$query 	array 	sql query
+	 * $qtype can contain a number of constants.<br />
+	 *
+	 * <b>SINGLE_RESULT_QUERY</b> - Your query is the same, except it will automatically load the [0] index into the query.
+	 * That is to say, you will use $results[$column] instead of $results[0][$column]. Useful for queries that, ahem,
+	 * have a SINGLE RESULT<br />
+	 *
+	 * <b>DIRECT_QUERY</b> - The results will return the data instead of latching it into $results.
+	 *
+	 * @param      $qname
+	 * @param      $query
+	 * @param null $qtype
 	 *
 	 * @throws Exception
+	 *
+	 * @return array [optional] results
 	 */
-	public function query( $qname, $query )
+	public function query( $qname, $query, $qtype = NULL)
 	{
 		$success = $this->execute($query);
 
 		if ( $success )
-			$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+		{
+			switch ( $qtype )
+			{
+				case 1:
+				{
+					$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC)[0];
+					break;
+				}
+				case 2:
+				{
+					return $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+				}
+				default:
+				{
+					$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+					break;
+				}
+			}
+		}
 		else
-			throw new Exception(' Query failed! ' . $query);
+		{
+			$qresult = $this->instance()->store_result();
+
+			if ($qresult->num_rows == 0)
+			{
+				throw new Exception( 'No results bruddah, Wizard, you need to make an error page for me to build a noresults exception' );
+			}
+			else
+			{
+				throw new Exception(' Query failed! ' . $query);
+			}
+
+		}
+
+
+
+//		if ( $success )
+//			$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+
 	}
 
 	/**
