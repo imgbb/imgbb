@@ -120,8 +120,6 @@ class main_front_news {
 			ON			ibb_staff_ranks.`id` = ibb_users.`staff_level`
 		');
 
-		$this->db->close();
-
 		foreach ( $this->db->results['front_data'] as &$entry )
 		{
 			if ( $entry['timestamp'] )
@@ -136,7 +134,5 @@ class main_front_news {
 			FROM		ibb_front_entries
 			WHERE		`category` = ' . $this->core->request('action')
 		);
-
-		$this->db->close();
 	}
 }
