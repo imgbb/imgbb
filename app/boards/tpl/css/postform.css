@@ -1,0 +1,53 @@
+
+/*
+Header blue: #25253d
+Header text: #ececec
+
+text background: #f2f2f7
+text color: #29292d
+
+
+*/
+html{
+    background: #e6e6ed;
+    font-family: sans-serif;
+}
+
+.postarea form table{
+    margin: 0 auto;
+    border-spacing: 2px;
+}
+.tdlabel{
+    padding: 0px 10px 0px 15px;
+    background: #25253d;
+    border: 1px solid #25253d;
+    color: #ececec;
+    text-align: right;
+}
+.helpme{
+    vertical-align: top;
+}
+.tdinput{
+    padding: 0px;
+    margin: 0px;
+}
+.tdinput input[type="text"],
+.tdinput input[type="password"],
+.tdinput select{
+    width: 240px;
+    background-color: #f2f2f7;
+    border: 1px solid #29292d;
+    height: 27px;
+}
+.tdinput input[type="file"]{
+    width: 240px;
+    height: 27px;
+}
+.tdinput textarea{
+    height: 162px;
+    width: 302px;
+    /*margin-bottom: -5px!important;*/
+    border: 1px solid #29292d;
+    background-color: #f2f2f7;
+}
+
