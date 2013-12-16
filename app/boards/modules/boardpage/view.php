@@ -40,7 +40,7 @@ class boards_boardpage_view {
 		$this->core 	= 	ibbCore::getInstance();
 		$this->db		=	$this->core->DB();
 		$this->request 	=	$this->core->request();
-		$this->db->singleResultQuery('boardinfo', '
+		$this->db->query('boardinfo', '
 			SELECT			ibb_boards.id 					AS board_id,
 							ibb_boards.name 			AS `board_name`,
 							title,
@@ -51,7 +51,7 @@ class boards_boardpage_view {
 			LEFT JOIN		ibb_board_categories
 			ON				ibb_board_categories.id = ibb_boards.category
 			WHERE			ibb_boards.name 					= "'.$this->core->request('action').'"
-		');
+		', SINGLE_RESULT_QUERY);
 		$this->user_data =	$this->core->data;
 	}
 
@@ -71,7 +71,8 @@ class boards_boardpage_view {
 			FROM 	  	ibb_boards
 			LEFT JOIN 	ibb_board_categories
 			ON 		  	ibb_boards.category = ibb_board_categories.id
-			WHERE 		ibb_boards.category = ibb_board_categories.id');
+			WHERE 		ibb_boards.category = ibb_board_categories.id
+			');
 
 		/* Load API... jesus I need a better/dynamic way to do this, TODO */
 		ClassHandler::loadAPI('boards');
@@ -80,6 +81,8 @@ class boards_boardpage_view {
 		$this->core->output->setTitle($this->db->results['boardinfo']['title']);
 
 		$this->core->output->addCSS( 'boards' );
+
+		$this->core->output->addCSS( 'postform' );
 
 		/* Use the API and stuff. */
 		$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->db->results['boards']);
@@ -117,7 +120,8 @@ class boards_boardpage_view {
 			AND			parentid	=	0
 			AND			deleted		=	0
 			AND			stickied	=	1
-			ORDER BY	`bumped` DESC');
+			ORDER BY	`bumped` DESC
+			');
 
 			foreach ($this->db->results['stickies'] as $sticky)
 			{
@@ -128,9 +132,19 @@ class boards_boardpage_view {
 					AND			parentid	=	' . $sticky['id'] . '
 					AND			deleted		=	0
 					ORDER BY	`bumped` DESC
-					LIMIT 		1');
+					LIMIT 		1
+					');
 			}
-
+			/*
+			 * thinking to self, enough spamming on skype, todo delete this before commit
+			 * ok, on insert op is updated with latest_post
+			 * select retrieves first 3 posts from latest_post_id to parent_id that share parent
+			 *
+			 * x > y & x <= z & xy = y
+			 *
+			 * translation
+			 *
+			 * */
 
 			$this->db->query('parents', '
 			SELECT		*
@@ -140,7 +154,8 @@ class boards_boardpage_view {
 			AND			deleted		=	0
 			AND			stickied	=	0
 			ORDER BY	`bumped` DESC
-			LIMIT 		' . (10 - count($this->db->results['stickies'])));
+			LIMIT 		' . (10 - count($this->db->results['stickies']))
+			);
 			foreach ($this->db->results['parents'] as $parent)
 			{
 				$this->db->queryInLoop('replies', $parent['id'], '
@@ -150,17 +165,19 @@ class boards_boardpage_view {
 					AND			parentid	=	' . $parent['id'] . '
 					AND			deleted		=	0
 					ORDER BY	`bumped` DESC
-					LIMIT 		3');
+					LIMIT 		3'
+				);
 			}
 
 			$this->db->results['parents'] = array_merge($this->db->results['stickies'], $this->db->results['parents']);
 			foreach ( $this->db->results['parents'] as $parent )
 			{
 				$this->db->queryInLoop('repliescount', $parent['id'], '
-				SELECT		COUNT(*)
-				FROM 		ibb_posts
-				WHERE		boardid			=	' . $this->db->results['boardinfo']['board_id'] . '
-				AND			parentid		=	' . $parent['id']);
+					SELECT		COUNT(*)
+					FROM 		ibb_posts
+					WHERE		boardid			=	' . $this->db->results['boardinfo']['board_id'] . '
+					AND			parentid		=	' . $parent['id']
+				);
 			}
 
 
