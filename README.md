@@ -40,9 +40,7 @@ receive various private on-the-house conversions of their themes.
 
 **Installation Scripts** -- Installation instructions and scripts will NOT be created in this phase.
 
-
-
-
-Project leader - D.B Truthlight\n
-Designer - Grandil\n
+<br /><br />
+Project leader - D.B Truthlight<br />
+Designer - Grandil<br />
 JavaScript - "Josh"
