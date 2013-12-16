@@ -36,7 +36,7 @@ and then rewrite the templates to fit the new template engine.
 
 **Themes** -- The only theme that would be created in this phase, and for the foreseeable future, is the current
 IMGBB theme written inherently within the CSS files. Interested parties that commit to our website early on will
-receive various on-the-house conversions of their themes.
+receive various private on-the-house conversions of their themes.
 
 **Installation Scripts** -- Installation instructions and scripts will NOT be created in this phase.
 
@@ -44,5 +44,7 @@ receive various on-the-house conversions of their themes.
 
 
 Project leader - D.B Truthlight
+
 Designer - Grandil
+
 JavaScript - "Josh"
