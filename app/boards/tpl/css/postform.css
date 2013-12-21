@@ -46,7 +46,7 @@ html{
 .tdinput textarea{
     height: 162px;
     width: 302px;
-    /*margin-bottom: -5px!important;*/
+    vertical-align: bottom;
     border: 1px solid #29292d;
     background-color: #f2f2f7;
 }
