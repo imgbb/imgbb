@@ -29,10 +29,8 @@ class Boards_API {
 
 		foreach ( $results as $board )
 		{
-			if ( !self::in_arrayr( $board['category_name'], $ret ) )
-			{
-				$ret[] = array( 'id' => $board['category_id'], 'name' => $board['category_name'] );
-			}
+			if ( !in_array( $board['category_name'], $ret ) )
+				$ret[$board['category_id']] = $board['category_name'];
 		}
 
 		return $ret;
@@ -50,9 +48,21 @@ class Boards_API {
 	 * @return bool
 	 */
 	static function in_arrayr($needle, $haystack) {
-		foreach ($haystack as $v) {
-			if ($needle == $v) return true;
-			elseif (is_array($v)) return self::in_arrayr($needle, $v);
+		echo "searching $needle in\n\n";
+		var_dump($haystack);
+		echo "\n\n";
+		foreach ($haystack as $value) {
+			echo "beginning foreach for:\n";
+			var_dump($value);
+
+			if ($needle == $value)
+			{
+				return true;
+			}
+			elseif (is_array($value))
+			{
+				return self::in_arrayr($needle, $value);
+			}
 		}
 		return false;
 	}
