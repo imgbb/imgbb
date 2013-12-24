@@ -83,14 +83,32 @@ class ibbController {
 		$this->user_data = $this->core->user()->init();
 
 		// temporarily putting this here while I figure out where to actually put this
-		if ($this->core->request('action') == 'process' || $this->core->request('subaction') == 'process')
+		switch ($this->core->request('do'))
 		{
-			define('REQUEST_TYPE', 'process');
-			foreach ($_POST as $fieldname => $fieldval)
+			case 'process':
 			{
-				$this->core->hotfixAddRequest($fieldname, $fieldval);
+				define('REQUEST_TYPE', 'process');
+				break;
 			}
+			case 'ajax':
+			{
+				define('REQUEST_TYPE', 'ajax');
+				break;
+			}
+			default:
+				define('REQUEST_TYPE', 'init');
+				break;
 		}
+
+//		if ($this->core->request('action') == 'process' || $this->core->request('subaction') == 'process')
+//		{
+//			define('REQUEST_TYPE', 'process');
+//			foreach ($_POST as $fieldname => $fieldval)
+//			{
+//				$this->core->hotfixAddRequest($fieldname, $fieldval);
+//			}
+//		}
+
 		// same for this
 		if (isset($_SESSION['user_name']))
 		{
@@ -98,7 +116,7 @@ class ibbController {
 		}
 
 		try {
-			ClassHandler::Execute( $this->core->request('app'));
+			ClassHandler::Execute( $this->core->request('app'), REQUEST_TYPE);
 		} catch (Exception $e) {
 			throw new Exception($e);
 		}
@@ -127,7 +145,7 @@ class ibbCore {
 
 	public 			$data;
 
-	public static	$queryc = 0;
+	public static	$queryc;
 
 	// temporarily static until settings configuration are made @ IMGBB state
 	public static	$settings = array(
@@ -167,13 +185,18 @@ class ibbCore {
 
 		/* Handles */
 			// init DB
-			self::$handles['db'] = ibbDBCore::getInstance();
+			self::$handles['db'] 	= ibbDBCore::getInstance();
+			self::$handles['upload'] = new upload;
 
 		/* First check if it's a fURL */
 		self::verifyfURL();
 
 		/* Calculate path: where do we need to go according to these GETs? */
 		self::determinePath();
+
+		self::fetchModularData();
+
+
 
 
 
@@ -195,8 +218,12 @@ class ibbCore {
 	}
 
 	// TODO IMGBB request handler
-	public function determinePath()
+	/// please don't look at this horrifying function, it's temporary ////
+	/// please///
+	public static function determinePath()
 	{
+		// please don't look, all temp, pls, my dignity is at stake, don't look
+
 		//TODO IMGBB rework
 		if ( self::$fURL )
 		{
@@ -212,10 +239,31 @@ class ibbCore {
 				self::$request[$key] = self::DB()->instance()->real_escape_string( $value );
 			}
 		}
-		else
+		if ( isset($_POST) )
 		{
-			self::$request['app'] = 'main';
+			foreach ($_POST as $key => $val)
+			{
+				self::$request[$key] = self::DB()->instance()->real_escape_string( $val );
+			}
 		}
+
+		// lord forgive me
+		// it's BASIC, it's just basic
+		// gotta stay calm
+		// it's just BASIC
+		// not final product
+		// objective is to get it running
+		// not to make it good
+		// objective is to get it running for front-end
+		// not to make a good back-end necessarily
+		// that's imgbb level
+		// oh adonai help me
+		if (!isset(self::$request['app']))
+			self::$request['app'] = 'main';
+		if (!isset(self::$request['mod']))
+			self::$request['mod'] = 'front';
+		if (!isset(self::$request['area']))
+			self::$request['area'] = 'view';
 
 		try
 		{
@@ -235,7 +283,7 @@ class ibbCore {
 	/**
 	 * Check for fURL
 	 */
-	public function verifyfURL()
+	public static function verifyfURL()
 	{
 		/* Only one key since there aren't any ampersands in a fURL, so let's just autofetch it with key() */
 		if (preg_match('#/(.*)?/(\d*)?#', key( $_REQUEST )))
@@ -246,6 +294,27 @@ class ibbCore {
 			/* Now it's going to send it to a function that loops over it until it finds the correct array. */
 			basicFriendlyURL::findpath( key( $_REQUEST ) );
 		}
+	}
+
+	public static function fetchModularData()
+	{
+		self::DB()->query('appdata', '
+			SELECT	*
+			FROM	ibb_applications
+			WHERE	name = "' . self::$request['app'] . '"
+		', SINGLE_RESULT_QUERY);
+		self::DB()->query('moddata', '
+			SELECT	*
+			FROM	ibb_modules
+			WHERE	name = "' . self::$request['mod'] . '"
+			AND		parentapp = '. self::DB()->results['appdata']['id'] .'
+		', SINGLE_RESULT_QUERY);
+		self::DB()->query('areadata', '
+			SELECT	*
+			FROM	ibb_areas
+			WHERE	name = "' . self::$request['area'] . '"
+			AND		parentmodule = '. self::DB()->results['moddata']['id'] .'
+		', SINGLE_RESULT_QUERY);
 	}
 
 	/**
@@ -308,6 +377,14 @@ class ibbCore {
 	{
 		return self::$User;
 	}
+
+	/**
+	 * @return upload
+	 */
+	public function upload()
+	{
+		return self::$handles['upload'];
+	}
 }
 
 /**
@@ -321,7 +398,7 @@ class ClassHandler {
 	public 			$request;
 
 	/**
-	 * @var ibbController
+	 * @var ibbCore
 	 */
 	public static	$core;
 
@@ -333,8 +410,13 @@ class ClassHandler {
 	 * @param string $app
 	 * @throws Exception
 	 */
-	public static function Execute( $app )
+	public static function Execute( $app, $request_type )
 	{
+		/////////////////////////////////////////////////
+		/////////////////////////////////////////////////
+		///// PLEASE DON'T LOOK AT THIS ABOMINATION /////
+		/////////////////////////////////////////////////
+		/////////////////////////////////////////////////
 		self::$core = ibbCore::getInstance();
 
 		$MODULE = self::$core->request('mod');
@@ -381,17 +463,65 @@ class ClassHandler {
 		/* Set path... */
 		self::$core->output->setWorkingTemplate( IBB_ROOT_PATH . '/app/'.$app.'/tpl/', 'default.xhtml');
 
+		if ($request_type == 'process' || $request_type == 'ajax')
+		{
+			$handle->process();
+			if (self::$core->DB()->results['areadata']['onprocess_class'])
+			{
+				header('Location: ' . self::EvolutionizedExecution( self::$core->DB()->results['areadata']['onprocess_class'], 'init' ));
+			}
+
+		}
+		else
+		{
+			$handle->init();
+		}
+//		print_r(self::$core->DB()->results['areadata']);
+
 		/* Initialize */
 		// it's complaining that init/process wasn't found, I guess that's why I need an abstract class...
-		if (REQUEST_TYPE == 'process')
-			$handle->process();
-		else
-			$handle->init();
+//		if (REQUEST_TYPE == 'process')
+//			$handle->process();
+//		else
+//			$handle->init();
 
 		/* Go go, power ranger */
 		// temp name ofc...
 		self::$core->output->goGoPowerRanger();
 
+	}
+
+	/**
+	 * @param $app
+	 * @param $request_type
+	 */
+	public static function EvolutionizedExecution( $class, $request_type )
+	{
+		list($app, $module, $area) = explode('_', $class);
+
+		// my dignity
+		// please
+		// don't look
+		// want to keep my dignity
+		// IT'S TEMPORARY BUT I NEED TO UPLOAD IT SORRY.
+		$subac = (self::$core->request('subaction') ? '&subaction='.self::$core->request('subaction') : '');
+
+		$url = 'app='.$app.'&mod='.$module.'&area='.$area.'&action='.self::$core->request('action') .
+			$subac;
+
+		// class to turn a url into a furl here
+		if (self::$core->DB()->results['areadata']['onprocess_class'] == 'boards_boardpage_view')
+		{
+			return 'index.php?/'.self::$core->request('action').'/'.
+				(self::$core->request('subaction') ? self::$core->request('subaction') : '');
+		}
+		elseif (self::$core->DB()->results['areadata']['onprocess_class'] == 'main_front_view')
+		{
+			return 'index.php';
+		}
+		//temp
+		return 'index.php?'.$url;
+//		self::$core->output->goGoPowerRanger();
 	}
 
 	/**
@@ -648,8 +778,8 @@ class output {
 		$this->vars['imgbb']['user']		= $this->core->user();
 
 //		print_r($this->vars['imgbb']['user']);
-		if ($this->user)
-			print_r($this->core->user()->getData());
+//		if ($this->user)
+//			print_r($this->core->user()->getData());
 //		var_dump($this->vars['imgbb']['user']->display_name);
 //		var_dump($this->core->user()->display_name);
 
@@ -689,11 +819,23 @@ class User {
 	protected 			$db;
 	protected static 	$instance;
 	protected			$user_data;
-	protected 			$permissions;
+	public	 			$permissions;
 	public				$registered = FALSE;
 	public				$display_name;
 	public				$display_trip;
 	public				$names;
+	public				$rank = 0;
+
+	/**
+	 * @return User
+	 */
+	public static function getInstance()
+	{
+		if (!self::$instance)
+			return self::$instance = new self;
+		else
+			return self::$instance;
+	}
 
 	/**
 	 * documentation later, still not sure about this
@@ -714,13 +856,30 @@ class User {
 				$this->registered = TRUE;
 
 				$this->user_data = $this->db->queryDirect('
-					SELECT	*
+					SELECT	 ibb_users.group_id					 as		user_group_id
+							,ibb_users.rank						 as		user_rank
+							,ibb_users.salt				  		 as		user_salt
+							,ibb_users.password				 	 as		user_password
+							,ibb_users.display_trip 			 as		user_display_trip
+							,ibb_users.display_name 			 as		user_display_name
+							,ibb_users.username					 as		user_username
+							,ibb_users.id						 as		user_id
+							,ibb_user_groups.name				 as		user_group_name
+							,ibb_user_groups.id				 	 as		user_group_id
+							,ibb_user_ranks.name				 as 	user_rank_name
+							,ibb_user_ranks.display_name 		 as 	user_rank_display_name
+							,ibb_user_ranks.display_stylization  as 	user_rank_display_stylization
 					FROM	ibb_users
-					WHERE	id = ' . $_SESSION['user_id']);
+					LEFT JOIN ibb_user_groups 	ON (ibb_user_groups.id = ibb_users.group_id)
+					LEFT JOIN ibb_user_ranks	ON (ibb_user_ranks.id = ibb_users.rank)
+					WHERE	ibb_users.id = ' . $_SESSION['user_id'])[0];
+
 
 				if ( $this->user_data )
 				{
-					$this->bootUser();
+					$this->bootRegistered();
+					if (in_array(1, $this->permissions['boards']))
+						print_r($this->permissions['boards']);
 					return $this->user_data;
 				}
 				else
@@ -731,22 +890,24 @@ class User {
 			}
 			else
 			{
-//				$this->bootAnon();
-				echo 'not logged in';
+				$this->bootAnon();
+//				echo 'not logged in';
 				return false;
 			}
 		}
 		else
 		{
-			$this->user_data = $this->db->queryDirect('
+			$instance = new User;
+
+			$instance->user_data = $this->db->queryDirect('
 				SELECT	*
 				FROM	ibb_users
 				WHERE	id = ' . $id);
 
-			if ( isset( $this->user_data ) )
+			if ( isset( $instance->user_data ) )
 			{
-				$this->registered = TRUE;
-				return $this->user_data;
+				$instance->registered = TRUE;
+				return $instance;
 			}
 			else
 			{
@@ -756,15 +917,52 @@ class User {
 		}
 	}
 
-	public function bootUser()
+	public function bootRegistered()
 	{
-		$this->display_name = $this->getData()['display_name'];
-		$this->display_trip = $this->getData()['display_trip'];
-		$this->names 		= $this->db->queryDirect('
-								SELECT	*
-								FROM	ibb_names
-								WHERE	userid = ' . $_SESSION['user_id']
-								);
+		$this->db->query('names', '
+			SELECT	*
+			FROM	ibb_names
+			WHERE	userid = ' . $_SESSION['user_id']
+		);
+		$this->db->query('permissions', '
+			SELECT	*
+			FROM	ibb_user_board_permissions
+			WHERE	groupid = ' . $this->getData()['user_group_id'] . '
+		');
+
+		$this->display_name = $this->getData()['user_display_name'];
+		$this->display_trip = $this->getData()['user_display_trip'];
+
+		foreach ($this->db->results['permissions'] as $board)
+		{
+			$this->permissions['boards'][$board['categoryid']][] = $board['boardid'];
+		}
+
+		foreach ($this->db->results['names'] as $name)
+		{
+			$this->names[$name['id']] = $name;
+		}
+
+	}
+
+	public function bootAnon()
+	{
+		$this->db->query('permissions', '
+			SELECT	*
+			FROM	ibb_user_board_permissions
+			WHERE	groupid = 5
+		');
+
+		foreach ($this->db->results['permissions'] as $board)
+		{
+			$this->permissions['boards'][$board['categoryid']][$board['boardid']] = $board['boardid']; //wtf
+		}
+
+		print_r($this->permissions['boards']);
+
+		$this->display_name	= 'Anonymous';
+		$this->display_trip	= '';
+
 
 	}
 
@@ -773,7 +971,7 @@ class User {
 	 */
 	public function getData()
 	{
-		return $this->user_data[0];
+		return $this->user_data;
 	}
 
 	/**
@@ -783,7 +981,7 @@ class User {
 	 */
 	public function getPermissions($key)
 	{
-		return explode(',', $this->user_data[$key]);
+		return $this->permissions[$key];
 	}
 
 	/**
@@ -879,7 +1077,7 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	 */
 	public function execute( $query, $type = NULL, $qname = NULL )
 	{
-		ibbCore::$queryc++;
+		ibbCore::$queryc[] = $query;
 		return $this->instance()->real_query( $query );
 	}
 
@@ -912,11 +1110,26 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 				case 1:
 				{
 					$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC)[0];
+					try
+					{
+						if (!$this->results[$qname])
+							throw new Exception( $qname );
+					}
+					catch (Exception $e)
+					{
+						throw new Exception($e->getMessage());
+					}
 					break;
 				}
 				case 2:
 				{
 					return $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+				}
+				case 3:
+				{
+					$store_me_away = func_get_arg(3);
+					$this->results[$qname][$store_me_away] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+					break;
 				}
 				default:
 				{
@@ -931,6 +1144,8 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 
 			if ($qresult->num_rows == 0)
 			{
+				print_r($query);
+				echo '<br /><br />';
 				throw new Exception( 'No results bruddah, Wizard, you need to make an error page for me to build a noresults exception' );
 			}
 			else
@@ -1017,14 +1232,47 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 
 	}
 
-	public function buildSafeQuery()
+	/**
+	 * This is a crazy paranoid function, what am I doing?
+	 *
+	 * @param array $array
+	 */
+	public function buildSafeQuery( array $array )
 	{
-		return func_get_args();
+		if ( isset($array['type']['INSERT']) )
+		{
+			$this->query = 'INSERT INTO ' . trim($array['type']['INSERT']);
+		}
+
+		if ( isset($array['columns']) )
+		{
+			$this->query .= ' (';
+			foreach ($array['columns'] as $column)
+			{
+				$this->query .= $column . ',';
+			}
+			$this->query = substr($this->query, 0, -1) . ')';
+		}
+
+
+		if ( isset($array['values']) )
+		{
+			$this->query .= ' VALUES (';
+			foreach ($array['values'] as $value)
+			{
+				$this->query .= $value . ',';
+			}
+			$this->query = substr($this->query, 0, -1) . ')';
+
+		}
+
+		// This entire function is stupid.
 	}
 
 	public function commit()
 	{
-
+		error_log($this->query);
+		$this->execute( $this->query );
 	}
 
 	/**
