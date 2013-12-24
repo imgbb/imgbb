@@ -39,9 +39,9 @@ class main_front_news {
 	public function init()
 	{
 		$this->db->query('news', '
-			SELECT		 ibb_staff_ranks.`id` AS `staff_rank_id`
-						,ibb_staff_ranks.`display_name` AS `staff_display_name`
-						,ibb_users.`staff_level` AS `user_staff_level`
+			SELECT		 ibb_user_ranks.`id` AS `staff_rank_id`
+						,ibb_user_ranks.`display_name` AS `staff_display_name`
+						,ibb_users.`group_id` AS `user_staff_level`
 						,ibb_users.`id` AS `user_id`
 						,ibb_users.`display_name`
 						,ibb_users.`display_trip`
@@ -52,8 +52,8 @@ class main_front_news {
 			FROM		ibb_front_news
 			LEFT JOIN	ibb_users
 			ON			ibb_users.`id` = ibb_front_news.`user`
-			LEFT JOIN	ibb_staff_ranks
-			ON			ibb_staff_ranks.`id` = ibb_users.`staff_level`
+			LEFT JOIN	ibb_user_ranks
+			ON			ibb_user_ranks.`id` = ibb_users.`group_id`
 		');
 		$this->db->query('front_categories', '
 			SELECT		*
@@ -101,10 +101,10 @@ class main_front_news {
 	public function news()
 	{
 		$this->db->query('front_data', '
-			SELECT		 ibb_staff_ranks.`id` AS `staff_rank_id`
-						,ibb_staff_ranks.`display_name` AS `staff_display_name`
-						,ibb_staff_ranks.`display_stylization` AS `staff_display_stylization`
-						,ibb_users.`staff_level` AS `user_staff_level`
+			SELECT		 ibb_user_ranks.`id` AS `staff_rank_id`
+						,ibb_user_ranks.`display_name` AS `staff_display_name`
+						,ibb_user_ranks.`display_stylization` AS `staff_display_stylization`
+						,ibb_users.`group_id` AS `user_staff_level`
 						,ibb_users.`id` AS `user_id`
 						,ibb_users.`display_name`
 						,ibb_users.`display_trip`
@@ -116,8 +116,8 @@ class main_front_news {
 			FROM		ibb_front_news
 			LEFT JOIN	ibb_users
 			ON			ibb_users.`id` = ibb_front_news.`user`
-			LEFT JOIN	ibb_staff_ranks
-			ON			ibb_staff_ranks.`id` = ibb_users.`staff_level`
+			LEFT JOIN	ibb_user_ranks
+			ON			ibb_user_ranks.`id` = ibb_users.`group_id`
 		');
 
 		foreach ( $this->db->results['front_data'] as &$entry )
