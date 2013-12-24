@@ -13,3 +13,5 @@
 
 	// database constants
 	define('SINGLE_RESULT_QUERY', 1);
+	define('STORE_ME_AWAY', 3);
+	define('IBB_REPLACE_THIS', 'a54327z fsjd h27452a dfjfdsh 348584');
