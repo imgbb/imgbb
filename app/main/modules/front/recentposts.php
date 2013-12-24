@@ -29,27 +29,25 @@ class main_front_recentposts {
 	public function init()
 	{
 		$this->db->query('posts', '
-			SELECT 		pcposts.`id`,
-						`boardid`,
-						`message`,
-						`parentid`,
-						`file`,
-						`file_type`,
-						`file_server`,
-						`tripcode`,
-						`pcposts`.`name`,
-						`pcboards`.`name` AS `boardname`,
-						`timestamp`,
-						`posterauthority`,
-						`ibb_staff_ranks`.`display_name` AS `rank_display_name`
-			FROM 		`pcposts`
-			LEFT JOIN 	`pcboards`
-			ON 			`boardid` = `pcboards`.`id`
-			LEFT JOIN 	`ibb_staff_ranks`
-			ON			`ibb_staff_ranks`.`id` = `posterauthority`
-			WHERE 		`IS_DELETED`
-							!=
-							1
+			SELECT 		 pcposts.id
+						,boardid
+						,message
+						,parentid
+						,file
+						,file_type
+						,file_server
+						,tripcode
+						,pcposts.name
+						,pcboards.name AS boardname
+						,timestamp
+						,posterauthority
+						,ibb_user_ranks.display_name AS rank_display_name
+			FROM 		pcposts
+			LEFT JOIN 	pcboards
+			ON 			boardid = pcboards.id
+			LEFT JOIN 	ibb_user_ranks
+			ON			ibb_user_ranks.id = posterauthority
+			WHERE 		IS_DELETED != 1
 			ORDER BY 	`timestamp` DESC
 			LIMIT 		10');
 
