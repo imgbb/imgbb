@@ -8,7 +8,7 @@
     <!--<link rel="stylesheet" tal:attributes="href string: ${imgbb/base_url}/app/main/tpl/css/menu.css" tal:condition="true: imgbb/menubar"/>-->
     <title tal:content="imgbb/title | default">imgBB</title>
 </head>
-<body>
+<body tal:condition="php: imgbb['highlight']['mod'] eq 'manage'">
 <div id="main">
 
     <div id="contents">
@@ -19,7 +19,7 @@
                 <img src="/imgbb/assets/pinkie.png" />
             </div>
 
-            <form action="?app=user&mod=manage&area=login&action=process" method="post" name="managelogin">
+            <form action="?app=user&amp;mod=manage&amp;area=login&amp;do=process" method="post" name="managelogin">
 
                 <input name="username" value="Username" onfocus="if (this.value=='Username') this.value = ''" type="text" />
                 <input name="password" value="Password" onfocus="if (this.value=='Password') this.value = ''" type="password" />
@@ -33,5 +33,8 @@
         <p align="center"><a href="http://www.ponychan.net/chan/">Home</a> | <a href="http://www.ponychan.net/chan/?p=news">News</a> | <a href="http://www.ponychan.net/chan/?p=faq">FAQ</a> | <a href="http://www.ponychan.net/chan/?p=rules">Rules</a> |&nbsp;<a href="http://www.ponychan.net/chan/?p=contact">Contact Us</a> | Powered by <a href="http://www.ponychan.net/chan/">Ponychan</a></p>
     </div>
 </div>
+</body>
+<body tal:condition="php: imgbb['highlight']['mod'] eq 'profile'">
+Unavailable<br /><br />
 </body>
 </html>
