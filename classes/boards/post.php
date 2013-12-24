@@ -16,6 +16,7 @@
  */
 class post implements Iterator
 {
+	private $core;
 	public  $posts = array();
 	private $post_index;
 	private $row_index;
@@ -27,6 +28,7 @@ class post implements Iterator
 	public $is_anon;
 	public $getname;
 	public $verify_name;
+	public $ranks;
 
 
 	/**
@@ -36,8 +38,30 @@ class post implements Iterator
 	 */
 	function __construct( $posts )
 	{
+		$this->core = ibbCore::getInstance();
+		$this->db	= $this->core->DB();
 //		echo 'construct<br />';
 		$this->posts = $posts;
+
+		$this->db->query('ranks','
+			SELECT	*
+			FROM	ibb_user_ranks
+		');
+
+		// This is becoming a trend. I do not like it. Has appeared in the user bootuser too
+		foreach ($this->db->results['ranks'] as $rank)
+		{
+			$this->ranks[$rank['id']] = $rank;
+		}
+
+		foreach ($this->posts as &$post)
+		{
+			if ($post['rank'] != 0)
+			{
+				$post['user_rank_display_name']			= $this->ranks[$post['rank']]['display_name'];
+				$post['user_rank_display_stylization']	= $this->ranks[$post['rank']]['display_stylization'];
+			}
+		}
 	}
 
 //	function __toString()
