@@ -11,19 +11,5 @@
     <body>
     <tal:block tal:condition="true: imgbb/menubar" metal:use-macro="${imgbb/IBB_TEMPLATES_PATH}/menubar.xhtml/menubar" />
 
-    <span metal:use-macro="${imgbb/tplpath}home.xhtml/header" />
-    <div class="frontwrap">
-        <div class="frontmaincolwrap">
-            <ul class="frontcontentmenu">
-                <li tal:repeat="category front_categories">
-                    <tal:block tal:define="global loc php: category['id'] === '1' ? FALSE : 'index.php?/front/' . category['id'] . '-' . category['name']"/>
-                    <a href='index.php'  tal:attributes="href loc | default">
-                        ${category/name}
-                    </a>
-                </li>
-            </ul>
-            <div class="frontcontentwrap" tal:omit-tag="" metal:use-macro="${imgbb/macro/src}/${imgbb/macro/name}"></div>
-        </div>
-        <div class="frontsidecolwrap" tal:omit-tag="" metal:use-macro="${imgbb/tplpath}home.xhtml/recent_posts"></div>
-    </div>
+    <tal:block metal:use-macro="${imgbb/page/src}/${imgbb/page/name}" />
     </body>
