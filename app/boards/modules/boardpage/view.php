@@ -71,23 +71,6 @@ class boards_boardpage_view {
 			throw new exception('Permission denied exception');
 		}
 
-		$this->db->query('boards', '
-			SELECT 		 ibb_boards.id		AS board_id
-						,ibb_boards.name	AS board_name
-						,ibb_boards.title	AS board_title
-						,ibb_boards.type	AS board_type
-						,ibb_boards.category AS board_category
-						,ibb_board_categories.id AS category_id
-						,ibb_board_categories.name AS category_name
-			FROM 	  	ibb_boards
-			LEFT JOIN 	ibb_board_categories
-			ON 		  	ibb_boards.category = ibb_board_categories.id
-			WHERE 		ibb_boards.category = ibb_board_categories.id
-			');
-
-		/* Load API... jesus I need a better/dynamic way to do this, TODO */
-		ClassHandler::loadAPI('boards');
-
 		/* Set page title */
 		$this->core->output->setTitle($this->db->results['boardinfo']['title']);
 
@@ -95,8 +78,6 @@ class boards_boardpage_view {
 
 		$this->core->output->addCSS( 'postform' );
 
-		/* Use the API and stuff. */
-		$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->db->results['boards']);
 
 		// a temp
 		require_once IBB_ROOT_PATH . '/classes/boards/post.php';
@@ -556,7 +537,7 @@ class boards_boardpage_view {
 			FROM	ibb_posts
 			WHERE	boardid		= 	'.$board.'
 			AND 	id			= 	'.$thread.'
-			AND		deleted	=	0
+			AND		deleted		=	0
 			UNION
 			SELECT	*
 			FROM	ibb_posts
@@ -571,8 +552,12 @@ class boards_boardpage_view {
 			$this->core->output->vars[$queryk] = $query;
 		}
 
+		// c temp
+		$this->core->output->vars['replies']	= new post($this->core->output->vars['posts']);
+
 		// TODO IMGBB deal with this
-		$this->core->output->vars['parent'] = $this->core->output->vars['posts'][0];
+		$this->core->output->vars['parents'] 	= array($this->core->output->vars['replies']->posts[0]);
+
 		foreach ($this->core->output->vars['posts'] as &$post)
 		{
 			$post['timestamp'] 	=	date('jS \of F, Y', $post['timestamp']);
@@ -581,10 +566,9 @@ class boards_boardpage_view {
 			$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
 		}
 
-		// c temp
-		$this->core->output->vars['posts']	= new post($this->core->output->vars['posts']);
 
-		$this->core->output->addMacro('thread', 'boards.xhtml');
+
+		$this->core->output->addMacro('board', 'boards.xhtml');
 	}
 
 }
