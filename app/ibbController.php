@@ -636,6 +636,11 @@ class output {
 	 */
 	public $user = FALSE;
 
+	/**
+	 * @var array
+	 */
+	public $page;
+
 
 	/**
 	 * Singleton
@@ -692,6 +697,18 @@ class output {
 	{
 		$this->macro = array('name'	=> 	$macro,
 							 'src' 	=> 	is_file($this->path.$template_src) ? $this->path.$template_src : $template_src);
+	}
+
+	/**
+	 * Set the page
+	 *
+	 * @param string $macro
+	 * @param string $template_src
+	 */
+	public function setPage( $macro, $template_src)
+	{
+		$this->page = array('name' 	=> $macro,
+							'src'	=> is_file($this->path.$template_src) ? $this->path.$template_src : $template_src);
 	}
 
 	/**
@@ -754,25 +771,53 @@ class output {
 		/* Initialize PHPTAL */
 		$this->tpl = new PHPTAL( $this->workingpath );
 
-		/* Set up head	*/
+		/* Set up menu	*/
 		if ($this->menu)
 		{
 			$this->addXAppCSS('menu.css', 'main');
+
+			$this->db->query('boards', '
+			SELECT 		 ibb_boards.id		AS board_id
+						,ibb_boards.name	AS board_name
+						,ibb_boards.title	AS board_title
+						,ibb_boards.type	AS board_type
+						,ibb_boards.category AS board_category
+						,ibb_board_categories.id AS category_id
+						,ibb_board_categories.name AS category_name
+			FROM 	  	ibb_boards
+			LEFT JOIN 	ibb_board_categories
+			ON 		  	ibb_boards.category = ibb_board_categories.id
+			WHERE 		ibb_boards.category = ibb_board_categories.id
+			');
+			$this->vars['boards'] = $this->db->results['boards'];
+
+			foreach ( $this->db->results['boards'] as $board )
+			{
+				if ( !in_array( $board['category_name'], $this->core->output->vars['boardsections'] ) )
+					$this->core->output->vars['boardsections'][$board['category_id']] = $board['category_name'];
+			}
+
+			/* Load API... jesus I need a better/dynamic way to do this, TODO */
+//			ClassHandler::loadAPI('boards');
+
+			/* Use the API and stuff. */
+//			$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->db->results['boards']);
 		}
 
 		/* Set up static variables. */
-		$this->vars['imgbb']['base_url'] 		= $this->core->settings('base_url');
-		$this->vars['imgbb']['this_app']		= $this->core->request('app');
-		$this->vars['imgbb']['macro']			= $this->macro;
-		$this->vars['imgbb']['slots']			= $this->slots;
-		$this->vars['imgbb']['tplpath']			= $this->path;
-		$this->vars['imgbb']['title']			= $this->title;
-		$this->vars['imgbb']['highlight']		= array ( 	'app' 		=> $this->core->request('app'),
-													  		'mod' 		=> $this->core->request('mod'),
-													  		'area' 		=> $this->core->request('area'),
-													  		'action' 	=> $this->core->request('action'),
-															'subaction'	=> $this->core->request('subaction')
-											  	);
+		$this->vars['imgbb']['base_url'] 	= $this->core->settings('base_url');
+		$this->vars['imgbb']['this_app']	= $this->core->request('app');
+		$this->vars['imgbb']['page']		= $this->page;
+		$this->vars['imgbb']['macro']		= $this->macro;
+		$this->vars['imgbb']['slots']		= $this->slots;
+		$this->vars['imgbb']['tplpath']		= $this->path;
+		$this->vars['imgbb']['title']		= $this->title;
+		$this->vars['imgbb']['highlight']	= array ( 	'app' 		=> $this->core->request('app'),
+												  		'mod' 		=> $this->core->request('mod'),
+												  		'area' 		=> $this->core->request('area'),
+												  		'action' 	=> $this->core->request('action'),
+														'subaction'	=> $this->core->request('subaction')
+											 );
 		$this->vars['imgbb']['IBB_TEMPLATES_PATH']	= IBB_TEMPLATES_PATH;
 		$this->vars['imgbb']['menubar']		= $this->menu;
 		$this->vars['imgbb']['user']		= $this->core->user();
