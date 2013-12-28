@@ -1,9 +1,11 @@
 <tal:block metal:define-macro="postbox">
-    <div style="text-align:center;font-size:6em;">${boardinfo/title}</div>
+    <div style="text-align:center;font-size:4em;">${boardinfo/title}</div>
     <hr />
     <div class="postarea">
-        <form id="postform" action="index.php?app=boards&amp;mod=boards&amp;area=view&amp;action=process" method="post">
-            <input type="hidden" name="board" value="${imgbb/highlight/action}" />
+        <form id="postform" enctype="multipart/form-data" action="index.php?app=boards&amp;mod=boardpage&amp;area=view&amp;do=process" method="post">
+            <input type="hidden" name="action" value="${imgbb/highlight/action}" />
+            <input type="hidden" name="subaction" value="${imgbb/highlight/subaction}" />
+            <input type="hidden" name="MAX_FILE_SIZE" value="8388608" />
             <table>
                 <tbody>
                 <tr tal:condition="not: imgbb/user/registered">
@@ -25,7 +27,7 @@
                         Name
                     </td>
                     <td class="tdinput">
-                        <select name="names">
+                        <select name="name">
                             <option value="main">
                                 ${imgbb/user/display_name}!${imgbb/user/display_trip}
                             </option>
@@ -153,53 +155,39 @@
 <!--<hr />-->
 <!--</tal:block>-->
 
-<tal:block metal:define-macro="thread">
-    <div class="board">
-        <div id="${parent/id}" class="thread" >
-            <div class="postcontainer" tal:repeat="post posts">
-                <div id="${post/id}" class="post op" tal:attributes="class php: posts.key() == 1 ? 'post op' : 'post reply'">
-                    <div class="file" tal:condition="post/file">
-                        <div class="fileinfo">
-                                <span class="filetext">
-                                    File:
-                                    <a href="${imgbb/base_url}/files/src/${post/file}.${post/file_type}">
-                                        ${post/file}.${post/file_type}
-                                    </a>
-                                    ${structure string: &ndash;} (${post/file_size}, ${post/image_h}x${post/image_w}, ${post/file_original}.${post/file_type})
-                                </span>
-                        </div>
-                        <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${post/file}.${post/file_type}">
-                            <img src="http://applejack.ponychan.net/chan/files/thumb/138522502933s.png" />
-                        </a>
-                    </div>
-                    <div class="postinfo">
-                        <label>
-                            <input type="checkbox" />
-                            <span class="subject" tal:content="structure post/subject"/>
-                                <span class="namespan">
-                                    <span class="name" tal:content="post/display_name" /><span class="postertrip" tal:condition="post/display_tripcode">!${post/display_tripcode}</span>
-                                </span>
-                                <span class="mod">
-                                </span>
-                            <span class="datetime" tal:content="post/timestamp"/>
-                                <span class="postnumber">
-                                    <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}-#${post/id}">
-                                        No.
-                                    </a>
-                                    <a href="${imgbb/base_url}/pls" tal:content="post/id"/>
-                                </span>
-                        </label>
-                    </div>
-                    <blockquote class="postmessage" tal:content="structure post/message" />
-                </div>
-                <!--<tal:block tal:repeat="replycount repliescount/${parent/id}">-->
-                    <!--<tal:block tal:repeat="reply replycount">-->
-                        <!--${reply}-->
-                    <!--</tal:block>-->
-                <!--</tal:block>-->
-            </div>
-        </div>
-    </div>
+
+<tal:block metal:define-macro="parent_mod_tools">
+<span tal:condition="imgbb/user/registered">
+    [
+    <a href="index.php?app=main&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
+        &amp;
+    <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>
+    ]
+
+    [
+    <a href="index.php?app=main&amp;mod=manage&amp;area=move&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Move</a>
+    /
+    <a href="index.php?app=main&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>
+    /
+    <a href="index.php?app=main&amp;mod=manage&amp;area=bump&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Bump</a>
+    /
+    <a href="index.php?app=main&amp;mod=manage&amp;area=kill&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Kill</a>
+    ]
+</span>
+</tal:block>
+
+<tal:block metal:define-macro="reply_mod_tools">
+<span tal:condition="imgbb/user/registered">
+    [
+    <a href="index.php?app=main&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
+        &amp;
+    <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>
+    ]
+
+    [
+    <a href="index.php?app=main&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>
+    ]
+</span>
 </tal:block>
 
 <tal:block metal:define-macro="board">
@@ -219,8 +207,11 @@
                                 </span>
                             </div>
                             <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}">
-                                <img src="http://applejack.ponychan.net/chan/files/thumb/138522502933s.png" />
+                                <img src="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}" height="${parent/thumb_h}" width="${parent/thumb_w}" />
                             </a>
+                            <tal:block tal:condition="parent/stickied">
+                                Sticky
+                            </tal:block>
                         </div>
                         <div class="postinfo">
                             <label>
@@ -229,7 +220,8 @@
                                 <span class="namespan">
                                     <span class="name" tal:content="parent/display_name" /><span class="postertrip" tal:condition="parent/display_tripcode">!${parent/display_tripcode}</span>
                                 </span>
-                                <span class="mod">
+                                <span class="mod" tal:condition="parent/rank" tal:attributes="style parent/user_rank_display_stylization">
+                                    ${parent/user_rank_display_name}
                                 </span>
                                 <span class="datetime" tal:content="parent/timestamp"/>
                                 <span class="postnumber">
@@ -239,20 +231,23 @@
                                     <a href="${imgbb/base_url}/pls" tal:content="parent/id"/>
                                 </span>
                                 <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}">
-                                    View
-                                </a>
+                                    [View]</a>
+                                <span tal:condition="imgbb/user/registered">
+                                    <tal:block metal:use-macro="parent_mod_tools" />
+                                </span>
                             </label>
                         </div>
                         <blockquote class="postmessage" tal:content="structure parent/message" />
                     </div>
-                    <tal:block tal:repeat="replycount repliescount/${parent/id}">
-                        <tal:block tal:repeat="reply replycount">
-                            ${reply}
-                        </tal:block>
-                    </tal:block>
+                    <!--<tal:block tal:repeat="replycount repliescount/${parent/id}">-->
+                        <!--<tal:block tal:repeat="reply replycount">-->
+                            ${parent/replycount}
+                        <!--</tal:block>-->
+                    <!--</tal:block>-->
                 </div>
                 <!--<tal:block tal:repeat="parentreplies replies/${parent/id}">-->
-                    <div class="postcontainer" tal:repeat="reply replies/${parent/id}">
+                <tal:block tal:repeat="reply replies">
+                    <div class="postcontainer" tal:condition="php: reply['parentid'] eq parent['id']">
                         <div id="${reply/id}" class="post reply">
                             <!--helloWorld${parent/id}-->
                             <!--${repeat/reply/key}-->
@@ -261,19 +256,22 @@
                                     <input type="checkbox" />
                                     <span class="subject" tal:content="structure reply/subject"/>
                                     <span class="namespan">
-                                        <span class="display_name">
+                                        <span class="name">
                                             ${reply/display_name}</span><span class="postertrip" tal:condition="reply/display_tripcode">!${reply/display_tripcode}
                                         </span>
                                     </span>
-                                    <span class="mod">
-                                        ## NeedUserAppFirst ##
+                                    <span class="mod" tal:condition="reply/rank" tal:attributes="style reply/user_rank_display_stylization">
+                                        ${reply/user_rank_display_name}
                                     </span>
                                     <span class="datetime" tal:content="reply/timestamp" />
                                     <span class="postnumber">
-                                        <a href="${reply/id}#helpmeobizekenobi, yoou're my only hope">
+                                        <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}-#${reply/id}">
                                             No.
                                         </a>
                                         <a href="${imgbb/base_url}/pls" tal:content="reply/id"/>
+                                    </span>
+                                    <span tal:condition="imgbb/user/registered">
+                                        <tal:block metal:use-macro="reply_mod_tools" />
                                     </span>
                                 </label>
                             </div>
@@ -288,13 +286,13 @@
                                     </span>
                                 </div>
                                 <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${reply/file}.${reply/file_type}">
-                                    <img src="http://applejack.ponychan.net/chan/files/thumb/138522502933s.png" />
+                                    <img src="${imgbb/base_url}/files/src/${reply/file}.${reply/file_type}" height="${reply/thumb_h}" width="${reply/thumb_w}" />
                                 </a>
                             </div>
                             <blockquote class="postmessage" tal:content="structure reply/message"/>
                         </div>
                     </div>
-                <!--</tal:block>-->
+                </tal:block>
             </div>
             <hr />
         </tal:block>
