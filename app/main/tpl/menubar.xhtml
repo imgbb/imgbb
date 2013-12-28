@@ -11,14 +11,14 @@
                 </ul>
             </li>
             <li>
-                <a href="${imgbb/base_url}">Boards</a><!-- second menu item-->
-                <ul><!-- dropdown for the second item-->
+                <!--<a href="${imgbb/base_url}">Boards</a>&lt;!&ndash; second menu item&ndash;&gt;-->
+                <!--<ul>&lt;!&ndash; dropdown for the second item&ndash;&gt;-->
                         <span tal:repeat="section boardsections" tal:omit-tag="">
-                            <li>
-                                <a href="#">${section/name}</a><!-- top item in the dropdown-->
-                                <ul><!-- next level of dropdown for the second menu item-->
+                            <li tal:condition="true: imgbb/user/permissions/boards/${repeat/section/key}" >
+                                <a href="#">${section}</a><!-- top item in the dropdown-->
+                                <ul ><!-- next level of dropdown for the second menu item-->
                                     <span tal:repeat="board boards" tal:omit-tag="">
-                                        <li>
+                                        <li tal:condition="php: board['category_id'] eq repeat.section.key" tal:define="btype board/board_type">
                                             <!--<a href="index.php?/${board/board_name}/"-->
                                             <!--tal:condition="php: board['board_category'] eq section['id']"-->
                                             <!--tal:attributes="class php: (board['board_name'] == imgbb['highlight']['action']) ? 'this_area' : '';-->
@@ -27,24 +27,24 @@
                                             <!--/${board/board_name}/-->
                                             <!--</a>-->
                                             <a href="index.php?/${board/board_name}/"
-                                               tal:condition="php: board['board_category'] eq section['id']">
-                                                ${board/board_name}
+                                                    tal:attributes="class php: (btype eq 1) ? 'locked' : ((btype eq 2) ? 'private' : 'board') ">
+                                                /${board/board_name}/
                                             </a>
                                         </li><!-- first item in the next level dropdown-->
                                     </span>
                                 </ul>
                             </li>
                         </span>
-                </ul>
+                <!--</ul>-->
             </li>
-            <li tal:condition="exists: user">
-                <a href="index.php?app=manage">Mod</a>
-            </li>
+            <!--<li tal:condition="exists: user">-->
+                <!--<a href="index.php?app=manage">Mod</a>-->
+            <!--</li>-->
 
             <li class="this_area" style="float:right;"><a href="#">Home</a><!-- The inline style should be switched for an ID.. In fact.. All the top-level items should get an ID.. That'd be nice-->
                 <ul style="right:0;"><!-- Disregard inline styling.. Will be moved to CSS if ID's are implemented for the top-level items.-->
                     <li>
-                        <a tal:attributes="class php: (imgbb['highlight']['mod'] eq 'front') ? 'this_area' : ''" href="${imgbb/base_url}">${imgbb/highlight/mod}</a>
+                        <a tal:attributes="class php: (imgbb['highlight']['mod'] eq 'front') ? 'this_area' : ''" href="${imgbb/base_url}">Front Page</a>
                     </li>
                     <li tal:condition="not: imgbb/user/registered">
                         <a href="index.php?app=user&amp;mod=manage&area=login">
@@ -56,14 +56,31 @@
                             Logout
                         </a>
                     </li>
+                    <li tal:condition="imgbb/user">
+                        <a href="index.php?app=user&amp;mod=settings&area=preferences">
+                            Settings
+                        </a>
+                    </li>
                     <li tal:condition="imgbb/user/registered">
-                        <a href="index.php?app=user&amp;&mod=profile">
+                        <a href="index.php?app=user&amp;mod=profile">
                             ${imgbb/user/display_name}
                         </a>
                     </li>
                     <li tal:attributes="class php: (imgbb['highlight']['mod'] eq 'settings' && imgbb['highlight']['area'] eq 'view') ? 'this_area' : ''" tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings">Account&nbsp;Settings</a></li>
                     <li tal:attributes="class php: (imgbb['highlight']['mod'] eq 'settings' && imgbb['highlight']['area'] eq 'pref') ? 'this_area' : ''" tal:condition="exists: user"><a href="/imgbb/index.php?app=user&amp;mod=settings&amp;sect=pref">User&nbsp;Preferences</a></li>
                 </ul>
+            </li>
+
+            <li class="this_area" style="float:right;"><a href="index.php?app=main&amp;mod=manage">Moderator CP</a>
+                <!--<ul style="right:0;">-->
+                <!--Manage Page-->
+                <!--</ul>-->
+            </li>
+
+            <li class="this_area" style="float:right;"><a href="index.php?app=main&amp;mod=admin">Admin CP</a>
+                <!--<ul style="right:0;">-->
+                <!--Manage Page-->
+                <!--</ul>-->
             </li>
         </ul>
     </nav>
