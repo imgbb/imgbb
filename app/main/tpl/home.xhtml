@@ -1,3 +1,23 @@
+<tal:block metal:define-macro="home">
+<span metal:use-macro="${imgbb/tplpath}home.xhtml/header" />
+
+<div class="frontwrap">
+    <div class="frontmaincolwrap">
+        <ul class="frontcontentmenu">
+            <li tal:repeat="category front_categories">
+                <tal:block tal:define="global loc php: category['id'] === '1' ? FALSE : 'index.php?/front/' . category['id'] . '-' . category['name']"/>
+                <a href='index.php'  tal:attributes="href loc | default">
+                    ${category/name}
+                </a>
+            </li>
+        </ul>
+        <div class="frontcontentwrap" tal:omit-tag="" metal:use-macro="${imgbb/macro/src}/${imgbb/macro/name}"></div>
+    </div>
+    <div class="frontsidecolwrap" tal:omit-tag="" metal:use-macro="${imgbb/tplpath}home.xhtml/recent_posts"></div>
+</div>
+</tal:block>
+
+
         <!-- macro: front -->
 <div class="frontcontentwrap" metal:define-macro="front">
 <div class="newsitem" tal:repeat="entry front_data">
@@ -6,11 +26,11 @@
                         ${entry/header}
                     </span>
         <br />
-                    <span class="newspostername" tal:condition="exists: entry/display_name">
-                        ${entry/display_name}</span><span class="newspostertrip" tal:condition="exists: entry/display_trip">!${entry/display_trip}
+                    <span class="newspostername" tal:condition="entry/display_name">
+                        ${entry/display_name}</span><span class="newspostertrip" tal:condition="entry/display_trip">!${entry/display_trip}
                     </span>
                     <span class="newsrank" style="${entry/staff_display_stylization}" tal:condition="exists: entry/staff_display_name">
-                        ## ${entry/staff_display_name} ##
+                        ${entry/staff_display_name}
                     </span>
                     <span class="newsposttime" tal:condition="exists: entry/timestamp">
                         ${entry/timestamp}
