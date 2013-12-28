@@ -9,8 +9,8 @@ class BasicFriendlyURL {
 	private static $Templates = array(
 
 		'#/front/(\d+)-#' 	=> array( 'app' 	=>	'main',
-									  'mod'		=>	'view',
-									  'area'	=>	'categories',
+									  'mod'		=>	'front',
+									  'area'	=>	'view',
 									  'action'	=>	'$1'
 		),
 		'#/(\w+)?/(\d+)?#'	=> array( 'app'		=>	'boards',
