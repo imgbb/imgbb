@@ -104,20 +104,16 @@ class main_front_news {
 			SELECT		 ibb_user_ranks.`id` AS `staff_rank_id`
 						,ibb_user_ranks.`display_name` AS `staff_display_name`
 						,ibb_user_ranks.`display_stylization` AS `staff_display_stylization`
-						,ibb_users.`group_id` AS `user_staff_level`
-						,ibb_users.`id` AS `user_id`
-						,ibb_users.`display_name`
-						,ibb_users.`display_trip`
 						,ibb_front_news.`user`
+						,ibb_front_news.display_name
+						,ibb_front_news.display_trip
 						,`header`
 						,`timestamp`
 						,`entry`
 						,`file`
 			FROM		ibb_front_news
-			LEFT JOIN	ibb_users
-			ON			ibb_users.`id` = ibb_front_news.`user`
 			LEFT JOIN	ibb_user_ranks
-			ON			ibb_user_ranks.`id` = ibb_users.`group_id`
+			ON			ibb_user_ranks.`id` = ibb_front_news.`rank_id`
 		');
 
 		foreach ( $this->db->results['front_data'] as &$entry )
