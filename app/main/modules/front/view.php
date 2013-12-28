@@ -31,19 +31,8 @@ class main_front_view {
 	 */
 	public function init()
 	{
-		$this->db->query('boards', '
-			SELECT 		 ibb_boards.id 	AS 				board_id
-						,ibb_boards.name AS 			board_name
-						,ibb_boards.title AS 			board_title
-						,ibb_boards.category AS 		board_category
-						,ibb_boards.type AS 			board_type
-						,ibb_board_categories.id AS 	category_id
-						,ibb_board_categories.name AS 	category_name
-			FROM 	  	ibb_boards
-			LEFT JOIN 	ibb_board_categories
-			ON 		  	ibb_boards.category 			= ibb_board_categories.id
-			WHERE 		ibb_boards.category 			= ibb_board_categories.id');
 
+		$this->core->output->setPage('home', 'home.xhtml');
 		/* begin temp */
 
 		// force enable modular system since settings do not exist and are not handled yet
@@ -58,9 +47,6 @@ class main_front_view {
 
 		/* end temp */
 
-		// todo get rid of this asap
-		ClassHandler::loadAPI('boards');
-
 		// todo this too, put it all somewhere easily accessible... maybe through the intface?
 
 		/* Set page title */
@@ -72,8 +58,5 @@ class main_front_view {
 
 		// useless now that BASIC is modular
 		$this->core->output->vars['boards'] = $this->db->results['boards'];
-
-		/* Let's recycle that function */
-		$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->core->output->vars['boards']);
 	}
 }
