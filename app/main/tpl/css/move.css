@@ -1,0 +1,18 @@
+.sidebar
+{
+    margin-left:10px;
+    border-style: double;
+    border-color:blue;
+    margin-right:90%;
+    white-space: nowrap;
+}
+.sectionhead
+{
+    min-width:100%;
+    background-color: royalblue;
+    display: inline-block;
+}
+.sectioncontents
+{
+    display: inline-block;
+}
