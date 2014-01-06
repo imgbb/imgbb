@@ -10,6 +10,9 @@ hr {
 	border-top: 1px solid rgba(0, 0, 0, 0.1);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
+.datetime {
+    font-style:italic;
+}
 .board{
 }
 .thread{
@@ -79,3 +82,12 @@ hr {
 }
 .postmessage{
 }
+a {
+    text-decoration: none;
+}
+.btns a:visited {
+   color:blue;
+}
+/*a:active {*/
+    /*color:green;*/
+/*}*/
