@@ -115,7 +115,7 @@
                     </td>
                 </tr>
 
-                <tr>
+                <tr tal:condition="not: true: imgbb/user/registered">
                     <td class="tdlabel">
                         Password
                     </td>
@@ -126,6 +126,61 @@
                                 ?
                             </span>
                         </a>
+                    </td>
+                </tr>
+                <tr tal:condition="imgbb/user/registered">
+                    <td class="tdlabel">
+                        Options
+                    </td>
+                    <td class="tdinput">
+                        <label for="sage">Sage: </label>
+                        <input id="sage" type="checkbox" name="sage"/>
+                        <a onclick="displayhelp()" href="#">
+                            <span class="helpme">
+                                ?
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+                <tr tal:condition="imgbb/user/registered">
+                    <td class="tdlabel">
+                        Moderator
+                    </td>
+                    <td class="tdinput">
+                        <label for="displaystatus">Display Staff Status: </label>
+                        <input id="displaystatus" type="checkbox" name="displaystatus"/>
+                        <!--<a onclick="displayhelp()" href="#">-->
+                            <!--<span class="helpme">-->
+                                <!--?-->
+                            <!--</span>-->
+                        <!--</a>-->
+                    </td>
+                    <td class="tdinput">
+                        <label for="lockthread">Lock Thread: </label>
+                        <input id="lockthread" type="checkbox" name="lockthread"/>
+                        <!--<a onclick="displayhelp()" href="#">-->
+                            <!--<span class="helpme">-->
+                                <!--?-->
+                            <!--</span>-->
+                        <!--</a>-->
+                    </td>
+                    <td class="tdinput">
+                        <label for="rawhtml">Raw HTML: </label>
+                        <input id="rawhtml" type="checkbox" name="rawhtml"/>
+                        <!--<a onclick="displayhelp()" href="#">-->
+                        <!--<span class="helpme">-->
+                        <!--?-->
+                        <!--</span>-->
+                        <!--</a>-->
+                    </td>
+                    <td class="tdinput">
+                        <label for="sticky">Sticky: </label>
+                        <input id="sticky" type="checkbox" name="sticky"/>
+                        <!--<a onclick="displayhelp()" href="#">-->
+                        <!--<span class="helpme">-->
+                        <!--?-->
+                        <!--</span>-->
+                        <!--</a>-->
                     </td>
                 </tr>
 
@@ -157,36 +212,28 @@
 
 
 <tal:block metal:define-macro="parent_mod_tools">
-<span tal:condition="imgbb/user/registered">
-    [
-    <a href="index.php?app=main&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
+<span tal:condition="imgbb/user/registered" class="btns" >
+    [<a href="index.php?app=main&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
         &amp;
-    <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>
-    ]
+    <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>]
 
-    [
-    <a href="index.php?app=main&amp;mod=manage&amp;area=move&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Move</a>
+    [<a href="index.php?app=main&amp;mod=manage&amp;area=move&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Move</a>
     /
     <a href="index.php?app=main&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>
     /
     <a href="index.php?app=main&amp;mod=manage&amp;area=bump&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Bump</a>
     /
-    <a href="index.php?app=main&amp;mod=manage&amp;area=kill&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Kill</a>
-    ]
+    <a href="index.php?app=main&amp;mod=manage&amp;area=kill&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Kill</a>]
 </span>
 </tal:block>
 
 <tal:block metal:define-macro="reply_mod_tools">
-<span tal:condition="imgbb/user/registered">
-    [
-    <a href="index.php?app=main&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
+<span tal:condition="imgbb/user/registered" class="btns" >
+    [<a href="index.php?app=main&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
         &amp;
     <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>
-    ]
-
-    [
-    <a href="index.php?app=main&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>
-    ]
+    /
+    <a href="index.php?app=main&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>]
 </span>
 </tal:block>
 
@@ -196,14 +243,14 @@
             <div id="two_${parent/id}" class="thread">
                 <div class="postcontainer">
                     <div id="one_${parent/id}" class="post op">
-                        <div class="file" tal:condition="parent/file">
+                        <div class="file btns" tal:condition="parent/file">
                             <div class="fileinfo">
                                 <span class="filetext">
                                     File:
                                     <a href="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}">
                                         ${parent/file}.${parent/file_type}
                                     </a>
-                                    ${structure string: &ndash;} (${parent/file_size}, ${parent/image_h}x${parent/image_w}, ${parent/file_original}.${parent/file_type})
+                                    ${structure string: &ndash;} (${parent/file_size}, ${parent/image_h}x${parent/image_w}, ${parent/file_original})
                                 </span>
                             </div>
                             <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}">
@@ -230,8 +277,9 @@
                                     </a>
                                     <a href="${imgbb/base_url}/pls" tal:content="parent/id"/>
                                 </span>
-                                <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}">
-                                    [View]</a>
+                                <span class="btns">
+                                    [<a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}" tal:condition="not: true: inthread">View</a>]
+                                </span>
                                 <span tal:condition="imgbb/user/registered">
                                     <tal:block metal:use-macro="parent_mod_tools" />
                                 </span>
@@ -275,14 +323,14 @@
                                     </span>
                                 </label>
                             </div>
-                            <div class="file" tal:condition="reply/file">
+                            <div class="file btns" tal:condition="reply/file">
                                 <div class="fileinfo">
                                     <span class="filetext">
                                         File:
                                         <a href="${imgbb/base_url}/files/src/${reply/file}.${reply/file_type}">
                                             ${reply/file}.${reply/file_type}
                                         </a>
-                                        ${structure string: &ndash;} (${reply/file_size}, ${reply/image_h}x${reply/image_w}, ${reply/file_original}.${reply/file_type})
+                                        ${structure string: &ndash;} (${reply/file_size}, ${reply/image_h}x${reply/image_w}, ${reply/file_original})
                                     </span>
                                 </div>
                                 <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${reply/file}.${reply/file_type}">
@@ -296,5 +344,7 @@
             </div>
             <hr />
         </tal:block>
+        <!--Pagination area-->
+        <!--Manipulation area-->
     </div>
 </tal:block>
