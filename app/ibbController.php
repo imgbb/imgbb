@@ -68,9 +68,11 @@ class ibbController {
 	 */
 	public function init()
 	{
+//		$tstart = microtime(true);
 		$this->core = ibbCore::getInstance();
 		$this->core->run();
 		$this->core->output = output::getInstance();
+//		echo '<b>controller</b><br />exec: ' . (microtime(true) - $tstart) . '<br />mem: ' . substr(memory_get_usage(), 0, strlen(memory_get_usage()) - 3) . '<br />';
 	}
 
 	/**
@@ -185,7 +187,7 @@ class ibbCore {
 
 		/* Handles */
 			// init DB
-			self::$handles['db'] 	= ibbDBCore::getInstance();
+			self::$handles['db'] 	= ibbDBCore::getDBType();
 			self::$handles['upload'] = new upload;
 
 		/* First check if it's a fURL */
@@ -241,9 +243,9 @@ class ibbCore {
 		}
 		if ( isset($_POST) )
 		{
-			foreach ($_POST as $key => $val)
+			foreach ($_POST as $key => $value)
 			{
-				self::$request[$key] = self::DB()->instance()->real_escape_string( $val );
+				self::$request[$key] = self::DB()->instance()->real_escape_string( $value );
 			}
 		}
 
@@ -417,6 +419,7 @@ class ClassHandler {
 		///// PLEASE DON'T LOOK AT THIS ABOMINATION /////
 		/////////////////////////////////////////////////
 		/////////////////////////////////////////////////
+//		$tstart = microtime(true);
 		self::$core = ibbCore::getInstance();
 
 		$MODULE = self::$core->request('mod');
@@ -487,13 +490,16 @@ class ClassHandler {
 
 		/* Go go, power ranger */
 		// temp name ofc...
+//		echo '<b>exec_handler</b><br />exec: ' . (microtime(true) - $tstart) . '<br />mem: ' . substr(memory_get_usage(), 0, strlen(memory_get_usage()) - 3) .'<br />';
 		self::$core->output->goGoPowerRanger();
 
 	}
 
 	/**
-	 * @param $app
+	 * @param $class
 	 * @param $request_type
+	 *
+	 * @return string
 	 */
 	public static function EvolutionizedExecution( $class, $request_type )
 	{
@@ -791,10 +797,15 @@ class output {
 			');
 			$this->vars['boards'] = $this->db->results['boards'];
 
+			#Clearing some notices
+			$this->vars['boardsections'] = array();
+
 			foreach ( $this->db->results['boards'] as $board )
 			{
-				if ( !in_array( $board['category_name'], $this->core->output->vars['boardsections'] ) )
+				if ( !in_array( $board['category_name'], $this->vars['boardsections'] ) )
+				{
 					$this->core->output->vars['boardsections'][$board['category_id']] = $board['category_name'];
+				}
 			}
 
 			/* Load API... jesus I need a better/dynamic way to do this, TODO */
@@ -870,6 +881,7 @@ class User {
 	public				$display_trip;
 	public				$names;
 	public				$rank = 0;
+	public				$is_staff = 0;
 
 	/**
 	 * @return User
@@ -902,7 +914,7 @@ class User {
 
 				$this->user_data = $this->db->queryDirect('
 					SELECT	 ibb_users.group_id					 as		user_group_id
-							,ibb_users.rank						 as		user_rank
+							,ibb_users.rank_id					 as		user_rank
 							,ibb_users.salt				  		 as		user_salt
 							,ibb_users.password				 	 as		user_password
 							,ibb_users.display_trip 			 as		user_display_trip
@@ -911,6 +923,7 @@ class User {
 							,ibb_users.id						 as		user_id
 							,ibb_user_groups.name				 as		user_group_name
 							,ibb_user_groups.id				 	 as		user_group_id
+							,ibb_user_groups.is_staff			 as		user_group_is_staff
 							,ibb_user_ranks.name				 as 	user_rank_name
 							,ibb_user_ranks.display_name 		 as 	user_rank_display_name
 							,ibb_user_ranks.display_stylization  as 	user_rank_display_stylization
@@ -977,15 +990,25 @@ class User {
 
 		$this->display_name = $this->getData()['user_display_name'];
 		$this->display_trip = $this->getData()['user_display_trip'];
+		$this->is_staff		= $this->getData()['user_group_is_staff'];
 
 		foreach ($this->db->results['permissions'] as $board)
 		{
+			/* Set each individual boardid as an independent value with the category id as the parent key */
+			/* e.g. $this->permissions['boards'][1][3] = 1 is ['boards']['Support'][3]['Questions & Answers'] */
 			$this->permissions['boards'][$board['categoryid']][] = $board['boardid'];
 		}
 
 		foreach ($this->db->results['names'] as $name)
 		{
+			/* Make each name accessible by its id from the database. Make sure to access $this->names */
+			/* and NOT the query result, because the query results has arbitrary keys to each name */
 			$this->names[$name['id']] = $name;
+		}
+
+		if ($this->user_data['user_group_id'] > 0)
+		{
+			$this->bootStaff();
 		}
 
 	}
@@ -1003,12 +1026,15 @@ class User {
 			$this->permissions['boards'][$board['categoryid']][$board['boardid']] = $board['boardid']; //wtf
 		}
 
-		print_r($this->permissions['boards']);
-
 		$this->display_name	= 'Anonymous';
 		$this->display_trip	= '';
 
 
+	}
+
+	public function bootStaff()
+	{
+		$this->is_staff = TRUE;
 	}
 
 	/**
@@ -1016,7 +1042,19 @@ class User {
 	 */
 	public function getData()
 	{
+		#Need to add some more stuff here
 		return $this->user_data;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getUserId()
+	{
+		if ($this->registered)
+			return $this->getData()['user_id'];
+		else
+			return 0;
 	}
 
 	/**
@@ -1058,7 +1096,7 @@ class User {
  *
  * DB class, accessed through $DB through the IBB Core.
  */
-class ibbDBCore /*implements ibbDBCoreInterface */ {
+abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 
 	/**
 	 * Populated upon using query()
@@ -1088,43 +1126,36 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	private $data;
 
 	/**
-	 * @return ibbDBCore
+	 * @return db_mysql
 	 */
-	public static function getInstance()
+	public static function getDBType()
 	{
-		if ( !self::$instance )
-		{
-			self::$instance = new self;
-		}
-
-		return self::$instance;
+		return new db_mysql;
 	}
 
 	/**
 	 * @return mysqli
 	 */
-	public static function instance()
-	{
-		if ( !self::$dbinstance )
-			self::$dbinstance = new mysqli('localhost', 'root', '', 'zildjohn01');
-
-		if ( self::$dbinstance->connect_errno) {
-			echo "Failed to connect to MySQL: (" . self::$dbinstance->connect_errno . ") " . self::$dbinstance->connect_error;
-		}
-
-		return self::$dbinstance;
-	}
+	abstract public function instance();
 
 	/**
 	 * @param	$query	array
 	 *
 	 * @throws	Exception
 	 */
-	public function execute( $query, $type = NULL, $qname = NULL )
-	{
-		ibbCore::$queryc[] = $query;
-		return $this->instance()->real_query( $query );
-	}
+	abstract public function execute( $query, $type = NULL, $qname = NULL );
+
+	/**
+	 * @param string $type MYSQL_ASSOC,... etc
+	 *
+	 * @return mixed
+	 */
+	abstract public function returnAll( $type );
+
+	/**
+	 * @return mixed
+	 */
+	abstract public function storeResult();
 
 
 	/**
@@ -1154,7 +1185,7 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 			{
 				case 1:
 				{
-					$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC)[0];
+					$this->results[$qname] = $this->returnAll(MYSQL_ASSOC)[0];
 					try
 					{
 						if (!$this->results[$qname])
@@ -1168,24 +1199,24 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 				}
 				case 2:
 				{
-					return $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+					return $this->returnAll(MYSQL_ASSOC);
 				}
 				case 3:
 				{
 					$store_me_away = func_get_arg(3);
-					$this->results[$qname][$store_me_away] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+					$this->results[$qname][$store_me_away] = $this->returnAll(MYSQL_ASSOC);
 					break;
 				}
 				default:
 				{
-					$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+					$this->results[$qname] = $this->returnAll(MYSQL_ASSOC);
 					break;
 				}
 			}
 		}
 		else
 		{
-			$qresult = $this->instance()->store_result();
+			$qresult = $this->storeResult();
 
 			if ($qresult->num_rows == 0)
 			{
@@ -1215,7 +1246,7 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	public function queryDirect( $query )
 	{
 		$this->execute($query);
-		return $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+		return $this->returnAll(MYSQL_ASSOC);
 	}
 
 	/**
@@ -1229,7 +1260,7 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 		$success = $this->execute($query);
 
 		if ( $success )
-			$this->results[$qname][$parent] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
+			$this->results[$qname][$parent] = $this->returnAll(MYSQL_ASSOC);
 		else
 			throw new Exception(' Query failed! ' . $query);
 	}
@@ -1246,7 +1277,7 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	{
 		try {
 			$this->execute( $query );
-			$results = $this->instance()->store_result();
+			$results = $this->storeResult();
 			if ($results->num_rows == 0)
 				throw new Exception('Query returned no results, boards needs to catch this ' . $query);
 			// dat [0]... there must be some function or constant that can be passed as an option to stop double array...
@@ -1265,14 +1296,14 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 	public function queryBoolean ( $query )
 	{
 		$this->execute ( $query );
-		$results = $this->instance()->store_result();
+		$results = $this->storeResult();
 		if ($results->num_rows == 0)
 		{
 			return false;
 		}
 		else
 		{
-			return $this->instance()->use_result()->fetch_all(MYSQL_ASSOC)[0];
+			return $this->returnAll(MYSQL_ASSOC)[0];
 		}
 
 	}
@@ -1337,6 +1368,57 @@ class ibbDBCore /*implements ibbDBCoreInterface */ {
 
 }
 
+/**
+ * Class db_mysql
+ */
+class db_mysql extends ibbDBCore
+{
+	/**
+	 * @return mysqli
+	 */
+	public function instance()
+	{
+		if ( !self::$dbinstance )
+			self::$dbinstance = new mysqli('localhost', 'root', '', 'zildjohn01');
+
+		if ( self::$dbinstance->connect_errno) {
+			echo "Failed to connect to MySQL: (" . self::$dbinstance->connect_errno . ") " . self::$dbinstance->connect_error;
+		}
+
+		return self::$dbinstance;
+	}
+
+	/**
+	 * @param string $query
+	 * @param null  $type
+	 * @param null  $qname
+	 *
+	 * @return bool|void
+	 */
+	public function execute( $query, $type = NULL, $qname = NULL )
+	{
+		ibbCore::$queryc[] = $query;
+		return $this->instance()->real_query( $query );
+	}
+
+	/**
+	 * @param int|string $type MYSQLI_ASSOC, MYSQLI_NUM, or MYSQLI_BOTH
+	 *
+	 * @return mixed|void
+	 */
+	public function returnAll( $type = MYSQLI_ASSOC )
+	{
+		return $this->instance()->use_result()->fetch_all($type);
+	}
+
+	/**
+	 * @return mysqli_result
+	 */
+	public function storeResult()
+	{
+		return $this->instance()->store_result();
+	}
+}
 /**
  * Dunno where to put this stuff
  *
