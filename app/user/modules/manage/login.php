@@ -50,12 +50,16 @@ class user_manage_login
 		', SINGLE_RESULT_QUERY );
 
 		if (!$this->db->results['user'])
+		{
 			throw new Exception('standard exception, login incorrect.');
+		}
 
 		setcookie('username', $this->core->request('username'), time()+60*60*24*30);
 		$_SESSION['user_name'] 		= $this->core->request('username');
 		$_SESSION['user_password'] 	= $this->core->request('password');
 		$_SESSION['user_id']		= $this->db->results['user']['id'];
+
+		$this->db->execute('UPDATE ibb_users SET lastlogin='.time().' WHERE id='.$_SESSION['user_id']);
 
 	}
 }
