@@ -53,7 +53,7 @@
 </div>
         <!-- macro: header @var intro_img -->
 <div class="header" metal:define-macro="header">
-<img src="https://dl.dropboxusercontent.com/u/20817027/imgbb/UGR5rof.png"/>
+    <img src="assets/UGR5rof.png"/>
 </div>
         <!-- macro: recent_posts @var posts -->
 <div class="frontsidecolwrap" metal:define-macro="recent_posts">
@@ -65,28 +65,28 @@
         <div class="recentpostwrap">
             <div class="recentpostheader">
                         <span class="recentpostboard">
-                            <a href="index.php?/${post/boardname}/${post/parentid}-${post/name}#${post/id}">
-                                /${post/boardname}/
+                            <a href="index.php?/${post/board_name}/${post/parentid}-${post/display_name}#${post/id}">
+                                /${post/board_name}/
                             </a>
                         </span>
                         <span class="recentsubjectposterdivider">
                             &#8211;
                         </span>
-                        <span class="recentpostername" tal:content="post/name | default">
-                            <span tal:condition="not: post/tripcode" tal:omit-tag="">
+                        <span class="recentpostername" tal:content="post/display_name | default">
+                            <span tal:condition="not: post/display_tripcode" tal:omit-tag="">
                                 Anonymous
                             </span>
-                        </span><span class="recentpostertrip" tal:condition="post/tripcode">!${post/tripcode}
+                        </span><span class="recentpostertrip" tal:condition="post/display_tripcode">!${post/display_tripcode}
                         </span>
-                        <span class="recentmod" tal:condition="php: post['tripcode'] eq '!ShiningArmor'">
-                            ## ${post/rank_display_name} ##
+                        <span class="recentmod" tal:condition="post/rank" tal:attributes="style post/rank_display_stylization">
+                            ${post/rank_display_name}
                         </span>
                         <span class="recentposttime">
                             ${post/timestamp}
                         </span>
             </div>
             <div class="recentpostcontent">
-                <img class="recentpostimg" src="http://www.gravatar.com/avatar/5946e3ebae0fcfbae5a54422aabf08a1?s=125&d=https%3A%2F%2Fmlpforums-feld0.netdna-ssl.com%2F%2Fpublic%2Fstyle_images%2Fmlp%2Fprofile%2Fdefault_large.png" />
+                <img class="recentpostimg" src="${imgbb/base_url}/files/src/${post/file}.${post/file_type}" height="${post/thumb_h}" width="{post/thumb_w}" />
                 <div class="recentpostbody">
                     <p tal:content="structure post/message">${post/message}</p>
                 </div>
