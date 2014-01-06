@@ -33,6 +33,16 @@ class boards_boardpage_view {
 	 */
 	public $board_info;
 
+	/**
+	 * I'm still not sure how to handle the post data.
+	 * Should I put them in the properties?
+	 * That sounds like the most logical thing... but this class
+	 * is not designed purely around the idea of post insertion...
+	 *
+	 * @var int
+	 */
+	private $sticky = 0;
+
 
 	/**
 	 *
@@ -41,7 +51,7 @@ class boards_boardpage_view {
 	{
 		$this->core 	= 	ibbCore::getInstance();
 		$this->db		=	$this->core->DB();
-		$this->request 	=	$this->core->request();
+//		$this->request 	=	$this->core->request();
 		$this->user		=	$this->core->user();
 		$this->db->query('boardinfo', '
 			SELECT			ibb_boards.id 				AS board_id,
@@ -64,6 +74,15 @@ class boards_boardpage_view {
 	 */
 	public function init()
 	{
+//		$tstart = microtime(true);
+//		if ( $this->user->is_staff )
+//		{
+//			if ( isset($_POST['displaystatus']) )
+//			{
+//				print_r($this->user->getData());
+//			}
+//		}
+//		print_r($this->user->getUserId());
 		// This needs to be in the registry, access should be granted
 		// via permissions in database fetched before module loads
 		if (!in_array($this->db->results['boardinfo']['board_id'], $this->user->getPermissions('boards')[$this->db->results['boardinfo']['category_id']]))
@@ -103,7 +122,7 @@ class boards_boardpage_view {
 				LIMIT		10
 			');
 
-			// Got to be a better way, even though it's temporary...
+			#Got to be a better way, even though it's temporary...
 			$piece = '';
 
 			foreach ($this->db->results['parents'] as $parent)
@@ -111,8 +130,12 @@ class boards_boardpage_view {
 				// kill me
 				if ($piece != '')
 					$piece .= ' OR ';
+				else
+					$piece .= '(';
 				$piece .= '( parentid = ' . $parent['id'] . ' AND id >= ' . $parent['latest_preview'] . ')';
 			}
+			#Make sure the OR is enclsoed in brackets
+			$piece .= ')';
 
 //			echo $piece;
 
@@ -125,10 +148,10 @@ class boards_boardpage_view {
 				AND			deleted		=	0
 				AND
 					' . $piece . '
-				ORDER BY	`bumped` DESC
+				ORDER BY	`bumped` ASC
 				LIMIT 30
 				');
-				$this->db->results['replies'] = array_reverse($this->db->results['replies']);
+//				$this->db->results['replies'] = array_reverse($this->db->results['replies']);
 
 				if (isset($this->db->results['replies']))
 				{
@@ -224,7 +247,7 @@ class boards_boardpage_view {
 			/***** Temporary parsing, all parsing will be moved to a parsing object */
 			foreach ($this->db->results['parents'] as &$post)
 			{
-				$post['timestamp'] 	=	date('jS \of F, Y g:i a', $post['timestamp']);
+				$post['timestamp'] 	=	date('D, M jS, Y g:i a', $post['timestamp']);
 				$post['display_name']		=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
 //				$post['message']	=	stripslashes($post['message']);
 				$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
@@ -235,22 +258,18 @@ class boards_boardpage_view {
 			/**** */
 
 			/* Load SQLs into the vars */
-			foreach ( $this->db->results as $queryk => $query )
-			{
-				$this->core->output->vars[$queryk] = $query;
-			}
+//			foreach ( $this->db->results as $queryk => $query )
+//			{
+//				$this->core->output->vars[$queryk] = $query;
+//			}
+			$this->core->output->vars['boardinfo'] = $this->db->results['boardinfo'];
 
 			// b temp
-			$this->core->output->vars['parents'] 	= new post($this->core->output->vars['parents']);
+			$this->core->output->vars['parents'] 	= new post($this->db->results['parents']);
 //			foreach ($this->core->output->vars['parents'] as $parent)
 //			{
-				$this->core->output->vars['replies'] = new post($this->core->output->vars['replies']);
+				$this->core->output->vars['replies'] = new post($this->db->results['replies']);
 //			}
-
-			if (!in_array($this->db->results['boardinfo']['board_id'], $this->user->getPermissions('boards')[$this->db->results['boardinfo']['category_id']]))
-			{
-				throw new Exception('permission denied exception');
-			}
 
 		} else
 		{
@@ -324,15 +343,28 @@ class boards_boardpage_view {
 
 		if ( $this->user->registered )
 		{
-			if ( $this->user->getPermissions('is_staff') )
+			if ( $this->user->names[$_POST['name']]['rank'])
 			{
-				if ( $this->user->names[$_POST['name']]['rank'])
+				$this->user->rank = $this->user->getData()['rank'];
+			}
+
+			if ( $this->user->is_staff )
+			{
+				if ( isset($_POST['displaystatus']) )
 				{
-					$this->user->rank = $this->user->getData()['rank'];
+					$this->user->rank = $this->user->getData()['user_rank'];
 				}
-				if ( $_POST['display_status'] )
+
+				if ( isset($_POST['sticky']) )
 				{
-					$this->user->rank = $this->user->getData()['rank'];
+					if ( $this->core->request('subaction') == 0)
+					{
+						$this->sticky = 1;
+					}
+					else
+					{
+						$this->db->execute('UPDATE ibb_posts SET stickied=1 WHERE id='.$this->core->request('subaction').' AND parentid=0');
+					}
 				}
 			}
 
@@ -378,9 +410,20 @@ class boards_boardpage_view {
 //			 use ibbloader to require the upload class...
 			list($filename, $filetype, $img_height, $img_width, $thumb_height, $thumb_width, $file_original) = $this->core->upload()->DoFile( intval($_POST['subaction'] ));
 		}
+
+		#tmp
+		if ($_POST['body'] == '' && $filename == 0)
+			throw new Exception('file or msg pls exception');
+		else
+			$_POST['body'] = IBBText::postParser($_POST['body']);
+
+		# Very temporary! Can't leave this here, too risky
+//		$this->db->query('id', 'SELECT MAX(id) AS id FROM ibb_posts WHERE boardid='.$this->db->results['boardinfo']['board_id'], SINGLE_RESULT_QUERY);
+
 		$this->db->buildSafeQuery(array(
 				'type'		=> array('INSERT' => 'ibb_posts'),
 				'columns'	=> array('boardid'
+									,'id'
 									,'parentid'
 									,'userid'
 									,'latest_preview'
@@ -398,10 +441,12 @@ class boards_boardpage_view {
 									,'thumb_h'
 									,'thumb_w'
 									,'file_original'
+									,'stickied'
 				),
 				'values'	=> array($this->db->results['boardinfo']['board_id']
+									,'(SELECT MAX(A.id) FROM ibb_posts A WHERE A.boardid='.$this->db->results['boardinfo']['board_id'].') +1'
 									,intval($_POST['subaction'])
-									,1
+									,$this->user->getUserId()
 									,0
 									,'"' .$_POST['body']. '"'
 									,'"' .$this->user->display_name. '"'
@@ -409,7 +454,7 @@ class boards_boardpage_view {
 									,'"' .$_POST['subject']. '"'
 									,time()
 									,time()
-									,$this->user->rank
+									,intval($this->user->rank)
 									,$filename
 									,$filetype
 									,$img_height
@@ -417,6 +462,7 @@ class boards_boardpage_view {
 									,$thumb_height
 									,$thumb_width
 									,$file_original
+									,$this->sticky
 				)
 			)
 		);
@@ -552,20 +598,22 @@ class boards_boardpage_view {
 			$this->core->output->vars[$queryk] = $query;
 		}
 
+		foreach ($this->core->output->vars['posts'] as &$post)
+		{
+			$post['timestamp'] 		=	date('D, M jS, Y g:i a', $post['timestamp']);
+			$post['display_name']	=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
+//			$post['message']		=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
+//			$post['message']		=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
+		}
+
 		// c temp
 		$this->core->output->vars['replies']	= new post($this->core->output->vars['posts']);
 
+		// d temp
+		$this->core->output->vars['inthread']	= TRUE;
+
 		// TODO IMGBB deal with this
 		$this->core->output->vars['parents'] 	= array($this->core->output->vars['replies']->posts[0]);
-
-		foreach ($this->core->output->vars['posts'] as &$post)
-		{
-			$post['timestamp'] 	=	date('jS \of F, Y', $post['timestamp']);
-			$post['display_name']		=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
-			$post['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
-			$post['message']	=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
-		}
-
 
 
 		$this->core->output->addMacro('board', 'boards.xhtml');
