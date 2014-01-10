@@ -157,7 +157,7 @@
                     </td>
                     <td class="tdinput">
                         <label for="lockthread">Lock Thread: </label>
-                        <input id="lockthread" type="checkbox" name="lockthread"/>
+                        <input id="lockthread" type="checkbox" name="lock"/>
                         <!--<a onclick="displayhelp()" href="#">-->
                             <!--<span class="helpme">-->
                                 <!--?-->
@@ -213,27 +213,27 @@
 
 <tal:block metal:define-macro="parent_mod_tools">
 <span tal:condition="imgbb/user/registered" class="btns" >
-    [<a href="index.php?app=main&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
+    [<a href="index.php?app=boards&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
         &amp;
     <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>]
 
-    [<a href="index.php?app=main&amp;mod=manage&amp;area=move&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Move</a>
+    [<a href="index.php?app=boards&amp;mod=manage&amp;area=move&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Move</a>
     /
-    <a href="index.php?app=main&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>
+    <a href="index.php?app=boards&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>
     /
-    <a href="index.php?app=main&amp;mod=manage&amp;area=bump&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Bump</a>
+    <a href="index.php?app=boards&amp;mod=manage&amp;area=bump&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Bump</a>
     /
-    <a href="index.php?app=main&amp;mod=manage&amp;area=kill&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Kill</a>]
+    <a href="index.php?app=boards&amp;mod=manage&amp;area=kill&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Force Sage</a>]
 </span>
 </tal:block>
 
 <tal:block metal:define-macro="reply_mod_tools">
 <span tal:condition="imgbb/user/registered" class="btns" >
-    [<a href="index.php?app=main&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
+    [<a href="index.php?app=boards&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${reply/id}">D</a>
         &amp;
-    <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>
+    <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${reply/id}">B</a>
     /
-    <a href="index.php?app=main&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>]
+    <a href="index.php?app=boards&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${reply/id}">Edit</a>]
 </span>
 </tal:block>
 
@@ -257,7 +257,10 @@
                                 <img src="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}" height="${parent/thumb_h}" width="${parent/thumb_w}" />
                             </a>
                             <tal:block tal:condition="parent/stickied">
-                                Sticky
+                                Sticky.png
+                            </tal:block>
+                            <tal:block tal:condition="parent/locked">
+                                Locked.png
                             </tal:block>
                         </div>
                         <div class="postinfo">
@@ -267,9 +270,7 @@
                                 <span class="namespan">
                                     <span class="name" tal:content="parent/display_name" /><span class="postertrip" tal:condition="parent/display_tripcode">!${parent/display_tripcode}</span>
                                 </span>
-                                <span class="mod" tal:condition="parent/rank" tal:attributes="style parent/user_rank_display_stylization">
-                                    ${parent/user_rank_display_name}
-                                </span>
+                                <span class="mod" tal:condition="parent/rank" tal:attributes="style parent/user_rank_display_stylization" tal:content="structure parent/user_rank_display_name" />
                                 <span class="datetime" tal:content="parent/timestamp"/>
                                 <span class="postnumber">
                                     <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}-#${parent/id}">
@@ -277,8 +278,8 @@
                                     </a>
                                     <a href="${imgbb/base_url}/pls" tal:content="parent/id"/>
                                 </span>
-                                <span class="btns">
-                                    [<a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}" tal:condition="not: true: inthread">View</a>]
+                                <span class="btns" tal:condition="not: true: inthread">
+                                    [<a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}">View</a>]
                                 </span>
                                 <span tal:condition="imgbb/user/registered">
                                     <tal:block metal:use-macro="parent_mod_tools" />
@@ -289,7 +290,7 @@
                     </div>
                     <!--<tal:block tal:repeat="replycount repliescount/${parent/id}">-->
                         <!--<tal:block tal:repeat="reply replycount">-->
-                            ${parent/replycount}
+                            ${parent/replycount} total replies have been made. GRANDIL, THIS LOOKS LIKE PART OF THE POST IN SOME PLACES, SAVE ME
                         <!--</tal:block>-->
                     <!--</tal:block>-->
                 </div>
@@ -308,9 +309,7 @@
                                             ${reply/display_name}</span><span class="postertrip" tal:condition="reply/display_tripcode">!${reply/display_tripcode}
                                         </span>
                                     </span>
-                                    <span class="mod" tal:condition="reply/rank" tal:attributes="style reply/user_rank_display_stylization">
-                                        ${reply/user_rank_display_name}
-                                    </span>
+                                    <span class="mod" tal:condition="reply/rank" tal:attributes="style reply/user_rank_display_stylization" tal:content="structure reply/user_rank_display_name" />
                                     <span class="datetime" tal:content="reply/timestamp" />
                                     <span class="postnumber">
                                         <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}-#${reply/id}">
