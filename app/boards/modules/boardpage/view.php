@@ -6,13 +6,11 @@
  * Time: 6:58 PM
  * To change this template use File | Settings | File Templates.
  *
- * TODO array reverse is used as a band-aid many times here, need to go back and see what misfire causes the need
- *
  * @BASIC
  * @INCOMPLETE
  */
 
-class boards_boardpage_view {
+class boards_boardpage_view implements appCore {
 
 	/**
 	 * @var ibbDBCore
@@ -33,6 +31,8 @@ class boards_boardpage_view {
 	 */
 	public $board_info;
 
+	public $upload;
+
 	/**
 	 * I'm still not sure how to handle the post data.
 	 * Should I put them in the properties?
@@ -43,17 +43,24 @@ class boards_boardpage_view {
 	 */
 	private $sticky = 0;
 
+	/**
+	 * Still not sure about this...
+	 *
+	 * @var bool
+	 */
+	private $raw = FALSE;
+
 
 	/**
 	 *
 	 */
 	public function __construct()
 	{
-		$this->core 	= 	ibbCore::getInstance();
-		$this->db		=	$this->core->DB();
-//		$this->request 	=	$this->core->request();
-		$this->user		=	$this->core->user();
-		$this->db->query('boardinfo', '
+		$this->core 		= 	ibbCore::getInstance();
+		$this->db			=	$this->core->DB();
+//		$this->request 		=	$this->core->request();
+		$this->user			=	$this->core->user();
+		$this->board_info 	= $this->db->queryDirect('
 			SELECT			ibb_boards.id 				AS board_id,
 							ibb_boards.name 			AS `board_name`,
 							title,
@@ -64,8 +71,9 @@ class boards_boardpage_view {
 			LEFT JOIN		ibb_board_categories
 			ON				ibb_board_categories.id = ibb_boards.category
 			WHERE			ibb_boards.name 					= "'.$this->core->request('action').'"
-		', SINGLE_RESULT_QUERY);
-		$this->user_data =	$this->core->data;
+		')[0];
+		$this->user_data 	=	$this->core->data;
+		$this->upload		=	$this->core->upload();
 	}
 
 	/**
@@ -74,6 +82,7 @@ class boards_boardpage_view {
 	 */
 	public function init()
 	{
+		$this->core->output->vars['boardinfo'] = $this->board_info;
 //		$tstart = microtime(true);
 //		if ( $this->user->is_staff )
 //		{
@@ -85,13 +94,15 @@ class boards_boardpage_view {
 //		print_r($this->user->getUserId());
 		// This needs to be in the registry, access should be granted
 		// via permissions in database fetched before module loads
-		if (!in_array($this->db->results['boardinfo']['board_id'], $this->user->getPermissions('boards')[$this->db->results['boardinfo']['category_id']]))
+		if (!in_array($this->board_info['board_id'], $this->user->getPermissions('boards')[$this->board_info['category_id']]))
 		{
 			throw new exception('Permission denied exception');
 		}
 
+		$this->core->output->vars['postbox'] = TRUE;
+
 		/* Set page title */
-		$this->core->output->setTitle($this->db->results['boardinfo']['title']);
+		$this->core->output->setTitle($this->board_info['title']);
 
 		$this->core->output->addCSS( 'boards' );
 
@@ -106,7 +117,7 @@ class boards_boardpage_view {
 //			$this->db->query('queries', '
 //			SELECT	*
 //			FROM	ibb_posts
-//			WHERE	boardid		= ' . $this->db->results['boardinfo']['board_id'] . '
+//			WHERE	boardid		= ' . $this->board_info['board_id'] . '
 //			AND		parentid	= 0
 //			AND		deleted		= 0
 //
@@ -115,7 +126,7 @@ class boards_boardpage_view {
 			$this->db->query('parents', '
 				SELECT		*
 				FROM		ibb_posts
-				WHERE		boardid		=	' . $this->db->results['boardinfo']['board_id'] . '
+				WHERE		boardid		=	' . $this->board_info['board_id'] . '
 				AND			parentid	=	0
 				AND			deleted		=	0
 				ORDER BY	stickied DESC, bumped DESC
@@ -144,7 +155,7 @@ class boards_boardpage_view {
 				$this->db->query('replies', '
 				SELECT		*
 				FROM		ibb_posts
-				WHERE		boardid		=	' . $this->db->results['boardinfo']['board_id'] . '
+				WHERE		boardid		=	' . $this->board_info['board_id'] . '
 				AND			deleted		=	0
 				AND
 					' . $piece . '
@@ -177,7 +188,7 @@ class boards_boardpage_view {
 //				$this->db->queryInLoop('replies', $parent['id'], '
 //					SELECT		*
 //					FROM		ibb_posts
-//					WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
+//					WHERE 		boardid 	=	' . $this->board_info['board_id'] . '
 //					AND			parentid	=	' . $parent['id'] . '
 //					AND			deleted		=	0
 //					ORDER BY	`bumped` DESC
@@ -202,7 +213,7 @@ class boards_boardpage_view {
 //			$this->db->query('parents', '
 //			SELECT		*
 //			FROM		ibb_posts
-//			WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
+//			WHERE 		boardid 	=	' . $this->board_info['board_id'] . '
 //			AND 		parentid	=	0
 //			AND			deleted		=	0
 //			AND			stickied	=	0
@@ -214,7 +225,7 @@ class boards_boardpage_view {
 //				$this->db->queryInLoop('replies', $parent['id'], '
 //					SELECT		*
 //					FROM		ibb_posts
-//					WHERE 		boardid 	=	' . $this->db->results['boardinfo']['board_id'] . '
+//					WHERE 		boardid 	=	' . $this->board_info['board_id'] . '
 //					AND			parentid	=	' . $parent['id'] . '
 //					AND			deleted		=	0
 //					ORDER BY	`bumped` DESC
@@ -228,7 +239,7 @@ class boards_boardpage_view {
 //				$this->db->queryInLoop('repliescount', $parent['id'], '
 //					SELECT		COUNT(*)
 //					FROM 		ibb_posts
-//					WHERE		boardid			=	' . $this->db->results['boardinfo']['board_id'] . '
+//					WHERE		boardid			=	' . $this->board_info['board_id'] . '
 //					AND			parentid		=	' . $parent['id']
 //				);
 //			}
@@ -262,7 +273,6 @@ class boards_boardpage_view {
 //			{
 //				$this->core->output->vars[$queryk] = $query;
 //			}
-			$this->core->output->vars['boardinfo'] = $this->db->results['boardinfo'];
 
 			// b temp
 			$this->core->output->vars['parents'] 	= new post($this->db->results['parents']);
@@ -273,7 +283,44 @@ class boards_boardpage_view {
 
 		} else
 		{
-			$this->viewSingleThread( $this->db->results['boardinfo']['board_id'], $this->core->request('subaction'));
+//			$this->viewSingleThread( $this->board_info['board_id'], $this->core->request('subaction'));
+			$this->db->query('posts', '
+			SELECT 	*
+			FROM	ibb_posts
+			WHERE	boardid		= 	'.$this->board_info['board_id'].'
+			AND 	id			= 	'.$this->core->request('subaction').'
+			AND		deleted		=	0
+			UNION
+			SELECT	*
+			FROM	ibb_posts
+			WHERE	boardid		=	'.$this->board_info['board_id'].'
+			AND 	parentid	=	'.$this->core->request('subaction').'
+			AND		deleted		=	0
+		');
+
+			/* Load SQLs into the vars */
+//			foreach ( $this->db->results as $queryk => $query )
+//			{
+//				$this->core->output->vars[$queryk] = $query;
+//			}
+
+			foreach ($this->db->results['posts'] as &$post)
+			{
+				$post['timestamp'] 		=	date('D, M jS, Y g:i a', $post['timestamp']);
+				$post['display_name']	=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
+			}
+
+			// c temp
+			$this->core->output->vars['replies']	= new post($this->db->results['posts']);
+
+			// d temp
+			$this->core->output->vars['inthread']	= TRUE;
+
+			// TODO IMGBB deal with this
+			$this->core->output->vars['parents'] 	= array($this->core->output->vars['replies']->posts[0]);
+
+
+			$this->core->output->addMacro('board', 'boards.xhtml');
 		}
 
 //		print_r($this->core->output->vars['replies']['36460509']);
@@ -321,21 +368,33 @@ class boards_boardpage_view {
 	public function process()
 	{
 
-		if (!in_array($this->db->results['boardinfo']['board_id'], $this->user->getPermissions('boards')[$this->db->results['boardinfo']['category_id']]))
+		if (!in_array($this->board_info['board_id'], $this->user->getPermissions('boards')[$this->board_info['category_id']]))
 		{
 			throw new Exception('permission denied exceptiofdsf');
 		}
 
 		$this->db->query('latest_preview','
-			SELECT	id
-			FROM	ibb_posts
-			WHERE	boardid		=	' . $this->db->results['boardinfo']['board_id'] . '
-			AND		parentid	=	' . intval($_POST['subaction']) . '
-			ORDER BY `timestamp` DESC
+			SELECT		id
+			FROM		ibb_posts
+			WHERE		boardid		=	' . $this->board_info['board_id'] . '
+			AND			parentid	=	' . intval($_POST['subaction']) . '
+			ORDER BY	`timestamp` DESC
 			LIMIT 2
 			');
+		if ( $_POST['subaction'] != 0 )
+		{
+			$this->db->query('parent_data','
+				SELECT		locked
+				FROM		ibb_posts
+				WHERE		boardid		=	' . $this->board_info['board_id'] . '
+				AND			id			=	' . intval($_POST['subaction']) . '
+				ORDER BY	timestamp	DESC
+				LIMIT 1
+			', SINGLE_RESULT_QUERY);
+		}
 
 		// so gimmicky, pls rewrite TODO
+		// I've already forgotten, what is this gimmick meant to even do? #killme
 		if (empty($this->db->results['latest_preview']))
 			$this->db->results['latest_preview'][0]['id'] = 0;
 		else
@@ -350,12 +409,12 @@ class boards_boardpage_view {
 
 			if ( $this->user->is_staff )
 			{
-				if ( isset($_POST['displaystatus']) )
+				if ( isset ( $_POST['displaystatus'] ) )
 				{
 					$this->user->rank = $this->user->getData()['user_rank'];
 				}
 
-				if ( isset($_POST['sticky']) )
+				if ( isset( $_POST['sticky'] ) )
 				{
 					if ( $this->core->request('subaction') == 0)
 					{
@@ -365,6 +424,23 @@ class boards_boardpage_view {
 					{
 						$this->db->execute('UPDATE ibb_posts SET stickied=1 WHERE id='.$this->core->request('subaction').' AND parentid=0');
 					}
+				}
+
+				if ( isset( $_POST['lock'] ) )
+				{
+					if ($this->core->request('subaction') == 0)
+					{
+						$this->sticky = 1;
+					}
+					else
+					{
+						$this->db->execute('UPDATE ibb_posts SET locked=1 WHERE id='.$this->core->request('subaction').' AND parentid=0');
+					}
+				}
+
+				if ( isset( $_POST['rawhtml'] ) )
+				{
+					$this->raw = TRUE;
 				}
 			}
 
@@ -384,6 +460,11 @@ class boards_boardpage_view {
 			list($this->user->display_name, $this->user->display_trip) = $this->calculateNameAndTripcode($_POST['postername']);
 		}
 
+		if ($this->db->results['parent_data']['locked'] && $this->user->rank == 0)
+		{
+			throw new Exception('(Notice-level exception error via AJAX): Thread is locked.');
+		}
+
 		if ( $_POST['body'] )
 		{
 			htmlentities($_POST['body']);
@@ -397,29 +478,41 @@ class boards_boardpage_view {
 		//csrf
 
 
-		$filename = 0;
-		$filetype = '""';
-		$img_height = 0;
-		$img_width = 0;
-		$thumb_height = 0;
-		$thumb_width = 0;
-		$file_original = '""';
-		if ($_FILES['file']['size'])
+//		$filename = 0;
+//		$filetype = '""';
+//		$img_height = 0;
+//		$img_width = 0;
+//		$thumb_height = 0;
+//		$thumb_width = 0;
+//		$file_original = '""';
+		if ($_FILES['file'])
 		{
 //			throw new exception(print_r($_FILES));
 //			 use ibbloader to require the upload class...
-			list($filename, $filetype, $img_height, $img_width, $thumb_height, $thumb_width, $file_original) = $this->core->upload()->DoFile( intval($_POST['subaction'] ));
+//			list($filename, $filetype, $img_height, $img_width, $thumb_height, $thumb_width, $file_original) = $this->core->upload()->DoFile( intval($_POST['subaction'] ));
+			$this->core->upload()->DoFile( intval($_POST['subaction']) );
 		}
 
 		#tmp
-		if ($_POST['body'] == '' && $filename == 0)
+		if ($_POST['body'] == '' && $this->upload->filename == 0)
 			throw new Exception('file or msg pls exception');
 		else
-			$_POST['body'] = IBBText::postParser($_POST['body']);
+		{
+			if (!$this->raw)
+			{
+				$_POST['body'] = IBBText::postParser($_POST['body']);
+			}
+			else
+			{
+				$_POST['body'] = IBBText::escapeQuotes($_POST['body']);
+			}
+//			$_POST['subject'] = IBBText::postParser($_POST['subject']);
+		}
 
 		# Very temporary! Can't leave this here, too risky
-//		$this->db->query('id', 'SELECT MAX(id) AS id FROM ibb_posts WHERE boardid='.$this->db->results['boardinfo']['board_id'], SINGLE_RESULT_QUERY);
+//		$this->db->query('id', 'SELECT MAX(id) AS id FROM ibb_posts WHERE boardid='.$this->board_info['board_id'], SINGLE_RESULT_QUERY);
 
+//		print_r($this->upload->filename);
 		$this->db->buildSafeQuery(array(
 				'type'		=> array('INSERT' => 'ibb_posts'),
 				'columns'	=> array('boardid'
@@ -431,6 +524,7 @@ class boards_boardpage_view {
 									,'display_name'
 									,'display_tripcode'
 									,'subject'
+									,'email'
 									,'timestamp'
 									,'bumped'
 									,'rank'
@@ -443,8 +537,8 @@ class boards_boardpage_view {
 									,'file_original'
 									,'stickied'
 				),
-				'values'	=> array($this->db->results['boardinfo']['board_id']
-									,'(SELECT MAX(A.id) FROM ibb_posts A WHERE A.boardid='.$this->db->results['boardinfo']['board_id'].') +1'
+				'values'	=> array($this->board_info['board_id']
+									,'(SELECT MAX(A.id) FROM ibb_posts A WHERE A.boardid='.$this->board_info['board_id'].') +1'
 									,intval($_POST['subaction'])
 									,$this->user->getUserId()
 									,0
@@ -452,16 +546,17 @@ class boards_boardpage_view {
 									,'"' .$this->user->display_name. '"'
 									,'"' .$this->user->display_trip. '"'
 									,'"' .$_POST['subject']. '"'
+									,'"'.$_POST['email'].'"'
 									,time()
 									,time()
 									,intval($this->user->rank)
-									,$filename
-									,$filetype
-									,$img_height
-									,$img_width
-									,$thumb_height
-									,$thumb_width
-									,$file_original
+									,$this->upload->filename
+									,$this->upload->filetype
+									,$this->upload->src_width
+									,$this->upload->src_height
+									,$this->upload->thumb_height
+									,$this->upload->thumb_width
+									,$this->upload->filename_original
 									,$this->sticky
 				)
 			)
@@ -475,7 +570,7 @@ class boards_boardpage_view {
 			UPDATE ibb_posts
 			SET		 latest_preview	= 	'.$this->db->instance()->insert_id.'
 					,bumped			=	'.time().'
-			WHERE 	boardid 		= 	'.$this->db->results['boardinfo']['board_id'].'
+			WHERE 	boardid 		= 	'.$this->board_info['board_id'].'
 			AND		id				=	'.intval($_POST['subaction']).'
 		');
 		}
@@ -486,7 +581,7 @@ class boards_boardpage_view {
 			SET		 latest_preview	=	'.$this->db->results['latest_preview'][0]['id'].'
 					,replycount		=	replycount+1
 					,bumped			=	'.time().'
-			WHERE	boardid			=	'.$this->db->results['boardinfo']['board_id'].'
+			WHERE	boardid			=	'.$this->board_info['board_id'].'
 			AND		id				=	'.intval($_POST['subaction']).'
 			');
 		}
@@ -495,7 +590,7 @@ class boards_boardpage_view {
 	}
 
 	/**
-	 * Thanks, Kusabaa X and Mithent. TODO ALPHA rewrite
+	 * Thanks, Kusabaa X and Mithent. TODO ALPHA full rewrite
 	 *
 	 * @param $post_name
 	 *
@@ -576,47 +671,47 @@ class boards_boardpage_view {
 	 * @param      $thread
 	 * @param null $user
 	 */
-	public function viewSingleThread( $board, $thread, $user = NULL)
-	{
-		$this->db->query('posts', '
-			SELECT 	*
-			FROM	ibb_posts
-			WHERE	boardid		= 	'.$board.'
-			AND 	id			= 	'.$thread.'
-			AND		deleted		=	0
-			UNION
-			SELECT	*
-			FROM	ibb_posts
-			WHERE	boardid		=	'.$board.'
-			AND 	parentid	=	'.$thread.'
-			AND		deleted		=	0
-		');
-
-		/* Load SQLs into the vars */
-		foreach ( $this->db->results as $queryk => $query )
-		{
-			$this->core->output->vars[$queryk] = $query;
-		}
-
-		foreach ($this->core->output->vars['posts'] as &$post)
-		{
-			$post['timestamp'] 		=	date('D, M jS, Y g:i a', $post['timestamp']);
-			$post['display_name']	=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
+//	public function viewSingleThread( $board, $thread, $user = NULL)
+//	{
+//		$this->db->query('posts', '
+//			SELECT 	*
+//			FROM	ibb_posts
+//			WHERE	boardid		= 	'.$board.'
+//			AND 	id			= 	'.$thread.'
+//			AND		deleted		=	0
+//			UNION
+//			SELECT	*
+//			FROM	ibb_posts
+//			WHERE	boardid		=	'.$board.'
+//			AND 	parentid	=	'.$thread.'
+//			AND		deleted		=	0
+//		');
+//
+//		/* Load SQLs into the vars */
+//		foreach ( $this->db->results as $queryk => $query )
+//		{
+//			$this->core->output->vars[$queryk] = $query;
+//		}
+//
+//		foreach ($this->core->output->vars['posts'] as &$post)
+//		{
+//			$post['timestamp'] 		=	date('D, M jS, Y g:i a', $post['timestamp']);
+//			$post['display_name']	=	($post['display_tripcode'] == '' && $post['display_name'] == '') ? 'Anonymous' : $post['display_name'];
 //			$post['message']		=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $post['message']);
 //			$post['message']		=	preg_replace('#\[b\](.*)?\[/b\]#', '<font style="font-weight:bold;">\1</font>', $post['message']);
-		}
-
-		// c temp
-		$this->core->output->vars['replies']	= new post($this->core->output->vars['posts']);
-
-		// d temp
-		$this->core->output->vars['inthread']	= TRUE;
-
-		// TODO IMGBB deal with this
-		$this->core->output->vars['parents'] 	= array($this->core->output->vars['replies']->posts[0]);
-
-
-		$this->core->output->addMacro('board', 'boards.xhtml');
-	}
-
+//		}
+//
+//		 c temp
+//		$this->core->output->vars['replies']	= new post($this->core->output->vars['posts']);
+//
+//		 d temp
+//		$this->core->output->vars['inthread']	= TRUE;
+//
+//		 TODO IMGBB deal with this
+//		$this->core->output->vars['parents'] 	= array($this->core->output->vars['replies']->posts[0]);
+//
+//
+//		$this->core->output->addMacro('board', 'boards.xhtml');
+//	}
+//
 }
