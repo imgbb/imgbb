@@ -1,6 +1,7 @@
 <!-- root @vars -->
     <head>
         <meta charset="utf-8" />
+        <link href="${imgbb/base_url}/favicon.ico" type="image/x-icon" rel="shortcut icon" />
         <span tal:omit-tag="" tal:repeat="each_css imgbb/css">
             <link tal:condition="php: !is_array(each_css) AND strlen(each_css) > 1" rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
             <link tal:condition="php: is_array(each_css)" rel="stylesheet" href="${imgbb/base_url}/app/${each_css/app}/tpl/css/${each_css/filename}" />
