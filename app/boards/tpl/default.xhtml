@@ -4,10 +4,11 @@
     <meta charset="utf-8" />
     <!--<link rel="stylesheet" href="/imgbb/app/img_global.css"/>-->
     <!--<link rel="stylesheet" href="/imgbb/app/colgate.css" id="userstylelink"/>-->
-        <span tal:omit-tag="" tal:repeat="each_css imgbb/css">
-            <link tal:condition="php: !is_array(each_css) AND strlen(each_css) > 1" rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
-            <link tal:condition="php: is_array(each_css)" rel="stylesheet" href="${imgbb/base_url}/app/${each_css/app}/tpl/css/${each_css/filename}" />
-        </span>
+    <link rel='shortcut icon' type='image/x-icon' href='${imgbb/base_url}/favicon.ico' />
+    <span tal:omit-tag="" tal:repeat="each_css imgbb/css">
+        <link tal:condition="php: !is_array(each_css) AND strlen(each_css) > 1" rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
+        <link tal:condition="php: is_array(each_css)" rel="stylesheet" href="${imgbb/base_url}/app/${each_css/app}/tpl/css/${each_css/filename}" />
+    </span>
     <link rel="stylesheet" tal:attributes="href string: ${imgbb/base_url}/app/main/tpl/css/menu.css" />
     <title tal:content="imgbb/title">imgBB</title>
 </head>
@@ -17,7 +18,7 @@
         <!--tmp-->
         <!--<tal:block metal:use-macro="${imgbb/macro/src}/boards_debug" />-->
         <!--tmp-->
-        <tal:block metal:use-macro="${imgbb/macro/src}/postbox" />
+        <tal:block metal:use-macro="${imgbb/macro/src}/postbox" tal:condition="true: postbox"/>
         <tal:block metal:use-macro="${imgbb/macro/src}/${imgbb/macro/name}" />
     </div>
     <div class="footer" tal:condition="true: imgbb/footer">
