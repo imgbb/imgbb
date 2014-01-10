@@ -1,5 +1,5 @@
 <?php
-
+#for /imgbb/, irrelevent to actual software
 require_once dirname(dirname(__FILE__)) . '/intruder_process.php';
 #temp
 $time_start = microtime(true);
@@ -10,6 +10,7 @@ require_once IBB_ROOT_PATH . '/classes/furl_class.php';
 require_once IBB_ROOT_PATH . '/classes/loader_class.php';
 require_once IBB_ROOT_PATH . '/classes/upload.php';
 require_once IBB_ROOT_PATH . '/classes/text/text.php';
+require_once IBB_ROOT_PATH . '/classes/interface/appCore.php';
 session_start();
 //echo 'Loading all metadata takes ' . (microtime(true) - $time_start);
 //echo '<b>index</b><br />';
