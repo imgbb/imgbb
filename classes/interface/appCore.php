@@ -12,11 +12,13 @@
  *
  * Undeveloped, probably will rename
  *
- * intention: extend module commanders with this to reduce clutter and repeat code
+ * // intention: extend module commanders with this to reduce clutter and repeat code
  */
 
-abstract class appCore {
+interface appCore {
 
-	public function templateVars(){}
+	public function init();
+
+	public function process();
 
 }
