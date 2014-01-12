@@ -57,6 +57,6 @@ class main_front_view {
 		//////////////////////////////
 
 		// useless now that BASIC is modular
-		$this->core->output->vars['boards'] = $this->db->results['boards'];
+//		$this->core->output->vars['boards'] = $this->db->results['boards'];
 	}
 }
