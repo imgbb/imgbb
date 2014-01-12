@@ -176,19 +176,20 @@ class ibbCore {
 	}
 
 	/**
-	 * @return bool
+	 * @return void
 	 */
 	public static function run()
 	{
 		if ( self::$initiated === TRUE )
 		{
-			return FALSE;
+			exit('initiated.');
 		}
 
 		/* Handles */
-			// init DB
-			self::$handles['db'] 	= ibbDBCore::getDBType();
-			self::$handles['upload'] = new upload;
+			/* init DB */
+			self::$handles['db'] 		= ibbDBCore::getDBType();
+			#temp
+			self::$handles['upload'] 	= (new upload)->init();
 
 		/* First check if it's a fURL */
 		self::verifyfURL();
@@ -212,11 +213,11 @@ class ibbCore {
 		self::$User = new User;
 
 		/* Does the user have access? */
-		//TODO BASIC create user permissions
-//		$memberData->checkPrivilege(self::$request);
+		//TODO IMGBB create permissions check
+//		self::$User->checkPrivilege(self::$request);
 
 		/* OK, let's pass this to the class they wanted. */
-		//TODO BASIC create proper application loader
+		//TODO IMGBB create proper application loader
 	}
 
 	// TODO IMGBB request handler
@@ -269,7 +270,7 @@ class ibbCore {
 
 		try
 		{
-			// Does the application physically exist?
+			#Does the application physically exist?
 			if ( !$handle = is_dir( "app/" . self::$request['app'] . '/' ) )
 			{
 				throw new Exception( "Could not find application " . $_GET['app'] );
@@ -277,7 +278,7 @@ class ibbCore {
 
 		} catch (Exception $e)
 		{
-			// Throw default output
+			#Throw default output
 			throw new Exception ($e);
 		}
 	}
@@ -394,6 +395,8 @@ class ibbCore {
  *
  * class handle, in its very primitive form
  * TODO use ion cannon and obliterate this mess and create handler in the ibbCore instead, maybe create ibbCommand?
+ *
+ * TODO ENOUGH FIXING, WRITE THE NEW CLASS, THE MORE YOU BANDAGE IT THE HARDER IT WILL BE TO CREATE
  */
 class ClassHandler {
 
@@ -405,11 +408,18 @@ class ClassHandler {
 	public static	$core;
 
 	/**
+	 * @var appCore
+	 */
+	public static	$handle;
+
+	/**
 	 * It's not REALLY execute, it WAS execute earlier in development though, now it also verifies
 	 * ...
 	 * hence need for rewrite
 	 *
 	 * @param string $app
+	 * @param string $request_type
+	 *
 	 * @throws Exception
 	 */
 	public static function Execute( $app, $request_type )
@@ -460,15 +470,14 @@ class ClassHandler {
 		// this line just looks dumb tbh, how to make it look more... professional?
 		$bootup = $app . '_' . $MODULE . '_' . $AREA;
 
-		/** Boot up an instance of our app */
-		$handle = new $bootup;
+		self::$handle = new $bootup;
 
 		/* Set path... */
-		self::$core->output->setWorkingTemplate( IBB_ROOT_PATH . '/app/'.$app.'/tpl/', 'default.xhtml');
+		self::$core->output->setMasterTemplate( IBB_ROOT_PATH . '/app/'.$app.'/tpl/', 'default.xhtml');
 
 		if ($request_type == 'process' || $request_type == 'ajax')
 		{
-			$handle->process();
+			self::$handle->process();
 			if (self::$core->DB()->results['areadata']['onprocess_class'])
 			{
 				header('Location: ' . self::EvolutionizedExecution( self::$core->DB()->results['areadata']['onprocess_class'], 'init' ));
@@ -477,7 +486,7 @@ class ClassHandler {
 		}
 		else
 		{
-			$handle->init();
+			self::$handle->init();
 		}
 //		print_r(self::$core->DB()->results['areadata']);
 
@@ -501,7 +510,7 @@ class ClassHandler {
 	 *
 	 * @return string
 	 */
-	public static function EvolutionizedExecution( $class, $request_type )
+	public static function EvolutionizedExecution( $class )
 	{
 		list($app, $module, $area) = explode('_', $class);
 
@@ -510,6 +519,13 @@ class ClassHandler {
 		// don't look
 		// want to keep my dignity
 		// IT'S TEMPORARY BUT I NEED TO UPLOAD IT SORRY.
+
+		if (is_int(self::$core->request('action')))
+		{
+			self::$core->DB()->query('boardname', 'SELECT name FROM ibb_boards WHERE id='.self::$core->request('action'));
+			self::$core->hotfixAddRequest('action', self::$core->DB()->results['boardname'][0]['name']);
+		}
+
 		$subac = (self::$core->request('subaction') ? '&subaction='.self::$core->request('subaction') : '');
 
 		$url = 'app='.$app.'&mod='.$module.'&area='.$area.'&action='.self::$core->request('action') .
@@ -534,6 +550,8 @@ class ClassHandler {
 	 * Load class
 	 *
 	 * @param $class
+	 *
+	 * @throws Exception
 	 */
 	public static function loadAPI($class)
 	{
@@ -588,7 +606,7 @@ class output {
 	 *
 	 * @var array
 	 */
-	private $staticvars = array();
+//	private $staticvars = array();
 
 	/**
 	 * @var ibbCore
@@ -661,7 +679,7 @@ class output {
 	}
 
 	/**
-	 *
+	 * Constructor
 	 */
 	public function __construct()
 	{
@@ -670,6 +688,8 @@ class output {
 	}
 
 	/**
+	 * Set the page's <title>title</title>.
+	 *
 	 * @param $title string
 	 */
 	public function setTitle( $title )
@@ -678,6 +698,8 @@ class output {
 	}
 
 	/**
+	 * Which folder are we looking in for the templates?
+	 *
 	 * @param $path string
 	 */
 	public function setPath( $path )
@@ -686,6 +708,8 @@ class output {
 	}
 
 	/**
+	 * What is the master template's name?
+	 *
 	 * @param $file string
 	 */
 	public function setFile( $file )
@@ -694,7 +718,7 @@ class output {
 	}
 
 	/**
-	 * Add a macro
+	 * Add a slave macro
 	 *
 	 * @param 	string	$macro
 	 * @param 	string 	$template_src
@@ -706,7 +730,7 @@ class output {
 	}
 
 	/**
-	 * Set the page
+	 * Set the master macro
 	 *
 	 * @param string $macro
 	 * @param string $template_src
@@ -730,12 +754,12 @@ class output {
 	}
 
 	/**
-	 * Set the working template
+	 * Set the master template
 	 *
 	 * @param $path string
 	 * @param $file string
 	 */
-	public function setWorkingTemplate( $path, $file )
+	public function setMasterTemplate( $path, $file )
 	{
 		$this->setPath( $path );
 		$this->setFile( $file );
@@ -745,7 +769,10 @@ class output {
 	/**
 	 * Could use some more work? Seems... weird
 	 *
-	 * @param $val string add CSS file
+	 * Add CSS to the head. It will look for it in the /css/ directory
+	 * within the Master Template's directory.
+	 *
+	 * @param string $filename add CSS file
 	 */
 	public function addCSS($filename)
 	{
@@ -755,6 +782,9 @@ class output {
 
 	/**
 	 * Mostly used to take stuff from app Main
+	 *
+	 * Add CSS to the head. It will look for it in the /css/ directory
+	 * within the designated $app's Master Template directory.
 	 *
 	 * @param $filename
 	 * @param $app
@@ -808,7 +838,7 @@ class output {
 				}
 			}
 
-			/* Load API... jesus I need a better/dynamic way to do this, TODO */
+			/* Load API... jesus I need a better/dynamic way to do this, TO\DO */
 //			ClassHandler::loadAPI('boards');
 
 			/* Use the API and stuff. */
@@ -903,10 +933,10 @@ class User {
 	 *
 	 * @return array
 	 */
-	public function init( $id = FALSE )
+	public function init()
 	{
-		if ( !$id )
-		{
+//		if ( !$id )
+//		{
 
 			if ( isset($_SESSION['user_id']) )
 			{
@@ -935,9 +965,9 @@ class User {
 
 				if ( $this->user_data )
 				{
-					$this->bootRegistered();
-					if (in_array(1, $this->permissions['boards']))
-						print_r($this->permissions['boards']);
+					$this->boot();
+//					if (in_array(1, $this->permissions['boards']))
+//						print_r($this->permissions['boards']);
 					return $this->user_data;
 				}
 				else
@@ -948,49 +978,74 @@ class User {
 			}
 			else
 			{
-				$this->bootAnon();
+				$this->user_data = $this->db->queryDirect('
+					SELECT	 ibb_user_groups.id			as	user_group_id
+							,ibb_user_groups.name		as	user_group_name
+							,ibb_user_groups.is_staff	as	is_staff
+					FROM	ibb_user_groups
+					WHERE	ibb_user_groups.id = 5')[0];
+
+				$this->boot();
 //				echo 'not logged in';
 				return false;
 			}
-		}
-		else
-		{
-			$instance = new User;
-
-			$instance->user_data = $this->db->queryDirect('
-				SELECT	*
-				FROM	ibb_users
-				WHERE	id = ' . $id);
-
-			if ( isset( $instance->user_data ) )
-			{
-				$instance->registered = TRUE;
-				return $instance;
-			}
-			else
-			{
-				error_log('CLASS USER->init() DEBUG: Passed variable $id ' . $id . ' did not go through.');
-				return false;
-			}
-		}
+//		}
+//		else
+//		{
+//			$instance = new User;
+//
+//			$instance->user_data = $this->db->queryDirect('
+//				SELECT	*
+//				FROM	ibb_users
+//				WHERE	id = ' . $id);
+//
+//			if ( isset( $instance->user_data ) )
+//			{
+//				$instance->registered = TRUE;
+//				$instance->boot();
+//				return $instance;
+//			}
+//			else
+//			{
+//				error_log('CLASS USER->init() DEBUG: Passed variable $id ' . $id . ' did not go through.');
+//				return false;
+//			}
+//		}
 	}
 
-	public function bootRegistered()
+	public function boot()
 	{
-		$this->db->query('names', '
-			SELECT	*
-			FROM	ibb_names
-			WHERE	userid = ' . $_SESSION['user_id']
-		);
 		$this->db->query('permissions', '
 			SELECT	*
 			FROM	ibb_user_board_permissions
 			WHERE	groupid = ' . $this->getData()['user_group_id'] . '
 		');
 
-		$this->display_name = $this->getData()['user_display_name'];
-		$this->display_trip = $this->getData()['user_display_trip'];
-		$this->is_staff		= $this->getData()['user_group_is_staff'];
+		if ( $this->registered )
+		{
+			$this->db->query('names', '
+			SELECT	*
+			FROM	ibb_names
+			WHERE	userid = ' . $_SESSION['user_id']
+			);
+
+			foreach ($this->db->results['names'] as $name)
+			{
+				/* Make each name accessible by its id from the database. Make sure to access $this->names */
+				/* and NOT the query result, because the query results has arbitrary keys to each name */
+				$this->names[$name['id']] = $name;
+			}
+
+			$this->display_name = $this->getData()['user_display_name'];
+			$this->display_trip = $this->getData()['user_display_trip'];
+			$this->is_staff		= $this->getData()['user_group_is_staff'];
+
+		}
+		else
+		{
+			$this->display_name	= 'Anonymous';
+			$this->display_trip	= '';
+		}
 
 		foreach ($this->db->results['permissions'] as $board)
 		{
@@ -999,38 +1054,68 @@ class User {
 			$this->permissions['boards'][$board['categoryid']][] = $board['boardid'];
 		}
 
-		foreach ($this->db->results['names'] as $name)
-		{
-			/* Make each name accessible by its id from the database. Make sure to access $this->names */
-			/* and NOT the query result, because the query results has arbitrary keys to each name */
-			$this->names[$name['id']] = $name;
-		}
-
-		if ($this->user_data['user_group_id'] > 0)
+		if ($this->user_data['user_group_is_staff'] == 1)
 		{
 			$this->bootStaff();
 		}
-
 	}
 
-	public function bootAnon()
-	{
-		$this->db->query('permissions', '
-			SELECT	*
-			FROM	ibb_user_board_permissions
-			WHERE	groupid = 5
-		');
+//	public function bootRegistered()
+//	{
+//		$this->db->query('names', '
+//			SELECT	*
+//			FROM	ibb_names
+//			WHERE	userid = ' . $_SESSION['user_id']
+//		);
+//		$this->db->query('permissions', '
+//			SELECT	*
+//			FROM	ibb_user_board_permissions
+//			WHERE	groupid = ' . $this->getData()['user_group_id'] . '
+//		');
+//
+//		$this->display_name = $this->getData()['user_display_name'];
+//		$this->display_trip = $this->getData()['user_display_trip'];
+//		$this->is_staff		= $this->getData()['user_group_is_staff'];
+//
+//		foreach ($this->db->results['permissions'] as $board)
+//		{
+//			/* Set each individual boardid as an independent value with the category id as the parent key */
+//			/* e.g. $this->permissions['boards'][1][3] = 1 is ['boards']['Support'][3]['Questions & Answers'] */
+//			$this->permissions['boards'][$board['categoryid']][] = $board['boardid'];
+//		}
+//
+//		foreach ($this->db->results['names'] as $name)
+//		{
+//			/* Make each name accessible by its id from the database. Make sure to access $this->names */
+//			/* and NOT the query result, because the query results has arbitrary keys to each name */
+//			$this->names[$name['id']] = $name;
+//		}
+//
+//		if ($this->user_data['user_group_id'] > 0)
+//		{
+//			$this->bootStaff();
+//		}
+//
+//	}
 
-		foreach ($this->db->results['permissions'] as $board)
-		{
-			$this->permissions['boards'][$board['categoryid']][$board['boardid']] = $board['boardid']; //wtf
-		}
-
-		$this->display_name	= 'Anonymous';
-		$this->display_trip	= '';
-
-
-	}
+//	public function bootAnon()
+//	{
+//		$this->db->query('permissions', '
+//			SELECT	*
+//			FROM	ibb_user_board_permissions
+//			WHERE	groupid = 5
+//		');
+//
+//		foreach ($this->db->results['permissions'] as $board)
+//		{
+//			$this->permissions['boards'][$board['categoryid']][$board['boardid']] = $board['boardid']; //wtf
+//		}
+//
+//		$this->display_name	= 'Anonymous';
+//		$this->display_trip	= '';
+//
+//
+//	}
 
 	public function bootStaff()
 	{
@@ -1077,9 +1162,9 @@ class User {
 	}
 
 	/**
-	 * @param $req		Object
+	 * @return bool
 	 */
-	public function checkPrivilege($req)
+	public function checkPrivilege( )
 	{
 		$this->db->query('privs', 'SELECT ');
 
@@ -1126,6 +1211,16 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 	private $data;
 
 	/**
+	 * @var mysqli_stmt|mysqli_result qobject The query results object
+	 */
+	public $qobject;
+
+	/**
+	 * @var string $query_error The error, if any.
+	 */
+	public $query_error = FALSE;
+
+	/**
 	 * @return db_mysql
 	 */
 	public static function getDBType()
@@ -1139,14 +1234,30 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 	abstract public function instance();
 
 	/**
-	 * @param	$query	array
+	 * @param	$query	string
+	 * @param	$type	null
+	 * @param	$qname	null
 	 *
 	 * @throws	Exception
 	 */
 	abstract public function execute( $query, $type = NULL, $qname = NULL );
 
 	/**
-	 * @param string $type MYSQL_ASSOC,... etc
+	 * @param $query string
+	 *
+	 * @return mysqli_stmt
+	 */
+	abstract public function prepare( $query );
+
+	/**
+	 * @param $types
+	 * @param $data
+	 *
+	 * @return mysqli_stmt
+	 */
+//	abstract public function bindParam( $types, $data );
+	/**
+	 * @param string $type MYSQLI_ASSOC,... etc
 	 *
 	 * @return mixed
 	 */
@@ -1185,11 +1296,13 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 			{
 				case 1:
 				{
-					$this->results[$qname] = $this->returnAll(MYSQL_ASSOC)[0];
+					$this->results[$qname] = $this->returnAll(MYSQLI_ASSOC)[0];
 					try
 					{
 						if (!$this->results[$qname])
+						{
 							throw new Exception( $qname );
+						}
 					}
 					catch (Exception $e)
 					{
@@ -1199,26 +1312,26 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 				}
 				case 2:
 				{
-					return $this->returnAll(MYSQL_ASSOC);
+					return $this->returnAll(MYSQLI_ASSOC);
 				}
 				case 3:
 				{
 					$store_me_away = func_get_arg(3);
-					$this->results[$qname][$store_me_away] = $this->returnAll(MYSQL_ASSOC);
+					$this->results[$qname][$store_me_away] = $this->returnAll(MYSQLI_ASSOC);
 					break;
 				}
 				default:
 				{
-					$this->results[$qname] = $this->returnAll(MYSQL_ASSOC);
+					$this->results[$qname] = $this->returnAll(MYSQLI_ASSOC);
 					break;
 				}
 			}
 		}
 		else
 		{
-			$qresult = $this->storeResult();
+			$this->qobject = $this->storeResult();
 
-			if ($qresult->num_rows == 0)
+			if ($this->qobject->num_rows == 0)
 			{
 				print_r($query);
 				echo '<br /><br />';
@@ -1226,7 +1339,7 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 			}
 			else
 			{
-				throw new Exception(' Query failed! ' . $query);
+				throw new Exception($this->query_error . '\n Query failed! ' . $query );
 			}
 
 		}
@@ -1246,32 +1359,45 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 	public function queryDirect( $query )
 	{
 		$this->execute($query);
-		return $this->returnAll(MYSQL_ASSOC);
+		return $this->returnAll(MYSQLI_ASSOC);
 	}
 
 	/**
 	 * temp
 	 *
 	 * @param $qname
+	 * @param $parent
 	 * @param $query
+	 *
+	 * @throws Exception
 	 */
 	public function queryInLoop( $qname, $parent, $query )
 	{
 		$success = $this->execute($query);
 
 		if ( $success )
-			$this->results[$qname][$parent] = $this->returnAll(MYSQL_ASSOC);
+		{
+			$this->results[$qname][$parent] = $this->returnAll(MYSQLI_ASSOC);
+		}
 		else
+		{
 			throw new Exception(' Query failed! ' . $query);
+		}
 	}
 
 	/**
+	 * <br />
+	 * @deprecated
+	 * <br />
 	 * This is used for queries against the database that fetch only one row. This function does not include
 	 * an array filled with each row, so you can access the row's columns directly without needing to add
 	 * annoying [0]s every time.
 	 *
+	 *
 	 * @param $qname
 	 * @param $query
+	 *
+	 * @throws Exception
 	 */
 	public function singleResultQuery ( $qname, $query )
 	{
@@ -1281,7 +1407,7 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 			if ($results->num_rows == 0)
 				throw new Exception('Query returned no results, boards needs to catch this ' . $query);
 			// dat [0]... there must be some function or constant that can be passed as an option to stop double array...
-			$this->results[$qname] = $results->fetch_all(MYSQL_ASSOC)[0];
+			$this->results[$qname] = $results->fetch_all(MYSQLI_ASSOC)[0];
 		}
 		catch (exception $e) {
 			throw new Exception($e->getMessage());
@@ -1303,7 +1429,7 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 		}
 		else
 		{
-			return $this->returnAll(MYSQL_ASSOC)[0];
+			return $this->returnAll(MYSQLI_ASSOC)[0];
 		}
 
 	}
@@ -1345,10 +1471,22 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 		// This entire function is stupid.
 	}
 
+	/**
+	 * @deprecated
+	 *
+	 * @throws Exception
+	 */
 	public function commit()
 	{
 		error_log($this->query);
-		$this->execute( $this->query );
+		try
+		{
+			$this->execute( $this->query );
+		}
+		catch (Exception $e)
+		{
+			throw $e;
+		}
 	}
 
 	/**
@@ -1390,15 +1528,59 @@ class db_mysql extends ibbDBCore
 
 	/**
 	 * @param string $query
+	 *
+	 * @return mysqli_stmt
+	 *
+	 * @throws Exception
+	 */
+	public function prepare( $query )
+	{
+		if ($this->qobject = $this->instance()->prepare( $query ))
+		{
+			return TRUE;
+		}
+		else
+		{
+			throw new Exception('MySQL error ('.$this->instance()->errno.') '.$this->instance()->error);
+		}
+	}
+
+	/**
+	 * @param $types
+	 * @param $data
+	 *
+	 * @return mysqli_stmt
+	 */
+//	public function bindParam( $types, $data )
+//	{
+//		return $this->qobject->bind_param( $types, $data );
+//	}
+
+
+	/**
+	 * @param string $query
 	 * @param null  $type
 	 * @param null  $qname
 	 *
 	 * @return bool|void
+	 * @throws Exception
 	 */
 	public function execute( $query, $type = NULL, $qname = NULL )
 	{
 		ibbCore::$queryc[] = $query;
-		return $this->instance()->real_query( $query );
+		$success = $this->instance()->real_query( $query );
+
+		if ($success)
+		{
+			$this->qobject = $this->instance()->use_result();
+			return true;
+		}
+		else
+		{
+			$this->query_error = $this->instance()->error;
+			throw new Exception($this->query_error . 'Full query: ' . $query);
+//			return FALSE;
+		}
 	}
 
 	/**
@@ -1408,7 +1590,7 @@ class db_mysql extends ibbDBCore
 	 */
 	public function returnAll( $type = MYSQLI_ASSOC )
 	{
-		return $this->instance()->use_result()->fetch_all($type);
+		return $this->qobject->fetch_all($type);
 	}
 
 	/**
