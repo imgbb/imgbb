@@ -18,6 +18,9 @@ class user_manage_login
 	 */
 	public $db;
 
+	/**
+	 * Constructor
+	 */
 	public function __construct()
 	{
 		$this->core	= ibbCore::getInstance();
