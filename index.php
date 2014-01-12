@@ -43,7 +43,13 @@ echo '<br /><b style="color:black;">Peak Memory Usage</b>: <span style="color:bl
 echo '<br /><b style="color:black;">Memory Usage at EoS</b>: <span style="color:black;">' . turnMemoryToKB(memory_get_usage()) . ' KB</span>';
 echo '<br /><b style="color:black;">Query Execution Count</b>: <span style="color:black;">' . count(ibbCore::$queryc) . '</span>';
 
-
+/**
+ * Convert memory to kilobytes
+ *
+ * @param $memory_get_usage
+ *
+ * @return string
+ */
 function turnMemoryToKB( $memory_get_usage )
 {
 	return substr($memory_get_usage, 0, strlen($memory_get_usage) - 3);
