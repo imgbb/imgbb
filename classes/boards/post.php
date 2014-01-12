@@ -17,9 +17,9 @@
 class post implements Iterator
 {
 	private $core;
-	public  $posts = array();
-	private $post_index;
+//	private $post_index;
 	private $row_index;
+	public  $posts = array();
 	public	$name;
 	public $tripcode;
 	public $message;
@@ -34,7 +34,7 @@ class post implements Iterator
 	/**
 	 * Constructor
 	 *
-	 * @param $parents array
+	 * @param $posts array
 	 */
 	function __construct( $posts )
 	{
@@ -91,6 +91,11 @@ class post implements Iterator
 
 	*/
 
+	/**
+	 * Iterator current()
+	 *
+	 * @return array
+	 */
 	function current()
 	{
 //		echo 'current<br />';
@@ -137,11 +142,30 @@ class post implements Iterator
 //		$this->date			= $this->posts[$this->row_index]['timestamp'];
 	}
 
+	/**
+	 * Iterator valid()
+	 *
+	 * @return bool
+	 */
 	function valid()
 	{
 //		echo 'validate<br />';
 //		echo $this->row_index;
 		return isset($this->posts[$this->row_index]);
+	}
+
+	/**
+	 * Fetch original filename.
+	 *
+	 * @return string
+	 */
+	function file_original()
+	{
+		#why in the world is this -1 necessary...? is this requested AFTER incrementation?
+		return
+		(strlen($this->posts[$this->row_index - 1]['file_original']) > 50) ?
+			substr($this->posts[$this->row_index - 1]['file_original'], 0, 50) . '&hellip;' :
+			$this->posts[$this->row_index - 1]['file_original'];
 	}
 
 	/**
@@ -159,43 +183,43 @@ class post implements Iterator
 
 	}
 
-	public function hasTrip( $index )
-	{
-		if ( $this->posts[$index]['tripcode'] == '' )
-			return false;
-		else
-			return true;
-	}
-
-	function getName()
-	{
-		// is anon
-		if (!$this->name && !$this->tripcode)
-		{
-			echo '1st';
-			return FALSE;
-		}
-
-		// has name, no tripcode
-		if ($this->name && !$this->tripcode)
-		{
-			echo '2nd';
-			return $this->name;
-		}
+//	public function hasTrip( $index )
+//	{
+//		if ( $this->posts[$index]['tripcode'] == '' )
+//			return false;
+//		else
+//			return true;
+//	}
+//
+//	function getName()
+//	{
+//		 is anon
+//		if (!$this->name && !$this->tripcode)
+//		{
+//			echo '1st';
+//			return FALSE;
+//		}
+//
+//		 has name, no tripcode
+//		if ($this->name && !$this->tripcode)
+//		{
+//			echo '2nd';
+//			return $this->name;
+//		}
 
 		//trip but no name
-		if ($this->tripcode && !$this->name)
-		{
-			echo '3rd';
-			return TRUE;
-		}
+//		if ($this->tripcode && !$this->name)
+//		{
+//			echo '3rd';
+//			return TRUE;
+//		}
+//
+//		name and trip
+//		if ($this->tripcode && $this->name)
+//		{
+//			echo '4th';
+//			return $this->name;
+//		}
 
-		//name and trip
-		if ($this->tripcode && $this->name)
-		{
-			echo '4th';
-			return $this->name;
-		}
-
-	}
+//	}
 }
