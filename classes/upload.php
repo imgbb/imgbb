@@ -17,6 +17,8 @@ class upload
 	public $thumb_height;
 	public $filetype;
 	public $filename;
+	public $file_size;
+	public $file_size_raw;
 	public $filename_original;
 
 	/**
@@ -24,13 +26,11 @@ class upload
 	 */
 	public function init()
 	{
-		$this->src_width = 0;
-		$this->src_height = 0;
-		$this->thumb_width = 0;
-		$this->thumb_height = 0;
-		$this->filetype = "''";
-		$this->filename = "''";
-		$this->filename_original = "''";
+		$this->src_width 			= 0;
+		$this->src_height 			= 0;
+		$this->thumb_width 			= 0;
+		$this->thumb_height 		= 0;
+		$this->file_size_raw 		= 0;
 
 		return $this;
 	}
@@ -51,11 +51,13 @@ class upload
 			new Exception('(Notice-level error exception): File type is not allowed.');
 		}
 
-		$this->filename = time() . substr(microtime(), 2, 2);
+		$this->filename 		= time() . substr(microtime(), 2, 2);
+		$this->file_size_raw 	= filesize($_FILES['file']['tmp_name']);
+		$this->file_size 		= $this->formatBytes($this->file_size_raw);
 
-		$this->dir 		= IBB_ROOT_PATH . '/files/';
-		$this->file 	= IBB_ROOT_PATH . '/files/src/' . $this->filename;
-		$this->thumb 	= IBB_ROOT_PATH . '/files/thumb/' . $this->filename . 's.' . $this->filetype;
+		$this->dir 				= IBB_ROOT_PATH . '/files/';
+		$this->file 			= IBB_ROOT_PATH . '/files/src/' . $this->filename;
+		$this->thumb 			= IBB_ROOT_PATH . '/files/thumb/' . $this->filename . 's.' . $this->filetype;
 
 //		throw new Exception($this->file);
 //		throw new Exception($this->filename);
@@ -129,8 +131,7 @@ class upload
 
 		list($this->thumb_width, $this->thumb_height) = $this->scaleSize($this->src_width, $this->src_height, $this->maxw, $this->maxh);
 
-		$this->filetype				= '"'.$this->filetype.'"';
-		$this->filename_original 	= '"'.$_FILES['file']['name'].'"';
+		$this->filename_original 	= $_FILES['file']['name'];
 
 
 //		throw new Exception($this->src_height);
@@ -183,5 +184,26 @@ class upload
 		else
 			$ratio = $height / $max_h;
 		return array(intval(ceil($width / $ratio)), intval(ceil($height / $ratio)));
+	}
+
+	/**
+	 * Thanks, php.net
+	 *
+	 * @param string	$bytes
+	 * @param int		$precision
+	 *
+	 * @return string
+	 */
+	function formatBytes($bytes, $precision = 2) {
+		$units = array('B', 'KB', 'MB', 'GB', 'TB');
+
+		$bytes = max($bytes, 0);
+		$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+		$pow = min($pow, count($units) - 1);
+
+		 $bytes /= pow(1024, $pow);
+//		$bytes /= (1 << (10 * $pow));
+
+		return round($bytes, $precision) . ' ' . $units[$pow];
 	}
 }
