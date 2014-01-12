@@ -22,26 +22,24 @@
 <div class="frontcontentwrap" metal:define-macro="front">
 <div class="newsitem" tal:repeat="entry front_data">
     <div class="newsheader">
-                    <span class="newsheadline">
+                    <span class="newsheadline" tal:condition="entry/header">
                         ${entry/header}
                     </span>
         <br />
                     <span class="newspostername" tal:condition="entry/display_name">
                         ${entry/display_name}</span><span class="newspostertrip" tal:condition="entry/display_trip">!${entry/display_trip}
                     </span>
-                    <span class="newsrank" style="${entry/staff_display_stylization}" tal:condition="exists: entry/staff_display_name">
-                        ${entry/staff_display_name}
-                    </span>
+                    <span class="newsrank" style="${entry/staff_display_stylization}" tal:condition="exists: entry/staff_display_name" tal:content="structure entry/staff_display_name"/>
                     <span class="newsposttime" tal:condition="exists: entry/timestamp">
                         ${entry/timestamp}
                     </span>
     </div>
     <div class="newscontent">
-        <a tal:condition="true: entry/file" href="${imgbb/base_url}/files/src/${entry/file}" target="_blank">
+        <a tal:condition="exists: entry/file" href="${imgbb/base_url}/files/src/${entry/file}" target="_blank">
             <img src="files/src/${entry/file}" class="newsimg" href="files/src/${entry/file}"/>
         </a>
         <div class="newsbody">
-            <p tal:content="structure entry/entry" tal:omit-tag="" />
+            <p tal:content="structure entry/entry" tal:condition="exists: entry/entry" tal:omit-tag="" />
         </div>
         <div tal:condition="exists: entry/staff_display_name" class="newsfooter">
             <a href="#">
@@ -86,7 +84,7 @@
                         </span>
             </div>
             <div class="recentpostcontent">
-                <img class="recentpostimg" src="${imgbb/base_url}/files/src/${post/file}.${post/file_type}" height="${post/thumb_h}" width="{post/thumb_w}" />
+                <img class="recentpostimg" src="${imgbb/base_url}/files/src/${post/file}.${post/file_type}" height="${post/thumb_h}" width="${post/thumb_w}" tal:condition="post/file"/>
                 <div class="recentpostbody">
                     <p tal:content="structure post/message">${post/message}</p>
                 </div>
