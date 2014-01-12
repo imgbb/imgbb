@@ -2,7 +2,7 @@
     <div style="text-align:center;font-size:4em;">${boardinfo/title}</div>
     <hr />
     <div class="postarea">
-        <form id="postform" enctype="multipart/form-data" action="index.php?app=boards&amp;mod=boardpage&amp;area=view&amp;do=process" method="post">
+        <form id="postform" enctype="multipart/form-data" action="${imgbb/base_url}/index.php?app=boards&amp;mod=boardpage&amp;area=view&amp;do=process" method="post">
             <input type="hidden" name="action" value="${imgbb/highlight/action}" />
             <input type="hidden" name="subaction" value="${imgbb/highlight/subaction}" />
             <input type="hidden" name="MAX_FILE_SIZE" value="8388608" />
@@ -247,10 +247,8 @@
                             <div class="fileinfo">
                                 <span class="filetext">
                                     File:
-                                    <a href="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}">
-                                        ${parent/file}.${parent/file_type}
-                                    </a>
-                                    ${structure string: &ndash;} (${parent/file_size}, ${parent/image_h}x${parent/image_w}, ${parent/file_original})
+                                    <a href="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}" tal:content="structure php: parents.file_original()"/>
+                                    ${structure string: &ndash;} (${parent/file_size}, ${parent/image_h}x${parent/image_w})
                                 </span>
                             </div>
                             <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}">
@@ -326,10 +324,8 @@
                                 <div class="fileinfo">
                                     <span class="filetext">
                                         File:
-                                        <a href="${imgbb/base_url}/files/src/${reply/file}.${reply/file_type}">
-                                            ${reply/file}.${reply/file_type}
-                                        </a>
-                                        ${structure string: &ndash;} (${reply/file_size}, ${reply/image_h}x${reply/image_w}, ${reply/file_original})
+                                        <a href="${imgbb/base_url}/files/src/${reply/file}.${reply/file_type}" tal:content="structure php: replies.file_original()" />
+                                        ${structure string: &ndash;} (${reply/file_size}, ${reply/image_h}x${reply/image_w})
                                     </span>
                                 </div>
                                 <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${reply/file}.${reply/file_type}">
