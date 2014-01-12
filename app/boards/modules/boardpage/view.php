@@ -50,6 +50,10 @@ class boards_boardpage_view implements appCore {
 	 */
 	private $raw = FALSE;
 
+	private $locked = 0;
+
+	private $id;
+
 
 	/**
 	 *
@@ -77,11 +81,33 @@ class boards_boardpage_view implements appCore {
 	}
 
 	/**
-	 * @return PHPTAL
 	 * @throws Exception
 	 */
 	public function init()
 	{
+//		echo $this->db->queryDirect('(SELECT MAX(A.id) FROM ibb_posts A WHERE A.boardid='.$this->board_info['board_id'].')')[0]['MAX(A.id)'] + 1;
+//		if ( $_GET['rebuildfilesizes'] )
+//		{
+//			$this->db->query('filesizes', '
+//				SELECT	id, boardid, file, file_type, file_size
+//				FROM	ibb_posts
+//			');
+//			foreach ($this->db->results['filesizes'] as $file)
+//			{
+//				$filepath = IBB_ROOT_PATH . '/files/src/'.$file['file'].'.'.$file['file_type'];
+//				if (is_file($filepath))
+//				{
+//					$filesize = filesize($filepath);
+//					$this->db->execute('
+//						UPDATE	ibb_posts
+//						SET		file_size_raw	= '.$filesize.'
+//						WHERE	boardid			= '.$file['boardid'].'
+//						AND		id				= '.$file['id'].'
+//					');
+//				}
+//			}
+//		}
+
 		$this->core->output->vars['boardinfo'] = $this->board_info;
 //		$tstart = microtime(true);
 //		if ( $this->user->is_staff )
@@ -159,7 +185,7 @@ class boards_boardpage_view implements appCore {
 				AND			deleted		=	0
 				AND
 					' . $piece . '
-				ORDER BY	`bumped` ASC
+				ORDER BY	timestamp	ASC
 				LIMIT 30
 				');
 //				$this->db->results['replies'] = array_reverse($this->db->results['replies']);
@@ -275,10 +301,16 @@ class boards_boardpage_view implements appCore {
 //			}
 
 			// b temp
-			$this->core->output->vars['parents'] 	= new post($this->db->results['parents']);
+			if (isset($this->db->results['parents']))
+			{
+				$this->core->output->vars['parents'] 	= new post($this->db->results['parents']);
+			}
 //			foreach ($this->core->output->vars['parents'] as $parent)
 //			{
+			if (isset($this->db->results['replies']))
+			{
 				$this->core->output->vars['replies'] = new post($this->db->results['replies']);
+			}
 //			}
 
 		} else
@@ -317,7 +349,7 @@ class boards_boardpage_view implements appCore {
 			$this->core->output->vars['inthread']	= TRUE;
 
 			// TODO IMGBB deal with this
-			$this->core->output->vars['parents'] 	= array($this->core->output->vars['replies']->posts[0]);
+			$this->core->output->vars['parents'] 	= new post(array($this->db->results['posts'][0]));
 
 
 			$this->core->output->addMacro('board', 'boards.xhtml');
@@ -393,7 +425,7 @@ class boards_boardpage_view implements appCore {
 			', SINGLE_RESULT_QUERY);
 		}
 
-		// so gimmicky, pls rewrite TODO
+		// so gimmicky, pls rewrite TODO IMGBB
 		// I've already forgotten, what is this gimmick meant to even do? #killme
 		if (empty($this->db->results['latest_preview']))
 			$this->db->results['latest_preview'][0]['id'] = 0;
@@ -430,7 +462,7 @@ class boards_boardpage_view implements appCore {
 				{
 					if ($this->core->request('subaction') == 0)
 					{
-						$this->sticky = 1;
+						$this->locked = 1;
 					}
 					else
 					{
@@ -513,56 +545,99 @@ class boards_boardpage_view implements appCore {
 //		$this->db->query('id', 'SELECT MAX(id) AS id FROM ibb_posts WHERE boardid='.$this->board_info['board_id'], SINGLE_RESULT_QUERY);
 
 //		print_r($this->upload->filename);
-		$this->db->buildSafeQuery(array(
-				'type'		=> array('INSERT' => 'ibb_posts'),
-				'columns'	=> array('boardid'
-									,'id'
-									,'parentid'
-									,'userid'
-									,'latest_preview'
-									,'message'
-									,'display_name'
-									,'display_tripcode'
-									,'subject'
-									,'email'
-									,'timestamp'
-									,'bumped'
-									,'rank'
-									,'file'
-									,'file_type'
-									,'image_w'
-									,'image_h'
-									,'thumb_h'
-									,'thumb_w'
-									,'file_original'
-									,'stickied'
-				),
-				'values'	=> array($this->board_info['board_id']
-									,'(SELECT MAX(A.id) FROM ibb_posts A WHERE A.boardid='.$this->board_info['board_id'].') +1'
-									,intval($_POST['subaction'])
-									,$this->user->getUserId()
-									,0
-									,'"' .$_POST['body']. '"'
-									,'"' .$this->user->display_name. '"'
-									,'"' .$this->user->display_trip. '"'
-									,'"' .$_POST['subject']. '"'
-									,'"'.$_POST['email'].'"'
-									,time()
-									,time()
-									,intval($this->user->rank)
-									,$this->upload->filename
-									,$this->upload->filetype
-									,$this->upload->src_width
-									,$this->upload->src_height
-									,$this->upload->thumb_height
-									,$this->upload->thumb_width
-									,$this->upload->filename_original
-									,$this->sticky
-				)
-			)
-		);
 
-		$this->db->commit();
+		#tmp TODO IMGBB
+		$this->id = $this->db->queryDirect('SELECT MAX(id) FROM ibb_posts WHERE boardid='.$this->board_info['board_id'])[0]['MAX(id)'] + 1;
+
+		#tmp
+		$abc = 0;
+
+		if ($this->db->prepare('
+			INSERT INTO		ibb_posts
+			(boardid, id, parentid, userid, latest_preview, message, display_name, display_tripcode
+			,subject, email, timestamp, bumped, rank, file, file_type, image_w, image_h, thumb_h, thumb_w
+			,file_original, file_size, file_size_raw, stickied, locked)
+			VALUES
+			(?, ?, ?, ?, ?, ?, ?, ?
+			,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+			,?, ?, ?, ?, ?)
+		'))
+		{
+			# this... will be very... very... hard... to touch.
+			$this->db->qobject->bind_param(
+				'iiiiisssssiiiisiiiisssii',
+
+				 $this->board_info['board_id'], $this->id, $_POST['subaction'], $this->user->getUserId(), $abc, $_POST['body']
+				,$this->user->display_name, $this->user->display_trip, $_POST['subject'], $_POST['email'], time(), time()
+				,$this->user->rank, $this->upload->filename, $this->upload->filetype, $this->upload->src_width
+				,$this->upload->src_height, $this->upload->thumb_height, $this->upload->thumb_width, $this->upload->filename_original
+				,$this->upload->file_size, $this->upload->file_size_raw, $this->sticky, $this->locked
+			);
+		}
+
+//		$this->db->buildSafeQuery(array(
+//				'type'		=> array('INSERT' => 'ibb_posts'),
+//				'columns'	=> array('boardid'
+//									,'id'
+//									,'parentid'
+//									,'userid'
+//									,'latest_preview'
+//									,'message'
+//									,'display_name'
+//									,'display_tripcode'
+//									,'subject'
+//									,'email'
+//									,'timestamp'
+//									,'bumped'
+//									,'rank'
+//									,'file'
+//									,'file_type'
+//									,'image_w'
+//									,'image_h'
+//									,'thumb_h'
+//									,'thumb_w'
+//									,'file_original'
+//									,'file_size'
+//									,'file_size_raw'
+//									,'stickied'
+//				),
+//				'values'	=> array($this->board_info['board_id']
+//									,'(SELECT MAX(A.id) FROM ibb_posts A WHERE A.boardid='.$this->board_info['board_id'].') +1'
+//									,intval($_POST['subaction'])
+//									,$this->user->getUserId()
+//									,0
+//									,'"' .$_POST['body']. '"'
+//									,'"' .$this->user->display_name. '"'
+//									,'"' .$this->user->display_trip. '"'
+//									,'"' .$_POST['subject']. '"'
+//									,'"'.$_POST['email'].'"'
+//									,time()
+//									,time()
+//									,intval($this->user->rank)
+//									,$this->upload->filename
+//									,$this->upload->filetype
+//									,$this->upload->src_width
+//									,$this->upload->src_height
+//									,$this->upload->thumb_height
+//									,$this->upload->thumb_width
+//									,$this->upload->filename_original
+//									,$this->upload->file_size
+//									,$this->upload->file_size_raw
+//									,$this->sticky
+//				)
+//			)
+//		);
+
+//		$this->id = $this->db->queryDirect('(SELECT MAX(A.id) FROM ibb_posts A WHERE A.boardid='.$this->board_info['board_id'].')')[0]['MAX(A.id'] + 1;
+
+		try
+		{
+			$this->db->qobject->execute();
+		}
+		catch (Exception $e)
+		{
+			throw $e;
+		}
 
 		if ($this->db->results['latest_preview'][0]['id'] == 0)
 		{
@@ -576,7 +651,7 @@ class boards_boardpage_view implements appCore {
 		}
 		else
 		{
-			$success = $this->db->execute('
+			$this->db->execute('
 			UPDATE	ibb_posts
 			SET		 latest_preview	=	'.$this->db->results['latest_preview'][0]['id'].'
 					,replycount		=	replycount+1
@@ -662,6 +737,7 @@ class boards_boardpage_view implements appCore {
 
 		return array($post_name, '');
 	}
+
 	/**
 	 * should probably put this back in init()
 	 *
