@@ -1,6 +1,6 @@
 <html>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <span tal:omit-tag="" tal:repeat="each_css imgbb/css">
             <link tal:condition="php: !is_array(each_css) AND strlen(each_css) > 1" rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
             <link tal:condition="php: is_array(each_css)" rel="stylesheet" href="${imgbb/base_url}/app/${each_css/app}/tpl/css/${each_css/filename}" />
@@ -9,6 +9,7 @@
     <title tal:content="imgbb/title | default">imgBB</title>
 </head>
 <body tal:condition="php: imgbb['highlight']['mod'] eq 'manage'">
+<tal:block tal:condition="true: imgbb/menubar" metal:use-macro="${imgbb/IBB_TEMPLATES_PATH}/menubar.xhtml/menubar" />
 <div id="main">
 
     <div id="contents">
@@ -29,7 +30,7 @@
         </div>
     </div>
 
-    <div class="footer">
+    <div class="footer" tal:condition="imgbb/footer" metal:use-macro="${imgbb/IBB_TEMPLATES_PATH}/footer.xhtml/footer">
         <p align="center"><a href="http://www.ponychan.net/chan/">Home</a> | <a href="http://www.ponychan.net/chan/?p=news">News</a> | <a href="http://www.ponychan.net/chan/?p=faq">FAQ</a> | <a href="http://www.ponychan.net/chan/?p=rules">Rules</a> |&nbsp;<a href="http://www.ponychan.net/chan/?p=contact">Contact Us</a> | Powered by <a href="http://www.ponychan.net/chan/">Ponychan</a></p>
     </div>
 </div>
