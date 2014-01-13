@@ -1,5 +1,5 @@
 *{
-    font-family: 'Lucida Grande', sans-serif;
+    font-family: sans-serif;
 }
 html {
     background: url(/imgbb/assets/mlp__rainbow_dash__s_workload_by_mrniceguy976-d58xstp.jpg) no-repeat center center fixed;
@@ -13,14 +13,6 @@ html, body {
     overflow: hidden;
     margin: 0;
     padding: 0;
-}
-
-a:link, a:visited {
-    text-decoration: none;
-    color: rgb(48, 57, 66);
-}
-a:hover{
-    color: rgb(148, 157, 166);
 }
 #contents{
     position: absolute;
@@ -88,19 +80,12 @@ input[type=submit]:hover{
     bottom: 0;
     width: 100%;
 }
-
-/*@media only screen and (max-device-width: 480px) {
-    /*html{
-        background-image: none;
-        background-color: rgb(159, 220, 231);
-    }
-    #loginform{
-        background-color: rgba(255,255,255,0.4);
-        border: 2px solid rgb(148, 157, 166);
-    }
-    .footer{
-        font-size: 2em;
-    }
-}*/
+.footer a:link,.footer a:visited {
+    text-decoration: none;
+    color: #3e3e42;
+}
+.footer a:hover{
+    text-decoration: underline;
+}
 
 
