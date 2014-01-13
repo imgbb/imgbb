@@ -21,8 +21,6 @@
         <tal:block metal:use-macro="${imgbb/macro/src}/postbox" tal:condition="true: postbox"/>
         <tal:block metal:use-macro="${imgbb/macro/src}/${imgbb/macro/name}" />
     </div>
-    <div class="footer" tal:condition="true: imgbb/footer">
-        footer content
-    </div>
+    <div class="footer" tal:condition="true: imgbb/footer" metal:use-macro="${imgbb/IBB_TEMPLATES_PATH}/footer.xhtml/footer"></div>
 </body>
 </html>
