@@ -11,6 +11,7 @@ require_once IBB_ROOT_PATH . '/classes/loader_class.php';
 require_once IBB_ROOT_PATH . '/classes/upload.php';
 require_once IBB_ROOT_PATH . '/classes/text/text.php';
 require_once IBB_ROOT_PATH . '/classes/interface/appCore.php';
+require_once IBB_ROOT_PATH . '/classes/boards/post.php';
 session_start();
 //echo 'Loading all metadata takes ' . (microtime(true) - $time_start);
 //echo '<b>index</b><br />';
