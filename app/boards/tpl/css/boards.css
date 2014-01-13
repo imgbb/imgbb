@@ -3,12 +3,6 @@ html{
 	color: #29292d;
 	font-family: sans-serif;
 }
-/*OVERLAPPING WITH CSS IN FRONT CSS. CLEAN UP LATER!*/
-.footer{
-    text-align: center;
-    margin: 5px 0;
-    font-size: 0.8em;
-}
 hr {
 	clear: both;
     border: 0;

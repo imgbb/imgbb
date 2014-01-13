@@ -1,5 +1,12 @@
 .footer {
-    text-align: center;
     margin: 5px 0;
     font-size: 0.8em;
+    text-align: center;
+}
+.footer a:link,.footer a:visited {
+    text-decoration: none;
+    color: #3e3e42;
+}
+.footer a:hover{
+    text-decoration: underline;
 }

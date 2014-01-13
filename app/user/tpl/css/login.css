@@ -75,17 +75,9 @@ input[type=submit]:hover{
     pointer-events:none;
 }
 .footer{
-    font-size: 0.75em;
     position: absolute;
     bottom: 0;
     width: 100%;
-}
-.footer a:link,.footer a:visited {
-    text-decoration: none;
-    color: #3e3e42;
-}
-.footer a:hover{
-    text-decoration: underline;
 }
 
 
