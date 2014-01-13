@@ -237,6 +237,22 @@
 </span>
 </tal:block>
 
+<tal:block metal:define-macro="pagination">
+<div class="pagination">
+    <a href="${imgbb/base_url}/index.php?/q/previous_page_algorithm">Previous</a>
+    |
+    <a href="${imgbb/base_url}/index.php?/q/page_algorithm">1</a>
+    |
+    <span class="currentpage">2</span>
+    |
+    <a href="${imgbb/base_url}/index.php?/q/page_algorithm">3</a>
+    |
+    <a href="${imgbb/base_url}/index.php?/q/page_algorithm">4</a>
+    |
+    <a href="${imgbb/base_url}/index.php?/q/next_page_algorithm">Next</a>
+</div>
+</tal:block>
+
 <tal:block metal:define-macro="board">
     <div class="board">
         <tal:block tal:repeat="parent parents">
@@ -254,12 +270,6 @@
                             <a class="filethumb" target="_blank" href="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}">
                                 <img src="${imgbb/base_url}/files/src/${parent/file}.${parent/file_type}" height="${parent/thumb_h}" width="${parent/thumb_w}" />
                             </a>
-                            <tal:block tal:condition="parent/stickied">
-                                Sticky.png
-                            </tal:block>
-                            <tal:block tal:condition="parent/locked">
-                                Locked.png
-                            </tal:block>
                         </div>
                         <div class="postinfo">
                             <label>
@@ -277,6 +287,8 @@
                                     <a href="${imgbb/base_url}/pls" tal:content="parent/id"/>
                                 </span>
                                 <span class="btns" tal:condition="not: true: inthread">
+                                    <tal:block tal:condition="parent/stickied" tal:content="string:Sticky.png" />
+                                    <tal:block tal:condition="parent/locked" tal:content="string:Locked.png" />
                                     [<a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}">View</a>]
                                 </span>
                                 <span tal:condition="imgbb/user/registered">
@@ -288,7 +300,7 @@
                     </div>
                     <!--<tal:block tal:repeat="replycount repliescount/${parent/id}">-->
                         <!--<tal:block tal:repeat="reply replycount">-->
-                            ${parent/replycount} total replies have been made. GRANDIL, THIS LOOKS LIKE PART OF THE POST IN SOME PLACES, SAVE ME
+                            <span class="postcount">${parent/replycount} replies made in total.</span>
                         <!--</tal:block>-->
                     <!--</tal:block>-->
                 </div>
@@ -340,6 +352,7 @@
             <hr />
         </tal:block>
         <!--Pagination area-->
+        <tal:block metal:use-macro="pagination" />
         <!--Manipulation area-->
     </div>
 </tal:block>
