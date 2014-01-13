@@ -16,12 +16,16 @@ hr {
 .board{
 }
 .thread{
+	margin: 0 15px;
 }
 .postcontainer{
 }
 .post{
 	overflow: hidden;
 	margin: 5px 5px;
+}
+.postcount{
+	display: block;
 }
 .thread > .postcontainer:last-child{
 	margin-bottom: 10px;
