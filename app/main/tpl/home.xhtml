@@ -70,15 +70,10 @@
                         <span class="recentsubjectposterdivider">
                             &#8211;
                         </span>
-                        <span class="recentpostername" tal:content="post/display_name | default">
-                            <span tal:condition="not: post/display_tripcode" tal:omit-tag="">
-                                Anonymous
-                            </span>
+                        <span class="recentpostername" tal:content="post/display_name">
                         </span><span class="recentpostertrip" tal:condition="post/display_tripcode">!${post/display_tripcode}
                         </span>
-                        <span class="recentmod" tal:condition="post/rank" tal:attributes="style post/rank_display_stylization">
-                            ${post/rank_display_name}
-                        </span>
+                        <span class="recentmod" tal:condition="post/rank" tal:attributes="style post/user_rank_display_stylization" tal:content=" structure post/user_rank_display_name" />
                         <span class="recentposttime">
                             ${post/timestamp}
                         </span>
