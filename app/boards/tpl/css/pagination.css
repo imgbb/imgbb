@@ -1,0 +1,18 @@
+html{
+    font-family: sans-serif;
+}
+.pagination a, .currentpage{
+    padding: 2px 7px;
+    color: #3e3e42;
+    text-decoration: none;
+}
+.pagination a:hover{
+    text-decoration: underline;
+}
+.currentpage{
+    font-weight: bold;
+}
+.paginationjumpto{
+
+}
+
