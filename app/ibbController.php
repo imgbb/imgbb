@@ -845,6 +845,11 @@ class output {
 //			$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->db->results['boards']);
 		}
 
+		if ( $this->footer )
+		{
+			$this->addXAppCSS('footer.css', 'main');
+		}
+
 		/* Set up static variables. */
 		$this->vars['imgbb']['base_url'] 	= $this->core->settings('base_url');
 		$this->vars['imgbb']['this_app']	= $this->core->request('app');
@@ -861,6 +866,7 @@ class output {
 											 );
 		$this->vars['imgbb']['IBB_TEMPLATES_PATH']	= IBB_TEMPLATES_PATH;
 		$this->vars['imgbb']['menubar']		= $this->menu;
+		$this->vars['imgbb']['footer']		= $this->footer;
 		$this->vars['imgbb']['user']		= $this->core->user();
 
 //		print_r($this->vars['imgbb']['user']);
