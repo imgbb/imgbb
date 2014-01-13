@@ -18,6 +18,13 @@ html, body{/*Will be removed when css is cleaned up*/
     width: 550px;
     height: auto;
 }
+/*Footer*/
+/*OVERLAPPING WITH CSS IN BOARD CSS. CLEAN UP LATER!*/
+.footer{
+    text-align: center;
+    margin: 5px 0;
+    font-size: 0.8em;
+}
 
 /*Front page content*/
 .frontwrap{

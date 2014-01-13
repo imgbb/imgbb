@@ -3,6 +3,12 @@ html{
 	color: #29292d;
 	font-family: sans-serif;
 }
+/*OVERLAPPING WITH CSS IN FRONT CSS. CLEAN UP LATER!*/
+.footer{
+    text-align: center;
+    margin: 5px 0;
+    font-size: 0.8em;
+}
 hr {
 	clear: both;
     border: 0;
@@ -82,6 +88,18 @@ hr {
 }
 .postmessage{
 }
+.pagination a, .currentpage{
+	padding: 2px 7px;
+	color: #3e3e42;
+	text-decoration: none;
+}
+.pagination a:hover{
+	text-decoration: underline;
+}
+.currentpage{
+	font-weight: bold;
+}
+
 a {
     text-decoration: none;
 }
