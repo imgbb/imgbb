@@ -12,7 +12,6 @@
  *
  * Undeveloped, probably will rename
  *
- * // intention: extend module commanders with this to reduce clutter and repeat code
  */
 
 interface appCore {

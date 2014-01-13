@@ -11,7 +11,7 @@
     define('IBB_LIB_PATH', IBB_ROOT_PATH . '/lib');
     define('IBB_TEMPLATES_PATH', IBB_ROOT_PATH . '/app/main/tpl');
 
-	// database constants
+	/* database constants */
 	define('SINGLE_RESULT_QUERY', 1);
 	define('STORE_ME_AWAY', 3);
 	define('IBB_REPLACE_THIS', 'a54327z fsjd h27452a dfjfdsh 348584');

@@ -67,7 +67,7 @@ class main_front_news {
 
 
 
-		// TODO need a rewrite by alpha to allow customization of default page
+		# TODO need a rewrite by alpha to allow customization of default page
 		if ($this->core->request('action'))
 		{
 			if ($this->core->output->vars['front_categories'][($this->core->request('action') - 1)])
@@ -83,10 +83,6 @@ class main_front_news {
 			}
 			else
 			{
-				// COME ON WTF
-				echo '<br />';
-				echo $this->core->request( 'action' );
-				echo '<br />';
 				throw new Exception( 'Could not find requested category!' );
 			}
 		}

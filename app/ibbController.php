@@ -68,11 +68,9 @@ class ibbController {
 	 */
 	public function init()
 	{
-//		$tstart = microtime(true);
 		$this->core = ibbCore::getInstance();
 		$this->core->run();
 		$this->core->output = output::getInstance();
-//		echo '<b>controller</b><br />exec: ' . (microtime(true) - $tstart) . '<br />mem: ' . substr(memory_get_usage(), 0, strlen(memory_get_usage()) - 3) . '<br />';
 	}
 
 	/**
@@ -84,7 +82,7 @@ class ibbController {
 	{
 		$this->user_data = $this->core->user()->init();
 
-		// temporarily putting this here while I figure out where to actually put this
+		# temporarily putting this here while I figure out where to actually put this
 		switch ($this->core->request('do'))
 		{
 			case 'process':
@@ -102,16 +100,7 @@ class ibbController {
 				break;
 		}
 
-//		if ($this->core->request('action') == 'process' || $this->core->request('subaction') == 'process')
-//		{
-//			define('REQUEST_TYPE', 'process');
-//			foreach ($_POST as $fieldname => $fieldval)
-//			{
-//				$this->core->hotfixAddRequest($fieldname, $fieldval);
-//			}
-//		}
-
-		// same for this
+		# same for this
 		if (isset($_SESSION['user_name']))
 		{
 			$this->core->output->user = TRUE;
@@ -149,7 +138,7 @@ class ibbCore {
 
 	public static	$queryc;
 
-	// temporarily static until settings configuration are made @ IMGBB state
+	# temporarily static until settings configuration are made @ IMGBB state
 	public static	$settings = array(
 		'base_url' => 'http://www.imgbb.net/imgbb'
 	);
@@ -206,28 +195,27 @@ class ibbCore {
 		/* Populate Settings */
 
 
-		//TODO IMGBB create global app controller && revise class into singleton
+		# TODO IMGBB create global app controller && revise class into singleton
 		/* Build for us the member */
 		/* Do we want this here, or in the Controller? */
 		/* Not sure how or where to construct it */
 		self::$User = new User;
 
 		/* Does the user have access? */
-		//TODO IMGBB create permissions check
-//		self::$User->checkPrivilege(self::$request);
+		# TODO IMGBB create permissions check
 
 		/* OK, let's pass this to the class they wanted. */
-		//TODO IMGBB create proper application loader
+		# TODO IMGBB create proper application loader
 	}
 
-	// TODO IMGBB request handler
-	/// please don't look at this horrifying function, it's temporary ////
-	/// please///
+	# TODO IMGBB request handler
+	# please don't look at this horrifying function, it's temporary
+	# please
 	public static function determinePath()
 	{
-		// please don't look, all temp, pls, my dignity is at stake, don't look
+		# please don't look, all temp, pls, my dignity is at stake, don't look
 
-		//TODO IMGBB rework
+		# TODO IMGBB rework
 		if ( self::$fURL )
 		{
 			foreach ( self::$fURLArray as $key => $value )
@@ -250,17 +238,17 @@ class ibbCore {
 			}
 		}
 
-		// lord forgive me
-		// it's BASIC, it's just basic
-		// gotta stay calm
-		// it's just BASIC
-		// not final product
-		// objective is to get it running
-		// not to make it good
-		// objective is to get it running for front-end
-		// not to make a good back-end necessarily
-		// that's imgbb level
-		// oh adonai help me
+		# lord forgive me
+		# it's BASIC, it's just basic
+		# gotta stay calm
+		# it's just BASIC
+		# not final product
+		# objective is to get it running
+		# not to make it good
+		# objective is to get it running for front-end
+		# not to make a good back-end necessarily
+		# that's imgbb level
+		# oh adonai help me
 		if (!isset(self::$request['app']))
 			self::$request['app'] = 'main';
 		if (!isset(self::$request['mod']))
@@ -424,22 +412,15 @@ class ClassHandler {
 	 */
 	public static function Execute( $app, $request_type )
 	{
-		/////////////////////////////////////////////////
-		/////////////////////////////////////////////////
-		///// PLEASE DON'T LOOK AT THIS ABOMINATION /////
-		/////////////////////////////////////////////////
-		/////////////////////////////////////////////////
-//		$tstart = microtime(true);
+		#################################################
+		#################################################
+		##### PLEASE DON'T LOOK AT THIS ABOMINATION #####
+		#################################################
+		#################################################
 		self::$core = ibbCore::getInstance();
 
 		$MODULE = self::$core->request('mod');
 		$AREA = self::$core->request('area');
-
-		/* ugh need to rewrite this class so badly, more edits to make it compatible */
-//		if ( $app == 'user' )
-//		{
-//			throw new Exception( "The application '$app' has been disabled on this installation." );
-//		}
 
 		if ( !$MODULE )
 		{
@@ -462,12 +443,12 @@ class ClassHandler {
 			throw new Exception( 'Failed to load class!' );
 		}
 
-		// ew
+		# ew
 		self::$core->hotfixAddRequest('mod', $MODULE);
 		self::$core->hotfixAddRequest('area', $AREA);
 
-		// safe from nasty attempts to load something the user SHOULDNT and that isn't protected
-		// this line just looks dumb tbh, how to make it look more... professional?
+		# safe from nasty attempts to load something the user SHOULDNT and that isn't protected
+		# this line just looks dumb tbh, how to make it look more... professional?
 		$bootup = $app . '_' . $MODULE . '_' . $AREA;
 
 		self::$handle = new $bootup;
@@ -488,25 +469,13 @@ class ClassHandler {
 		{
 			self::$handle->init();
 		}
-//		print_r(self::$core->DB()->results['areadata']);
 
-		/* Initialize */
-		// it's complaining that init/process wasn't found, I guess that's why I need an abstract class...
-//		if (REQUEST_TYPE == 'process')
-//			$handle->process();
-//		else
-//			$handle->init();
-
-		/* Go go, power ranger */
-		// temp name ofc...
-//		echo '<b>exec_handler</b><br />exec: ' . (microtime(true) - $tstart) . '<br />mem: ' . substr(memory_get_usage(), 0, strlen(memory_get_usage()) - 3) .'<br />';
 		self::$core->output->goGoPowerRanger();
 
 	}
 
 	/**
 	 * @param $class
-	 * @param $request_type
 	 *
 	 * @return string
 	 */
@@ -514,11 +483,11 @@ class ClassHandler {
 	{
 		list($app, $module, $area) = explode('_', $class);
 
-		// my dignity
-		// please
-		// don't look
-		// want to keep my dignity
-		// IT'S TEMPORARY BUT I NEED TO UPLOAD IT SORRY.
+		# my dignity
+		# please
+		# don't look
+		# want to keep my dignity
+		# IT'S TEMPORARY BUT I NEED TO UPLOAD IT SORRY.
 
 		if (is_int(self::$core->request('action')))
 		{
@@ -531,7 +500,7 @@ class ClassHandler {
 		$url = 'app='.$app.'&mod='.$module.'&area='.$area.'&action='.self::$core->request('action') .
 			$subac;
 
-		// class to turn a url into a furl here
+		# class to turn a url into a furl here
 		if (self::$core->DB()->results['areadata']['onprocess_class'] == 'boards_boardpage_view')
 		{
 			return 'index.php?/'.self::$core->request('action').'/'.
@@ -541,9 +510,8 @@ class ClassHandler {
 		{
 			return 'index.php';
 		}
-		//temp
+		# temp
 		return 'index.php?'.$url;
-//		self::$core->output->goGoPowerRanger();
 	}
 
 	/**
@@ -600,13 +568,6 @@ class output {
 	 * @var array PHPTAL variables
 	 */
 	public $vars = array();
-
-	/**
-	 * Don't think there's a need for this?
-	 *
-	 * @var array
-	 */
-//	private $staticvars = array();
 
 	/**
 	 * @var ibbCore
@@ -838,11 +799,6 @@ class output {
 				}
 			}
 
-			/* Load API... jesus I need a better/dynamic way to do this, TO\DO */
-//			ClassHandler::loadAPI('boards');
-
-			/* Use the API and stuff. */
-//			$this->core->output->vars['boardsections'] = Boards_API::returnBoardCategories($this->db->results['boards']);
 		}
 
 		if ( $this->footer )
@@ -869,12 +825,6 @@ class output {
 		$this->vars['imgbb']['footer']		= $this->footer;
 		$this->vars['imgbb']['user']		= $this->core->user();
 
-//		print_r($this->vars['imgbb']['user']);
-//		if ($this->user)
-//			print_r($this->core->user()->getData());
-//		var_dump($this->vars['imgbb']['user']->display_name);
-//		var_dump($this->core->user()->display_name);
-
 
 		/* Give PHPTAL our variables */
 		foreach ( $this->vars as $key => $value )
@@ -883,14 +833,10 @@ class output {
 		}
 
 		/* Set up booleans */
-		//TODO IMGBB set up our own template engine
-//		if ( $this->head )
-//		{
-//			$this-
-//		}
+		# TODO IMGBB set up our own template engine
 
-		// temp
-		// Set configuration
+		# temp
+		/* Set configuration */
 		$this->tpl->setPhpCodeDestination(IBB_LIB_PATH . '/PHPTAL-' . preg_replace('#_#', '.', PHPTAL_VERSION) . '/cache');
 
 		/* All fired up, baby, OUR IMAGEBOARD IS WORKING */
@@ -941,9 +887,6 @@ class User {
 	 */
 	public function init()
 	{
-//		if ( !$id )
-//		{
-
 			if ( isset($_SESSION['user_id']) )
 			{
 				$this->registered = TRUE;
@@ -972,8 +915,6 @@ class User {
 				if ( $this->user_data )
 				{
 					$this->boot();
-//					if (in_array(1, $this->permissions['boards']))
-//						print_r($this->permissions['boards']);
 					return $this->user_data;
 				}
 				else
@@ -992,31 +933,8 @@ class User {
 					WHERE	ibb_user_groups.id = 5')[0];
 
 				$this->boot();
-//				echo 'not logged in';
 				return false;
 			}
-//		}
-//		else
-//		{
-//			$instance = new User;
-//
-//			$instance->user_data = $this->db->queryDirect('
-//				SELECT	*
-//				FROM	ibb_users
-//				WHERE	id = ' . $id);
-//
-//			if ( isset( $instance->user_data ) )
-//			{
-//				$instance->registered = TRUE;
-//				$instance->boot();
-//				return $instance;
-//			}
-//			else
-//			{
-//				error_log('CLASS USER->init() DEBUG: Passed variable $id ' . $id . ' did not go through.');
-//				return false;
-//			}
-//		}
 	}
 
 	public function boot()
@@ -1066,62 +984,6 @@ class User {
 		}
 	}
 
-//	public function bootRegistered()
-//	{
-//		$this->db->query('names', '
-//			SELECT	*
-//			FROM	ibb_names
-//			WHERE	userid = ' . $_SESSION['user_id']
-//		);
-//		$this->db->query('permissions', '
-//			SELECT	*
-//			FROM	ibb_user_board_permissions
-//			WHERE	groupid = ' . $this->getData()['user_group_id'] . '
-//		');
-//
-//		$this->display_name = $this->getData()['user_display_name'];
-//		$this->display_trip = $this->getData()['user_display_trip'];
-//		$this->is_staff		= $this->getData()['user_group_is_staff'];
-//
-//		foreach ($this->db->results['permissions'] as $board)
-//		{
-//			/* Set each individual boardid as an independent value with the category id as the parent key */
-//			/* e.g. $this->permissions['boards'][1][3] = 1 is ['boards']['Support'][3]['Questions & Answers'] */
-//			$this->permissions['boards'][$board['categoryid']][] = $board['boardid'];
-//		}
-//
-//		foreach ($this->db->results['names'] as $name)
-//		{
-//			/* Make each name accessible by its id from the database. Make sure to access $this->names */
-//			/* and NOT the query result, because the query results has arbitrary keys to each name */
-//			$this->names[$name['id']] = $name;
-//		}
-//
-//		if ($this->user_data['user_group_id'] > 0)
-//		{
-//			$this->bootStaff();
-//		}
-//
-//	}
-
-//	public function bootAnon()
-//	{
-//		$this->db->query('permissions', '
-//			SELECT	*
-//			FROM	ibb_user_board_permissions
-//			WHERE	groupid = 5
-//		');
-//
-//		foreach ($this->db->results['permissions'] as $board)
-//		{
-//			$this->permissions['boards'][$board['categoryid']][$board['boardid']] = $board['boardid']; //wtf
-//		}
-//
-//		$this->display_name	= 'Anonymous';
-//		$this->display_trip	= '';
-//
-//
-//	}
 
 	public function bootStaff()
 	{
@@ -1256,13 +1118,6 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 	abstract public function prepare( $query );
 
 	/**
-	 * @param $types
-	 * @param $data
-	 *
-	 * @return mysqli_stmt
-	 */
-//	abstract public function bindParam( $types, $data );
-	/**
 	 * @param string $type MYSQLI_ASSOC,... etc
 	 *
 	 * @return mixed
@@ -1349,12 +1204,6 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 			}
 
 		}
-
-
-
-//		if ( $success )
-//			$this->results[$qname] = $this->instance()->use_result()->fetch_all(MYSQL_ASSOC);
-
 	}
 
 	/**
@@ -1412,7 +1261,7 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 			$results = $this->storeResult();
 			if ($results->num_rows == 0)
 				throw new Exception('Query returned no results, boards needs to catch this ' . $query);
-			// dat [0]... there must be some function or constant that can be passed as an option to stop double array...
+			# dat [0]... there must be some function or constant that can be passed as an option to stop double array...
 			$this->results[$qname] = $results->fetch_all(MYSQLI_ASSOC)[0];
 		}
 		catch (exception $e) {
@@ -1438,43 +1287,6 @@ abstract class ibbDBCore /*implements ibbDBCoreInterface */ {
 			return $this->returnAll(MYSQLI_ASSOC)[0];
 		}
 
-	}
-
-	/**
-	 * This is a crazy paranoid function, what am I doing?
-	 *
-	 * @param array $array
-	 */
-	public function buildSafeQuery( array $array )
-	{
-		if ( isset($array['type']['INSERT']) )
-		{
-			$this->query = 'INSERT INTO ' . trim($array['type']['INSERT']);
-		}
-
-		if ( isset($array['columns']) )
-		{
-			$this->query .= ' (';
-			foreach ($array['columns'] as $column)
-			{
-				$this->query .= $column . ',';
-			}
-			$this->query = substr($this->query, 0, -1) . ')';
-		}
-
-
-		if ( isset($array['values']) )
-		{
-			$this->query .= ' VALUES (';
-			foreach ($array['values'] as $value)
-			{
-				$this->query .= $value . ',';
-			}
-			$this->query = substr($this->query, 0, -1) . ')';
-
-		}
-
-		// This entire function is stupid.
 	}
 
 	/**
@@ -1551,17 +1363,6 @@ class db_mysql extends ibbDBCore
 		}
 	}
 
-	/**
-	 * @param $types
-	 * @param $data
-	 *
-	 * @return mysqli_stmt
-	 */
-//	public function bindParam( $types, $data )
-//	{
-//		return $this->qobject->bind_param( $types, $data );
-//	}
-
 
 	/**
 	 * @param string $query
@@ -1585,7 +1386,6 @@ class db_mysql extends ibbDBCore
 		{
 			$this->query_error = $this->instance()->error;
 			throw new Exception($this->query_error . 'Full query: ' . $query);
-//			return FALSE;
 		}
 	}
 

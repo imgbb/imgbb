@@ -47,7 +47,6 @@ class upload
 		}
 		else
 		{
-//			error_log($matches[0]);
 			new Exception('(Notice-level error exception): File type is not allowed.');
 		}
 
@@ -58,9 +57,6 @@ class upload
 		$this->dir 				= IBB_ROOT_PATH . '/files/';
 		$this->file 			= IBB_ROOT_PATH . '/files/src/' . $this->filename;
 		$this->thumb 			= IBB_ROOT_PATH . '/files/thumb/' . $this->filename . 's.' . $this->filetype;
-
-//		throw new Exception($this->file);
-//		throw new Exception($this->filename);
 
 		switch ($_FILES['file']['error'])
 		{
@@ -108,10 +104,6 @@ class upload
 			}
 		}
 
-//		print_r($_FILES);
-//		throw new Exception();
-//		throw new Exception($_FILES['file']);
-
 		move_uploaded_file($_FILES['file']['tmp_name'], $this->file . '.' . $this->filetype);
 
 		$this->image_dimensions = getimagesize($this->file . '.' . $this->filetype);
@@ -133,31 +125,7 @@ class upload
 
 		$this->filename_original 	= $_FILES['file']['name'];
 
-
-//		throw new Exception($this->src_height);
-
-
-
-//		if (!is_file($_FILES['file']['tmp_name']) || !is_readable($_FILES['file']['tmp_name']))
-//		{
-//			exit('There was an error during the transfer period. (ERROR: CORRUPTED (IF/IS))');
-//		}
-//		else
-//		{
-//			if ($this->file_type == '.jpg' || $this->file_type == '.gif' || $this->file_type == '.png') {
-//				if (!@getimagesize($_FILES['file']['tmp_name'])) {
-//					exit('There was an error during the transfer period. (ERROR: CORRUPTED (GIS))');
-//				}
-//			}
-//		}
-
-
-
-		//createThumbnail($file);
-
-//		return array('"'.$this->filename.'"', '"'.$this->file_type.'"', $this->imgHeight, $this->imgWidth, $this->thumb_height, $this->thumb_width, '"'.$_FILES['file']['name'].'"');
-//		return $this;
-
+		#create thumbnail here
 	}
 
 	/**

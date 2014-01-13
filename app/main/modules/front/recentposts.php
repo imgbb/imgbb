@@ -62,16 +62,15 @@ class main_front_recentposts
 		foreach ($this->core->output->vars['posts'] as $key => $post)
 		{
 			$ref =& $this->core->output->vars['posts']->posts[$key];
-//			$post['timestamp'] 	=	date('jS \of F, Y', $post['timestamp']);
 			$ref['display_name']		=	($ref['display_tripcode'] == '' && $ref['display_name'] == '') ? 'Anonymous' : $ref['display_name'];
-//			$ref['message']	=	stripslashes($ref['message']);
-//			$ref['message']	=	preg_replace('#\[i\](.*)?\[/i\]#', '<i>\1</i>', $ref['message']);
 			$ref['message']	=	strlen($ref['message']) > 500 ? substr($ref['message'], 0, 500) . ' <b>&hellip;</b>' : $ref['message'];
+
 			# Just so that it will make sense.
 			if ($ref['parentid'] == 0)
 			{
 				$ref['parentid'] = $ref['id'];
 			}
+
 			/* This entire algorithm is absolutely horrible. Not necessarily in the way it was designed, but its mere
 				presence. Just because if anybody messes with font sizes, weight etc, it's completely incompatible. I
 				need to consult my front-end designers on ways to do this via CSS. */

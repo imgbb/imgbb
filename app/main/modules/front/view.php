@@ -33,9 +33,8 @@ class main_front_view {
 	{
 
 		$this->core->output->setPage('home', 'home.xhtml');
-		/* begin temp */
 
-		// force enable modular system since settings do not exist and are not handled yet
+		/* force enable modular system since settings do not exist and are not handled yet */
 
 		require_once 'recentposts.php';
 		require_once 'news.php';
@@ -47,16 +46,8 @@ class main_front_view {
 
 		/* end temp */
 
-		// todo this too, put it all somewhere easily accessible... maybe through the intface?
-
 		/* Set page title */
 		$this->core->output->setTitle( 'imgBB' );
 
-		///////////////////////////////
-		//	Prepare dynamic variables
-		//////////////////////////////
-
-		// useless now that BASIC is modular
-//		$this->core->output->vars['boards'] = $this->db->results['boards'];
 	}
 }
