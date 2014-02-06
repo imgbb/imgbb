@@ -16,7 +16,7 @@
                         <input id="postername" type="text" name="postername" />
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
                     </td>
@@ -27,18 +27,15 @@
                         Name
                     </td>
                     <td class="tdinput">
-                        <select name="name">
-                            <option value="main">
-                                ${imgbb/user/display_name}!${imgbb/user/display_trip}
-                            </option>
+                        <select id="name" name="name">
                             <option value="${name/id}" tal:repeat="name imgbb/user/names">
                                 ${name/display_name}!${name/display_trip}
                             </option>
                         </select>
-                        <input id="goanon" type="button" name="goanon" value="Go Anon!" />
+                        <input id="anonmode" type="button" name="anonmode" class="user" value="Anonymous" />
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
                     </td>
@@ -52,7 +49,7 @@
                         <input id="email" type="text" name="email"/>
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
                     </td>
@@ -67,7 +64,7 @@
                         <input id="submit" type="submit" onclick="" value="New Post" name="Submit" />
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
                     </td>
@@ -81,7 +78,7 @@
                         <textarea id="message" name="body" />
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
                     </td>
@@ -95,7 +92,7 @@
                         <input id="file" type="file" name="file"/>
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
                     </td>
@@ -109,7 +106,7 @@
                         <input id="embed" type="text" name="embed"/>
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
                     </td>
@@ -123,7 +120,7 @@
                         <input id="password" type="password" name="password"/>
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
                     </td>
@@ -137,23 +134,23 @@
                         <input id="sage" type="checkbox" name="sage"/>
                         <a onclick="displayhelp()" href="#">
                             <span class="helpme">
-                                ?
+                                <!--?-->
                             </span>
                         </a>
+                    </td>
+                    <td class="tdinput" tal:condition="imgbb/user/registered">
+                        <label for="displaystatus">Display Rank: </label>
+                        <input id="displaystatus" type="checkbox" name="displaystatus"/>
+                        <!--<a onclick="displayhelp()" href="#">-->
+                        <!--<span class="helpme">-->
+                        <!--?-->
+                        <!--</span>-->
+                        <!--</a>-->
                     </td>
                 </tr>
                 <tr tal:condition="imgbb/user/registered">
                     <td class="tdlabel">
                         Moderator
-                    </td>
-                    <td class="tdinput">
-                        <label for="displaystatus">Display Staff Status: </label>
-                        <input id="displaystatus" type="checkbox" name="displaystatus"/>
-                        <!--<a onclick="displayhelp()" href="#">-->
-                            <!--<span class="helpme">-->
-                                <!--?-->
-                            <!--</span>-->
-                        <!--</a>-->
                     </td>
                     <td class="tdinput">
                         <label for="lockthread">Lock Thread: </label>
@@ -213,48 +210,59 @@
 
 <tal:block metal:define-macro="parent_mod_tools">
 <span tal:condition="imgbb/user/registered" class="btns" >
-    [<a href="index.php?app=boards&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
+    [<a href="${imgbb/base_url}/index.php?app=boards&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${parent/id}">D</a>
         &amp;
-    <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>]
+    <a href="${imgbb/base_url}/index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${parent/id}">B</a>]
 
-    [<a href="index.php?app=boards&amp;mod=manage&amp;area=move&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Move</a>
+    [<a href="${imgbb/base_url}/index.php?app=boards&amp;mod=manage&amp;area=move&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Move</a>
     /
-    <a href="index.php?app=boards&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>
+    <a href="${imgbb/base_url}/index.php?app=boards&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Edit</a>
     /
-    <a href="index.php?app=boards&amp;mod=manage&amp;area=bump&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Bump</a>
+    <a href="${imgbb/base_url}/index.php?app=boards&amp;mod=manage&amp;area=bump&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Bump</a>
     /
-    <a href="index.php?app=boards&amp;mod=manage&amp;area=kill&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Force Sage</a>]
+    <a href="${imgbb/base_url}/index.php?app=boards&amp;mod=manage&amp;area=kill&amp;action=${parent/boardid}&amp;subaction=${parent/id}">Force Sage</a>]
 </span>
 </tal:block>
 
 <tal:block metal:define-macro="reply_mod_tools">
 <span tal:condition="imgbb/user/registered" class="btns" >
-    [<a href="index.php?app=boards&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${reply/id}">D</a>
+    [<a href="${imgbb/base_url}/index.php?app=boards&amp;mod=manage&amp;area=delete&amp;action=${parent/boardid}&amp;subaction=${reply/id}">D</a>
         &amp;
-    <a href="index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${reply/id}">B</a>
+    <a href="${imgbb/base_url}/index.php?app=main&amp;mod=manage&amp;area=ban&amp;action=${parent/boardid}&amp;subaction=${reply/id}">B</a>
     /
-    <a href="index.php?app=boards&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${reply/id}">Edit</a>]
+    <a href="${imgbb/base_url}/index.php?app=boards&amp;mod=manage&amp;area=edit&amp;action=${parent/boardid}&amp;subaction=${reply/id}">Edit</a>]
 </span>
 </tal:block>
 
 <tal:block metal:define-macro="pagination">
 <div class="pagination">
-    <a href="${imgbb/base_url}/index.php?/q/previous_page_algorithm">Previous</a>
+    <a href="${imgbb/core_url}/q/previous_page_algorithm">Previous</a>
     |
-    <a href="${imgbb/base_url}/index.php?/q/page_algorithm">1</a>
-    |
-    <span class="currentpage">2</span>
-    |
-    <a href="${imgbb/base_url}/index.php?/q/page_algorithm">3</a>
-    |
-    <a href="${imgbb/base_url}/index.php?/q/page_algorithm">4</a>
-    |
-    <a href="${imgbb/base_url}/index.php?/q/next_page_algorithm">Next</a>
+    <tal:block tal:repeat="num php: range(1, totalpages)">
+        <a href="${imgbb/core_url}/q/page_algorithm">${num}</a>
+        |
+    </tal:block>
+
+    <a href="${imgbb/core_url}/q/next_page_algorithm">Next</a>
+</div>
+</tal:block>
+
+<tal:block metal:define-macro="quickmod">
+<div id="modmenu" style="display:none;">
+    <input type="hidden" name="threadid" value="" />
+    <label for="modSelect">Action: </label>
+        <select id="modSelect">
+            <option value="delete">Delete</option>
+            <option value="sticky">Sticky</option>
+            <option value="lockpost">Lock</option>
+            <option value="bump">Bump</option>
+        </select>
+    <input type="button" id="modSubmit" value="Submit" />
 </div>
 </tal:block>
 
 <tal:block metal:define-macro="board">
-    <div class="board">
+    <div class="board" id="board">
         <tal:block tal:repeat="parent parents">
             <div id="two_${parent/id}" class="thread">
                 <div class="postcontainer">
@@ -273,7 +281,7 @@
                         </div>
                         <div class="postinfo">
                             <label>
-                                <input type="checkbox" />
+                                <input type="checkbox" class="postbutton" tal:condition="imgbb/user/registered"/>
                                 <span class="subject" tal:content="structure parent/subject"/>
                                 <span class="namespan">
                                     <span class="name" tal:content="parent/display_name" /><span class="postertrip" tal:condition="parent/display_tripcode">!${parent/display_tripcode}</span>
@@ -281,7 +289,7 @@
                                 <span class="mod" tal:condition="parent/rank" tal:attributes="style parent/user_rank_display_stylization" tal:content="structure parent/user_rank_display_name" />
                                 <span class="datetime" tal:content="parent/timestamp"/>
                                 <span class="postnumber">
-                                    <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}-#${parent/id}">
+                                    <a href="${imgbb/core_url}/${boardinfo/board_name}/${parent/id}-#${parent/id}">
                                         No.
                                     </a>
                                     <a href="${imgbb/base_url}/pls" tal:content="parent/id"/>
@@ -289,7 +297,7 @@
                                 <span class="btns" tal:condition="not: true: inthread">
                                     <tal:block tal:condition="parent/stickied" tal:content="string:Sticky.png" />
                                     <tal:block tal:condition="parent/locked" tal:content="string:Locked.png" />
-                                    [<a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}">View</a>]
+                                    [<a href="${imgbb/core_url}/${boardinfo/board_name}/${parent/id}">View</a>]
                                 </span>
                                 <span tal:condition="imgbb/user/registered">
                                     <tal:block metal:use-macro="parent_mod_tools" />
@@ -312,7 +320,7 @@
                             <!--${repeat/reply/key}-->
                             <div class="postinfo">
                                 <label>
-                                    <input type="checkbox" />
+                                    <input type="checkbox" class="postbutton" tal:condition="imgbb/user/registered" />
                                     <span class="subject" tal:content="structure reply/subject"/>
                                     <span class="namespan">
                                         <span class="name">
@@ -322,7 +330,7 @@
                                     <span class="mod" tal:condition="reply/rank" tal:attributes="style reply/user_rank_display_stylization" tal:content="structure reply/user_rank_display_name" />
                                     <span class="datetime" tal:content="reply/timestamp" />
                                     <span class="postnumber">
-                                        <a href="${imgbb/base_url}/index.php?/${boardinfo/board_name}/${parent/id}-#${reply/id}">
+                                        <a href="${imgbb/core_url}/${boardinfo/board_name}/${parent/id}-#${reply/id}">
                                             No.
                                         </a>
                                         <a href="${imgbb/base_url}/pls" tal:content="reply/id"/>
@@ -354,5 +362,6 @@
         <!--Pagination area-->
         <tal:block metal:use-macro="pagination" />
         <!--Manipulation area-->
+        <tal:block metal:use-macro="quickmod" />
     </div>
 </tal:block>
