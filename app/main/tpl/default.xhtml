@@ -10,6 +10,7 @@
         <title tal:content="imgbb/title | default">imgBB</title>
     </head>
     <body>
+    <br /><br />
     <tal:block tal:condition="true: imgbb/menubar" metal:use-macro="${imgbb/IBB_TEMPLATES_PATH}/menubar.xhtml/menubar" />
 
     <tal:block metal:use-macro="${imgbb/page/src}/${imgbb/page/name}" />
