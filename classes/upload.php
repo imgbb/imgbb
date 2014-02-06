@@ -30,6 +30,11 @@ class upload
 		$this->src_height 			= 0;
 		$this->thumb_width 			= 0;
 		$this->thumb_height 		= 0;
+		$this->filetype				= '';
+		$this->filename				= 0;
+		$this->file_size			= '';
+		$this->file_size_raw		= 0;
+		$this->filename_original	= '';
 		$this->file_size_raw 		= 0;
 
 		return $this;
