@@ -37,7 +37,7 @@ class IBBText
 	public static function escapeQuotes( $text )
 	{
 		$text = str_replace("'", "\\'", $text);
-		$text = str_replace('"', '\\"', $text);
+//		$text = str_replace('"', '\\"', $text);
 
 		return $text;
 	}
