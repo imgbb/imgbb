@@ -21,5 +21,6 @@ class main_manage_view
 	public function init()
 	{
 		$this->core->output->setPage('manage', 'manage.xhtml');
+		$this->core->output->addCSS('manage');
 	}
 }
