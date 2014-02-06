@@ -10,7 +10,7 @@
                     <li><a href="#">moo</a></li>
                 </ul>
             </li>
-            <li>
+            <!--<li>-->
                 <!--<a href="${imgbb/base_url}">Boards</a>&lt;!&ndash; second menu item&ndash;&gt;-->
                 <!--<ul>&lt;!&ndash; dropdown for the second item&ndash;&gt;-->
                         <span tal:repeat="section boardsections" tal:omit-tag="">
@@ -26,7 +26,7 @@
                                             <!--style php: (board['board_type'] == 3) ? 'color:blue' : ''">-->
                                             <!--/${board/board_name}/-->
                                             <!--</a>-->
-                                            <a href="index.php?/${board/board_name}/"
+                                            <a href="${imgbb/core_url}/${board/board_name}/"
                                                     tal:attributes="class php: (btype eq 1) ? 'locked' : ((btype eq 2) ? 'private' : 'board') ">
                                                 /${board/board_name}/
                                             </a>
@@ -36,7 +36,7 @@
                             </li>
                         </span>
                 <!--</ul>-->
-            </li>
+            <!--</li>-->
             <!--<li tal:condition="exists: user">-->
                 <!--<a href="index.php?app=manage">Mod</a>-->
             <!--</li>-->
@@ -44,25 +44,25 @@
             <li class="this_area" style="float:right;"><a href="#">Home</a><!-- The inline style should be switched for an ID.. In fact.. All the top-level items should get an ID.. That'd be nice-->
                 <ul style="right:0;"><!-- Disregard inline styling.. Will be moved to CSS if ID's are implemented for the top-level items.-->
                     <li>
-                        <a tal:attributes="class php: (imgbb['highlight']['mod'] eq 'front') ? 'this_area' : ''" href="${imgbb/base_url}">Front Page</a>
+                        <a tal:attributes="class php: (imgbb['highlight']['mod'] eq 'front') ? 'this_area' : ''" href="${imgbb/core_url_tr}">Front Page</a>
                     </li>
                     <li tal:condition="not: imgbb/user/registered">
-                        <a href="index.php?app=user&amp;mod=manage&area=login">
+                        <a href="${imgbb/base_url}/index.php?app=user&amp;mod=manage&area=login">
                             Login
                         </a>
                     </li>
                     <li tal:condition="imgbb/user/registered">
-                        <a href="index.php?app=user&amp;mod=manage&area=logout">
+                        <a href="${imgbb/base_url}/index.php?app=user&amp;mod=manage&area=logout">
                             Logout
                         </a>
                     </li>
                     <li tal:condition="imgbb/user">
-                        <a href="index.php?app=user&amp;mod=settings&area=preferences">
+                        <a href="${imgbb/base_url}/index.php?app=user&amp;mod=settings&area=preferences">
                             Settings
                         </a>
                     </li>
                     <li tal:condition="imgbb/user/registered">
-                        <a href="index.php?app=user&amp;mod=profile">
+                        <a href="${imgbb/base_url}/index.php?app=user&amp;mod=profile">
                             ${imgbb/user/display_name}
                         </a>
                     </li>
@@ -71,13 +71,18 @@
                 </ul>
             </li>
 
-            <li class="this_area" style="float:right;"><a href="index.php?app=main&amp;mod=manage">Moderator CP</a>
+            <li class="this_area" style="float:right;"><a href="${imgbb/base_url}/index.php?app=main&amp;mod=manage">Moderator CP <span style="color:red">(1)</span></a>
+                <ul>
+                    <li>
+                        <a href="${imgbb/base_url}/index.php?app=main&amp;mod=manage&amp;area=reports">Reports Center <span style="color:red;">(1)</span></a>
+                    </li>
+                </ul>
                 <!--<ul style="right:0;">-->
                 <!--Manage Page-->
                 <!--</ul>-->
             </li>
 
-            <li class="this_area" style="float:right;"><a href="index.php?app=main&amp;mod=admin">Admin CP</a>
+            <li class="this_area" style="float:right;"><a href="${imgbb/base_url}/index.php?app=main&amp;mod=admin">Admin CP</a>
                 <!--<ul style="right:0;">-->
                 <!--Manage Page-->
                 <!--</ul>-->
