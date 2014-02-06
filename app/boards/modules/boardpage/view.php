@@ -66,7 +66,8 @@ class boards_boardpage_view implements appCore {
 		$this->board_info 	= $this->db->queryDirect('
 			SELECT			ibb_boards.id 				AS board_id,
 							ibb_boards.name 			AS `board_name`,
-							title,
+							ibb_boards.title,
+							ibb_boards.threadperpage,
 							ibb_boards.category 		AS board_category,
 							ibb_board_categories.id 	AS category_id,
 							ibb_board_categories.name 	AS category_name
@@ -84,23 +85,25 @@ class boards_boardpage_view implements appCore {
 	 */
 	public function init()
 	{
-		$this->core->output->vars['boardinfo'] = $this->board_info;
 
+		/* Temporary permissions verification */
 		if (!in_array($this->board_info['board_id'], $this->user->getPermissions('boards')[$this->board_info['category_id']]))
 		{
 			throw new exception('Permission denied exception');
 		}
 
-		$this->core->output->vars['postbox'] = TRUE;
-
-		/* Set page title */
+		/* Metadata */
 		$this->core->output->setTitle($this->board_info['title']);
-
 		$this->core->output->addCSS( 'boards' );
-
 		$this->core->output->addCSS( 'postform' );
+		$this->core->output->addCSS( 'quickmod' );
+		$this->core->output->addJS( 'jquery' );
+		$this->core->output->addJS( 'boards' );
+		$this->core->output->vars['postbox'] = TRUE;
+		$this->core->output->vars['boardinfo'] = $this->board_info;
 
 
+		/* If we're not in a thread... */
 		if (!$this->core->request('subaction'))
 		{
 			$this->db->query('parents', '
@@ -110,7 +113,7 @@ class boards_boardpage_view implements appCore {
 				AND			parentid	=	0
 				AND			deleted		=	0
 				ORDER BY	stickied DESC, bumped DESC
-				LIMIT		10
+				LIMIT		' . $this->board_info['threadperpage'] . '
 			');
 
 			#Got to be a better way, even though it's temporary...
@@ -138,7 +141,7 @@ class boards_boardpage_view implements appCore {
 				AND
 					' . $piece . '
 				ORDER BY	timestamp	ASC
-				LIMIT 30
+				LIMIT 45
 				');
 
 				if (isset($this->db->results['replies']))
@@ -175,7 +178,14 @@ class boards_boardpage_view implements appCore {
 				$this->core->output->vars['replies'] = new post($this->db->results['replies']);
 			}
 
-		} else
+			/* Pagination data */
+			$this->core->output->vars['totalpages'] = round($this->db->queryDirect('
+				SELECT COUNT(*) FROM ibb_posts WHERE parentid = 0 AND deleted = 0 AND boardid = ' .
+				$this->board_info['board_id'])[0]['COUNT(*)'] / $this->board_info['threadperpage']);
+
+		}
+		/* We're in a thread! */
+		else
 		{
 			$this->db->query('posts', '
 			SELECT 	*
@@ -300,6 +310,10 @@ class boards_boardpage_view implements appCore {
 					$this->user->rank = $this->user->names[$_POST['name']]['rank'];
 				}
 			}
+			else
+			{
+				list($this->user->display_name, $this->user->display_trip) = $this->calculateNameAndTripcode($_POST['postername']);
+			}
 		}
 		else
 		{
@@ -324,14 +338,16 @@ class boards_boardpage_view implements appCore {
 		#csrf
 
 
-		if ($_FILES['file'])
+		if ($_FILES['file']['size'])
 		{
 			$this->core->upload()->DoFile( intval($_POST['subaction']) );
 		}
 
 		#tmp
 		if ($_POST['body'] == '' && $this->upload->filename == 0)
+		{
 			throw new Exception('file or msg pls exception');
+		}
 		else
 		{
 			if (!$this->raw)
@@ -404,7 +420,7 @@ class boards_boardpage_view implements appCore {
 			');
 		}
 
-		$this->core->hotfixAddRequest('action', 'q');
+//		$this->core->hotfixAddRequest('action', 'q');
 	}
 
 	/**
