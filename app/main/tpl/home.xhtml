@@ -5,8 +5,8 @@
     <div class="frontmaincolwrap">
         <ul class="frontcontentmenu">
             <li tal:repeat="category front_categories">
-                <tal:block tal:define="global loc php: category['id'] === '1' ? FALSE : 'index.php?/front/' . category['id'] . '-' . category['name']"/>
-                <a href='index.php'  tal:attributes="href loc | default">
+                <tal:block tal:define="global loc php: category['id'] === '1' ? FALSE : imgbb['core_url'] . '/front/' . category['id'] . '-' . category['name']"/>
+                <a tal:attributes="href loc | imgbb/core_url_tr">
                     ${category/name}
                 </a>
             </li>
@@ -36,7 +36,7 @@
     </div>
     <div class="newscontent">
         <a tal:condition="exists: entry/file" href="${imgbb/base_url}/files/src/${entry/file}" target="_blank">
-            <img src="files/src/${entry/file}" class="newsimg" href="files/src/${entry/file}"/>
+            <img src="${imgbb/base_url}/files/src/${entry/file}" class="newsimg" href="${imgbb/base_url}/files/src/${entry/file}"/>
         </a>
         <div class="newsbody">
             <p tal:content="structure entry/entry" tal:condition="exists: entry/entry" tal:omit-tag="" />
@@ -51,7 +51,7 @@
 </div>
         <!-- macro: header @var intro_img -->
 <div class="header" metal:define-macro="header">
-    <img src="assets/UGR5rof.png"/>
+    <img src="${imgbb/base_url}/assets/UGR5rof.png"/>
 </div>
         <!-- macro: recent_posts @var posts -->
 <div class="frontsidecolwrap" metal:define-macro="recent_posts">
@@ -63,7 +63,7 @@
         <div class="recentpostwrap">
             <div class="recentpostheader">
                         <span class="recentpostboard">
-                            <a href="index.php?/${post/board_name}/${post/parentid}-${post/display_name}#${post/id}">
+                            <a href="${imgbb/core_url}/${post/board_name}/${post/parentid}-${post/display_name}#${post/id}">
                                 /${post/board_name}/
                             </a>
                         </span>
