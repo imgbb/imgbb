@@ -23,12 +23,9 @@ class ibbController {
 	public static 	$instance;
 
 	/**
-	 * @var $handles 	ibbDBCore
-	 * @var $settings	array
-	 * @var $request	array
+	 * @var appCore $handle
 	 */
-	public static	$handles;
-	public			$settings;
+	public			$handle;
 
 	/**
 	 * @var $core	ibbCore
@@ -106,11 +103,98 @@ class ibbController {
 			$this->core->output->user = TRUE;
 		}
 
-		try {
-			ClassHandler::Execute( $this->core->request('app'), REQUEST_TYPE);
-		} catch (Exception $e) {
-			throw new Exception($e);
+		$MODULE = $this->core->request('mod');
+		$AREA 	= $this->core->request('area');
+
+		if ( !$MODULE )
+		{
+			if ( !include_once IBB_ROOT_PATH . "/app/" . $this->core->request('app'). "/modules/defaultMod.php" )
+			{
+				throw new Exception( 'Could not find default module!' );
+			}
 		}
+
+		if ( !$AREA )
+		{
+			if ( !include_once IBB_ROOT_PATH . "/app/".$this->core->request('app')."/modules/".$MODULE."/defaultArea.php" )
+			{
+				throw new exception( 'Could not find default area!' );
+			}
+		}
+
+		if ( !include_once IBB_ROOT_PATH . "/app/".$this->core->request('app')."/modules/$MODULE/$AREA.php" )
+		{
+			throw new Exception( 'Failed to load class!' );
+		}
+
+		# ew
+		$this->core->hotfixAddRequest('mod', $MODULE);
+		$this->core->hotfixAddRequest('area', $AREA);
+
+		# safe from nasty attempts to load something the user SHOULDNT and that isn't protected
+		# this line just looks dumb tbh, how to make it look more... professional?
+		$bootup = $this->core->request('app') . '_' . $MODULE . '_' . $AREA;
+
+		$this->handle = new $bootup;
+
+		/* Set path... */
+		$this->core->output->setMasterTemplate( IBB_ROOT_PATH . '/app/'.$this->core->request('app').'/tpl/', 'default.xhtml');
+
+		if (REQUEST_TYPE == 'process')
+		{
+			$this->handle->process();
+
+			if ($this->core->DB()->results['areadata']['onprocess_class'])
+			{
+				header('Location: ' . $this->core->settings('core_url')
+									. BasicFriendlyURL::toFURL( $_POST['action'], $_POST['subaction'], $bootup ));
+			}
+
+		}
+		else
+		{
+			$this->handle->init();
+		}
+
+		$this->core->output->goGoPowerRanger();
+
+		# my dignity
+		# please
+		# don't look
+		# want to keep my dignity
+		# IT'S TEMPORARY BUT I NEED TO UPLOAD IT SORRY.
+
+//		if (is_int(self::$core->request('action')))
+//		{
+//			self::$core->DB()->query('boardname', 'SELECT name FROM ibb_boards WHERE id='.self::$core->request('action'));
+//			self::$core->hotfixAddRequest('action', self::$core->DB()->results['boardname'][0]['name']);
+//		}
+//
+//		$subac = (self::$core->request('subaction') ? '&subaction='.self::$core->request('subaction') : '');
+//
+//		$url = 'app='.$app.'&mod='.$module.'&area='.$area.'&action='.self::$core->request('action') .
+//			$subac;
+//
+//		# class to turn a url into a furl here
+//		if (self::$core->DB()->results['areadata']['onprocess_class'] == 'boards_boardpage_view')
+//		{
+//			return 'index.php?/'.self::$core->request('action').'/'.
+//			(self::$core->request('subaction') ? self::$core->request('subaction') : '');
+//		}
+//		elseif (self::$core->DB()->results['areadata']['onprocess_class'] == 'main_front_view')
+//		{
+//			return 'index.php';
+//		}
+//		# temp
+//		return 'index.php?'.$url;
+//	}
+//
+//
+//		try {
+//			ClassHandler::Execute( $this->core->request('app'), REQUEST_TYPE);
+//		} catch (Exception $e) {
+//			throw new Exception($e);
+//		}
 
 	}
 }
@@ -140,7 +224,10 @@ class ibbCore {
 
 	# temporarily static until settings configuration are made @ IMGBB state
 	public static	$settings = array(
-		'base_url' => 'http://www.imgbb.net/imgbb'
+		'base_url' 			=> 'http://www.imgbb.net/imgbb',
+		'furls_rewrite' 	=> TRUE,
+		'core_url'			=> 'http://www.imgbb.net/imgbb',
+		'core_url_tr' => 'http://www.imgbb.net/imgbb/'
 	);
 
 	/**
@@ -283,7 +370,7 @@ class ibbCore {
 			self::$fURL = TRUE;
 
 			/* Now it's going to send it to a function that loops over it until it finds the correct array. */
-			basicFriendlyURL::findpath( key( $_REQUEST ) );
+			BasicFriendlyURL::translateFURL( key( $_REQUEST ) );
 		}
 	}
 
@@ -378,157 +465,157 @@ class ibbCore {
 	}
 }
 
-/**
- * Class ClassHandler
- *
- * class handle, in its very primitive form
- * TODO use ion cannon and obliterate this mess and create handler in the ibbCore instead, maybe create ibbCommand?
- *
- * TODO ENOUGH FIXING, WRITE THE NEW CLASS, THE MORE YOU BANDAGE IT THE HARDER IT WILL BE TO CREATE
- */
-class ClassHandler {
-
-	public 			$request;
-
-	/**
-	 * @var ibbCore
-	 */
-	public static	$core;
-
-	/**
-	 * @var appCore
-	 */
-	public static	$handle;
-
-	/**
-	 * It's not REALLY execute, it WAS execute earlier in development though, now it also verifies
-	 * ...
-	 * hence need for rewrite
-	 *
-	 * @param string $app
-	 * @param string $request_type
-	 *
-	 * @throws Exception
-	 */
-	public static function Execute( $app, $request_type )
-	{
-		#################################################
-		#################################################
-		##### PLEASE DON'T LOOK AT THIS ABOMINATION #####
-		#################################################
-		#################################################
-		self::$core = ibbCore::getInstance();
-
-		$MODULE = self::$core->request('mod');
-		$AREA = self::$core->request('area');
-
-		if ( !$MODULE )
-		{
-			if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/defaultMod.php" )
-			{
-				throw new Exception( 'Could not find default module!' );
-			}
-		}
-
-		if ( !$AREA )
-		{
-			if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/$MODULE/defaultArea.php" )
-			{
-				throw new exception( 'Could not find default area!' );
-			}
-		}
-
-		if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/$MODULE/$AREA.php" )
-		{
-			throw new Exception( 'Failed to load class!' );
-		}
-
-		# ew
-		self::$core->hotfixAddRequest('mod', $MODULE);
-		self::$core->hotfixAddRequest('area', $AREA);
-
-		# safe from nasty attempts to load something the user SHOULDNT and that isn't protected
-		# this line just looks dumb tbh, how to make it look more... professional?
-		$bootup = $app . '_' . $MODULE . '_' . $AREA;
-
-		self::$handle = new $bootup;
-
-		/* Set path... */
-		self::$core->output->setMasterTemplate( IBB_ROOT_PATH . '/app/'.$app.'/tpl/', 'default.xhtml');
-
-		if ($request_type == 'process' || $request_type == 'ajax')
-		{
-			self::$handle->process();
-			if (self::$core->DB()->results['areadata']['onprocess_class'])
-			{
-				header('Location: ' . self::EvolutionizedExecution( self::$core->DB()->results['areadata']['onprocess_class'], 'init' ));
-			}
-
-		}
-		else
-		{
-			self::$handle->init();
-		}
-
-		self::$core->output->goGoPowerRanger();
-
-	}
-
-	/**
-	 * @param $class
-	 *
-	 * @return string
-	 */
-	public static function EvolutionizedExecution( $class )
-	{
-		list($app, $module, $area) = explode('_', $class);
-
-		# my dignity
-		# please
-		# don't look
-		# want to keep my dignity
-		# IT'S TEMPORARY BUT I NEED TO UPLOAD IT SORRY.
-
-		if (is_int(self::$core->request('action')))
-		{
-			self::$core->DB()->query('boardname', 'SELECT name FROM ibb_boards WHERE id='.self::$core->request('action'));
-			self::$core->hotfixAddRequest('action', self::$core->DB()->results['boardname'][0]['name']);
-		}
-
-		$subac = (self::$core->request('subaction') ? '&subaction='.self::$core->request('subaction') : '');
-
-		$url = 'app='.$app.'&mod='.$module.'&area='.$area.'&action='.self::$core->request('action') .
-			$subac;
-
-		# class to turn a url into a furl here
-		if (self::$core->DB()->results['areadata']['onprocess_class'] == 'boards_boardpage_view')
-		{
-			return 'index.php?/'.self::$core->request('action').'/'.
-				(self::$core->request('subaction') ? self::$core->request('subaction') : '');
-		}
-		elseif (self::$core->DB()->results['areadata']['onprocess_class'] == 'main_front_view')
-		{
-			return 'index.php';
-		}
-		# temp
-		return 'index.php?'.$url;
-	}
-
-	/**
-	 * Load class
-	 *
-	 * @param $class
-	 *
-	 * @throws Exception
-	 */
-	public static function loadAPI($class)
-	{
-		if (!is_file(IBB_ROOT_PATH . "/app/$class/api.php"))
-			throw new Exception('Application API not found ' . IBB_ROOT_PATH . "/app/$class/api.php");
-
-		require_once IBB_ROOT_PATH . "/app/$class/api.php";
-	}
-}
+///**
+// * Class ClassHandler
+// *
+// * class handle, in its very primitive form
+// * TO/DO use ion cannon and obliterate this mess and create handler in the ibbCore instead, maybe create ibbCommand?
+// *
+// * TO/DO ENOUGH FIXING, WRITE THE NEW CLASS, THE MORE YOU BANDAGE IT THE HARDER IT WILL BE TO CREATE
+// */
+//class ClassHandler {
+//
+//	public 			$request;
+//
+//	/**
+//	 * @var ibbCore
+//	 */
+//	public static	$core;
+//
+//	/**
+//	 * @var appCore
+//	 */
+//	public static	$handle;
+//
+//	/**
+//	 * It's not REALLY execute, it WAS execute earlier in development though, now it also verifies
+//	 * ...
+//	 * hence need for rewrite
+//	 *
+//	 * @param string $app
+//	 * @param string $request_type
+//	 *
+//	 * @throws Exception
+//	 */
+//	public static function Execute( $app, $request_type )
+//	{
+//		#################################################
+//		#################################################
+//		##### PLEASE DON'T LOOK AT THIS ABOMINATION #####
+//		#################################################
+//		#################################################
+//		self::$core = ibbCore::getInstance();
+//
+//		$MODULE = self::$core->request('mod');
+//		$AREA = self::$core->request('area');
+//
+//		if ( !$MODULE )
+//		{
+//			if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/defaultMod.php" )
+//			{
+//				throw new Exception( 'Could not find default module!' );
+//			}
+//		}
+//
+//		if ( !$AREA )
+//		{
+//			if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/$MODULE/defaultArea.php" )
+//			{
+//				throw new exception( 'Could not find default area!' );
+//			}
+//		}
+//
+//		if ( !include_once IBB_ROOT_PATH . "/app/$app/modules/$MODULE/$AREA.php" )
+//		{
+//			throw new Exception( 'Failed to load class!' );
+//		}
+//
+//		# ew
+//		self::$core->hotfixAddRequest('mod', $MODULE);
+//		self::$core->hotfixAddRequest('area', $AREA);
+//
+//		# safe from nasty attempts to load something the user SHOULDNT and that isn't protected
+//		# this line just looks dumb tbh, how to make it look more... professional?
+//		$bootup = $app . '_' . $MODULE . '_' . $AREA;
+//
+//		self::$handle = new $bootup;
+//
+//		/* Set path... */
+//		self::$core->output->setMasterTemplate( IBB_ROOT_PATH . '/app/'.$app.'/tpl/', 'default.xhtml');
+//
+//		if ($request_type == 'process' || $request_type == 'ajax')
+//		{
+//			self::$handle->process();
+//			if (self::$core->DB()->results['areadata']['onprocess_class'])
+//			{
+//				header('Location: ' . self::EvolutionizedExecution( self::$core->DB()->results['areadata']['onprocess_class'], 'init' ));
+//			}
+//
+//		}
+//		else
+//		{
+//			self::$handle->init();
+//		}
+//
+//		self::$core->output->goGoPowerRanger();
+//
+//	}
+//
+//	/**
+//	 * @param $class
+//	 *
+//	 * @return string
+//	 */
+//	public static function EvolutionizedExecution( $class )
+//	{
+//		list($app, $module, $area) = explode('_', $class);
+//
+//		# my dignity
+//		# please
+//		# don't look
+//		# want to keep my dignity
+//		# IT'S TEMPORARY BUT I NEED TO UPLOAD IT SORRY.
+//
+//		if (is_int(self::$core->request('action')))
+//		{
+//			self::$core->DB()->query('boardname', 'SELECT name FROM ibb_boards WHERE id='.self::$core->request('action'));
+//			self::$core->hotfixAddRequest('action', self::$core->DB()->results['boardname'][0]['name']);
+//		}
+//
+//		$subac = (self::$core->request('subaction') ? '&subaction='.self::$core->request('subaction') : '');
+//
+//		$url = 'app='.$app.'&mod='.$module.'&area='.$area.'&action='.self::$core->request('action') .
+//			$subac;
+//
+//		# class to turn a url into a furl here
+//		if (self::$core->DB()->results['areadata']['onprocess_class'] == 'boards_boardpage_view')
+//		{
+//			return 'index.php?/'.self::$core->request('action').'/'.
+//				(self::$core->request('subaction') ? self::$core->request('subaction') : '');
+//		}
+//		elseif (self::$core->DB()->results['areadata']['onprocess_class'] == 'main_front_view')
+//		{
+//			return 'index.php';
+//		}
+//		# temp
+//		return 'index.php?'.$url;
+//	}
+//
+//	/**
+//	 * Load class
+//	 *
+//	 * @param $class
+//	 *
+//	 * @throws Exception
+//	 */
+//	public static function loadAPI($class)
+//	{
+//		if (!is_file(IBB_ROOT_PATH . "/app/$class/api.php"))
+//			throw new Exception('Application API not found ' . IBB_ROOT_PATH . "/app/$class/api.php");
+//
+//		require_once IBB_ROOT_PATH . "/app/$class/api.php";
+//	}
+//}
 
 /**
  * Class output
@@ -625,6 +712,8 @@ class output {
 	 * @var array
 	 */
 	public $page;
+
+	public $js;
 
 
 	/**
@@ -742,6 +831,17 @@ class output {
 	}
 
 	/**
+	 * tmp TODO IMGBB
+	 *
+	 * @param $filename
+	 */
+	public function addJS($filename)
+	{
+		$this->vars['imgbb']['js'][] = $filename;
+		$this->js = TRUE;
+	}
+
+	/**
 	 * Mostly used to take stuff from app Main
 	 *
 	 * Add CSS to the head. It will look for it in the /css/ directory
@@ -808,6 +908,8 @@ class output {
 
 		/* Set up static variables. */
 		$this->vars['imgbb']['base_url'] 	= $this->core->settings('base_url');
+		$this->vars['imgbb']['core_url']	= $this->core->settings('core_url');
+		$this->vars['imgbb']['core_url_tr'] = $this->core->settings('core_url_tr');
 		$this->vars['imgbb']['this_app']	= $this->core->request('app');
 		$this->vars['imgbb']['page']		= $this->page;
 		$this->vars['imgbb']['macro']		= $this->macro;
@@ -948,17 +1050,36 @@ class User {
 		if ( $this->registered )
 		{
 			$this->db->query('names', '
-			SELECT	*
-			FROM	ibb_names
-			WHERE	userid = ' . $_SESSION['user_id']
+			SELECT		*
+			FROM		ibb_names
+			WHERE		userid	= ' . $_SESSION['user_id'] . '
+			UNION
+			SELECT		 null
+						,id
+						,display_name
+						,display_trip
+						,null
+			FROM		ibb_users
+			WHERE		id		= ' . $_SESSION['user_id']
 			);
 
+			/* Make each name accessible by its id from the database. Make sure to access $this->names */
+			/* and NOT the query result, because the query results has arbitrary keys to each name */
 			foreach ($this->db->results['names'] as $name)
 			{
-				/* Make each name accessible by its id from the database. Make sure to access $this->names */
-				/* and NOT the query result, because the query results has arbitrary keys to each name */
-				$this->names[$name['id']] = $name;
+				# 0 == primary name
+				if ($name === end($this->db->results['names']))
+				{
+					$name['id'] = 0;
+					$this->names[0] = $name;
+				}
+				else
+				{
+					$this->names[$name['id']] = $name;
+				}
 			}
+
+			ksort($this->names);
 
 			$this->display_name = $this->getData()['user_display_name'];
 			$this->display_trip = $this->getData()['user_display_trip'];
