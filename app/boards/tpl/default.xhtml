@@ -5,11 +5,15 @@
     <!--<link rel="stylesheet" href="/imgbb/app/img_global.css"/>-->
     <!--<link rel="stylesheet" href="/imgbb/app/colgate.css" id="userstylelink"/>-->
     <link rel='shortcut icon' type='image/x-icon' href='${imgbb/base_url}/favicon.ico' />
-    <span tal:omit-tag="" tal:repeat="each_css imgbb/css">
+    <tal:block tal:repeat="each_css imgbb/css" tal:condition="exists: imgbb/css">
         <link tal:condition="php: !is_array(each_css) AND strlen(each_css) > 1" rel="stylesheet" href="${imgbb/base_url}/app/${imgbb/this_app}/tpl/css/${each_css}.css" />
         <link tal:condition="php: is_array(each_css)" rel="stylesheet" href="${imgbb/base_url}/app/${each_css/app}/tpl/css/${each_css/filename}" />
-    </span>
-    <link rel="stylesheet" tal:attributes="href string: ${imgbb/base_url}/app/main/tpl/css/menu.css" />
+    </tal:block>
+    <tal:block tal:repeat="each_js imgbb/js" tal:condition="exists: imgbb/js">
+        <script tal:condition="php: !is_array(each_js) AND strlen(each_js) > 1" type="text/javascript" src="${imgbb/base_url}/app/${imgbb/this_app}/tpl/js/${each_js}.js"></script>
+        <script tal:condition="php: is_array(each_js)" type="text/javascript" src="${imgbb/base_url}/app/${each_js/app}/tpl/js/${each_js/js}"></script>
+    </tal:block>
+    <!--<link rel="stylesheet" tal:attributes="href string: ${imgbb/base_url}/app/main/tpl/css/menu.css" />-->
     <title tal:content="imgbb/title">imgBB</title>
 </head>
 <body>
