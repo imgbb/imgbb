@@ -1,3 +1,7 @@
+
+.frontwrap{
+   margin-top:40px;
+}
 html{
 	background: #e6e6ed;
 	color: #29292d;
@@ -58,6 +62,7 @@ hr {
 }
 .datetime{
 	font-style: italic;
+    font-size: 0.8em;
 }
 .postnumber{
 }
